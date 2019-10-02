@@ -7,13 +7,13 @@ import * as Particles from 'particlesjs';
   styleUrls: ['./app.component.sass']
 })
 export class AppComponent implements OnInit {
-  title = 'StarbreakersNet-Website';
+  title = 'StarbreakersNet';
   ngOnInit() {
     Particles.init({
       selector: '.constructionBackground',
       maxParticles: 150,
       sizeVariations: 3,
-      speed: 0.5,
+      speed: 0.3,
       color: ['#FAED4F', '#8D1C1A'],
       minDistance: 120,
       connectParticles: true,
