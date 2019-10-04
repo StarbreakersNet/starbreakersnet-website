@@ -14,21 +14,15 @@ export class SliderComponent implements OnInit {
     jQuery(document).ready(($) => {
       const slidesWrapper = $('.cd-hero-slider');
       if (slidesWrapper.length > 0) {
-        var primaryNav = $('.cd-primary-nav');
-        var sliderNav = $('.cd-slider-nav');
+        var sliderNav = $('.ui.menu');
         var navigationMarker = $('.cd-marker');
         var slidesNumber = slidesWrapper.children('li').length;
-        var autoPlayId = 100000;
-        var autoPlayDelay = 100000;
+        var autoPlayId = 10000;
+        var autoPlayDelay = 10000;
         var visibleSlidePosition = 0;
         uploadVideo(slidesWrapper);
         setAutoplay(slidesWrapper, slidesNumber, autoPlayDelay);
-        primaryNav.on('click', function(event) {
-          if ($(event.target).is('.cd-primary-nav')) {
-            $(this).children('ul').toggleClass('is-visible');
-          }
-        });
-        sliderNav.on('click', 'li', function(event) {
+        sliderNav.on('click', 'a', function(event) {
           event.preventDefault();
           const selectedItem = $(this);
           if (!selectedItem.hasClass('selected')) {
@@ -75,7 +69,7 @@ export class SliderComponent implements OnInit {
       function updateSliderNavigation(pagination, n) {
         const navigationDot = pagination.find('.selected');
         navigationDot.removeClass('selected');
-        pagination.find('li').eq(n).addClass('selected');
+        pagination.find('a').eq(n).addClass('selected');
       }
 
       function setAutoplay(wrapper, length, delay) {
