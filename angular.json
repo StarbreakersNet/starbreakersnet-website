@@ -28,10 +28,13 @@
               "src/assets"
             ],
             "styles": [
+              "semantic/dist/semantic.min.css",
               "src/styles.sass"
             ],
             "scripts": [
-              "node_modules/particlesjs/dist/particles.min.js"
+              "node_modules/particlesjs/dist/particles.min.js",
+              "node_modules/jquery/dist/jquery.min.js",
+              "semantic/dist/semantic.min.js"
             ]
           },
           "configurations": {
