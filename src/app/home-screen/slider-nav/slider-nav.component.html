@@ -1,23 +1,10 @@
 <div class="ui centered grid">
   <div class="nav-container">
     <div class="ui fluid borderless menu">
-      <div class="item selected">
-        <a class="ui fluid button">Accueil</a>
-      </div>
-      <div class="item">
-        <a class="ui fluid button">Heroes of the Storm</a>
-      </div>
-      <div class="item">
-        <a class="ui fluid button">World of Warcraft</a>
-      </div>
-      <div class="item">
-        <a class="ui fluid button">League of Legends</a>
-      </div>
-      <div class="item">
-        <a class="ui fluid button">Grand Theft Auto 5</a>
-      </div>
-      <div class="item">
-        <a class="ui fluid button">Counter Strike: GO</a>
+      <div class="item" *ngFor="let element of elements; let i = index; first as isFirst" [class.selected]="isFirst">
+        <a class="ui fluid button" [ngStyle]="{'background-color': element.color}">
+          <img class="ui image" src="{{element.src}}">
+        </a>
       </div>
     </div>
   </div>

@@ -1,3 +1,5 @@
+$easeInOutBack: 0.68, -0.55, 0.265, 1.55
+
 .nav-container
   width: 100%
   position: absolute
@@ -6,7 +8,22 @@
 .ui.fluid.menu
   display: flex
   justify-content: center
+  height: 7vw
+  transition: all ease-in-out 0.3s
 
 .ui.button
   height: 5vw
   width: 5vw
+  transition: all cubic-bezier($easeInOutBack) 0.3s
+
+.ui.button
+  padding: 15px !important
+
+.ui.button i
+  height: auto
+  width: 90%
+
+.item.selected .button
+  height: 6vw
+  width: 6vw
+
