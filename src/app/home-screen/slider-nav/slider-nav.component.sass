@@ -3,13 +3,21 @@ $easeInOutBack: 0.68, -0.55, 0.265, 1.55
 .nav-container
   width: 100%
   position: absolute
-  bottom: 0
+  bottom: 2vh
 
 .ui.fluid.menu
   display: flex
   justify-content: center
-  height: 7vw
+  height: 9vw
   transition: all ease-in-out 0.3s
+  background-color: rgba(255,255,255,0.3)
+  backdrop-filter: blur(50px)
+
+// Retrait de la bordure et shadow de Fomantic-UI pour qu'elle ne soit pas visible sur l'effet backdrop-filter
+.ui.menu
+  border: 0
+  border-radius: 2vw
+  box-shadow: none
 
 .ui.button
   height: 5vw
@@ -18,6 +26,7 @@ $easeInOutBack: 0.68, -0.55, 0.265, 1.55
 
 .ui.button
   padding: 15px !important
+  border-radius: 22.37%
 
 .ui.button i
   height: auto
