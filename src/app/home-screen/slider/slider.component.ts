@@ -13,6 +13,8 @@ export class SliderComponent implements OnInit {
   ngOnInit() {
     jQuery(document).ready(($) => {
       const slidesWrapper = $('.cd-hero-slider');
+      const targetNavContainer = 'div';
+      const targetNavElement = 'a';
       if (slidesWrapper.length > 0) {
         var sliderNav = $('.ui.menu');
         var navigationMarker = $('.cd-marker');
@@ -22,9 +24,10 @@ export class SliderComponent implements OnInit {
         var visibleSlidePosition = 0;
         uploadVideo(slidesWrapper);
         setAutoplay(slidesWrapper, slidesNumber, autoPlayDelay);
-        sliderNav.on('click', 'a', function(event) {
+        sliderNav.children().on('click', targetNavElement, function(event) {
+          console.log($(this).parent());
           event.preventDefault();
-          const selectedItem = $(this);
+          const selectedItem = $(this).parent();
           if (!selectedItem.hasClass('selected')) {
             const selectedPosition = selectedItem.index();
             const activePosition = slidesWrapper.find('li.selected').index();
@@ -69,7 +72,7 @@ export class SliderComponent implements OnInit {
       function updateSliderNavigation(pagination, n) {
         const navigationDot = pagination.find('.selected');
         navigationDot.removeClass('selected');
-        pagination.find('a').eq(n).addClass('selected');
+        pagination.find(targetNavContainer).eq(n).addClass('selected');
       }
 
       function setAutoplay(wrapper, length, delay) {
@@ -121,14 +124,14 @@ export class SliderComponent implements OnInit {
       }
 
       function updateNavigationMarker(marker, n) {
-        marker.removeClassPrefix('item').addClass('item-' + n);
+        marker.removeClassPrefix('item').addClass('item item-' + n);
       }
       $.fn.removeClassPrefix = function(prefix) {
         this.each((i, el) => {
-          const classes = el.className.split(' ').filter((c) => {
+          var classes = el.className.split(' ').filter((c) => {
             return c.lastIndexOf(prefix, 0) !== 0;
           });
-          el.className = $.trim();
+          el.className = $.trim(classes.join(' '));
         });
         return this;
       };
