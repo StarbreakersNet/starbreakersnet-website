@@ -19,7 +19,7 @@ export class SliderComponent implements OnInit {
       color: '#8D1C1A',
       content: {
         img: '/assets/images/logo.png',
-        title: 'La Team dont vous êtes le jouer',
+        title: 'La Team dont vous êtes le joueur',
         text: 'Une grande famille ouverte à tous, surtout aux plus marrant',
         btn: [
           {
@@ -179,8 +179,8 @@ export class SliderComponent implements OnInit {
         var sliderNav = $('.ui.menu');
         var navigationMarker = $('.cd-marker');
         var slidesNumber = slidesWrapper.children('li').length;
-        var autoPlayId = 10000;
-        var autoPlayDelay = 10000;
+        var autoPlayId = 100000;
+        var autoPlayDelay = 100000;
         var visibleSlidePosition = 0;
         uploadVideo(slidesWrapper);
         setAutoplay(slidesWrapper, slidesNumber, autoPlayDelay);
