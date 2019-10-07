@@ -8,6 +8,163 @@ import * as jQuery from 'jquery';
 })
 export class SliderComponent implements OnInit {
 
+  elements: [
+    {
+      type: 'cd-full-width',
+      name: 'Accueil',
+      src: {
+        slider: '/assets/images/slider/bg_strb.png',
+        icon: '/assets/icons/icon_strb_active.png',
+      },
+      color: '#8D1C1A',
+      content: {
+        img: '/assets/images/logo.png',
+        title: 'La Team dont vous êtes le jouer',
+        text: 'Une grande famille ouverte à tous, surtout aux plus marrant',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Devenir Membre',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'En savoir plus',
+            link: '#0?about'
+          }
+        ]
+      }
+    },
+    {
+      type: 'cd-half-width',
+      name: 'HOTS',
+      src: {
+        slider: '/assets/images/slider/bg_heroes.png',
+        img: '/assets/images/char/char_heroes_kael.png',
+        video: '/assets/videos/heroes_trailer.webm',
+        icon: '/assets/icons/icon_heroes_active.png',
+      },
+      color: '#8D1C1A',
+      content: {
+        title: 'Heroes of the Storm',
+        text: 'Les héros légendaires de Warcraft, StarCraft et Diablo sont téléportés dans le Nexus. Choisissez votre héros et battez-vous dans Heroes of the Storm !',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre l\'Équipe',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'Contacter nos Leader',
+            link: '#0?contact'
+          }
+        ]
+      }
+    },
+    {
+      type: 'cd-full-width',
+      name: 'Wow',
+      src: {
+        slider: '/assets/images/slider/bg_wow.png',
+        video: '/assets/videos/wow_animated.webm',
+        icon: '/assets/icons/icon_wow_active.png',
+      },
+      color: '#8D1C1A',
+      content: {
+        title: 'World of Warcraft',
+        text: 'Champions d\'Azeroth ! Unissons nos forces pour vaincre ensembles les forces démoniaques de Sargeras et sa légion ardente !',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre la Guilde',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'Contacter nos Officiers',
+            link: '#0?contact'
+          }
+        ]
+      }
+    },
+    {
+      type: 'cd-full-width',
+      name: 'Lol',
+      src: {
+        slider: '/assets/images/slider/bg_lol.png',
+        video: '/assets/videos/lol_trailer.webm',
+        icon: '/assets/icons/icon_lol_active.png',
+      },
+      color: '#8D1C1A',
+      content: {
+        title: 'League of Legends',
+        text: 'Casser des culs c\'est bien, mais avec des amis c\'est mieux !',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre la Team',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'Contacter nos Leader',
+            link: '#0?contact'
+          }
+        ]
+      }
+    },
+    {
+      type: 'cd-half-width',
+      name: 'GTA V',
+      src: {
+        slider: '/assets/images/slider/bg_gtav.png',
+        img: '/assets/images/char/char_gtav.png',
+        video: '/assets/videos/gtav_trailer.webm',
+        icon: '/assets/icons/icon_gtav_active.png',
+      },
+      color: '#8D1C1A',
+      content: {
+        title: 'Grand Theft Auto V',
+        text: 'Braquages, Courses, Fusillades, bref venez vous éclater en Crew !',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre le Crew',
+            link: '#0?register'
+          }
+        ]
+      }
+    },
+    {
+      type: 'cd-half-width',
+      name: 'CS:GO',
+      src: {
+        slider: '/assets/images/slider/bg_csgo.png',
+        img: '/assets/images/char/char_csgo.png',
+        video: '/assets/videos/csgo_trailer.webm',
+        icon: '/assets/icons/icon_csgo_active.png',
+      },
+      color: '#8D1C1A',
+      content: {
+        title: 'Counter Strike: GO',
+        text: 'Tactique et précision sont maîtres mots. Compétition pour but et amusement pour rêgle, les StarBreakers vous attendent sur le champ de tir !',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre l\'escouade',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'Contacter nos Chefs d\'escouades',
+            link: '#0?contact'
+          }
+        ]
+      }
+    },
+  ];
+
   constructor() { }
 
   ngOnInit() {
