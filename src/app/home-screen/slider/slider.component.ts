@@ -8,7 +8,7 @@ import * as jQuery from 'jquery';
 })
 export class SliderComponent implements OnInit {
 
-  elements: [
+  elements = [
     {
       type: 'cd-full-width',
       name: 'Accueil',
@@ -37,6 +37,7 @@ export class SliderComponent implements OnInit {
     },
     {
       type: 'cd-half-width',
+      orientation: 'left',
       name: 'HOTS',
       src: {
         slider: '/assets/images/slider/bg_heroes.png',
@@ -116,6 +117,7 @@ export class SliderComponent implements OnInit {
     },
     {
       type: 'cd-half-width',
+      orientation: 'right',
       name: 'GTA V',
       src: {
         slider: '/assets/images/slider/bg_gtav.png',
@@ -138,6 +140,7 @@ export class SliderComponent implements OnInit {
     },
     {
       type: 'cd-half-width',
+      orientation: 'right',
       name: 'CS:GO',
       src: {
         slider: '/assets/images/slider/bg_csgo.png',

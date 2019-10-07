@@ -1,85 +1,105 @@
 <ul class="cd-hero-slider autoplay">
-  <li class="selected">
-    <div class="cd-full-width">
-      <img style="width: 25vw; height: auto" id="logo-strb" src="/assets/images/logo.png" />
-      <h2>La Team dont <strong>vous</strong> êtes le joueur</h2>
-      <p>Une grande famille ouverte à tous, surtout aux plus marrant</p>
-      <a href="http://starbreakersgaming.com/forum/member.php?action=register" class="cd-btn">Devenir membre</a>
-      <a href="#" class="cd-btn cd-next secondary">En savoir plus</a>
+  <li *ngFor="let element of elements; first as isFirst" [class.selected]="isFirst">
+    <div *ngIf="element.src.img && element.orientation == 'left'" class="{{element.type}} cd-img-container">
+      <img src="{{element.src.img}}" alt="{{element.name}} slider image">
     </div>
-  </li>
-  <li>
-    <div class="cd-half-width cd-img-container">
-      <img src="/assets/images/char/char_heroes_kael.png" style="right: 16em" alt="Kael'Thas" />
+    <div class="{{element.type}}">
+      <img *ngIf="element.content.img" style="width: 25vw; height: auto" src="{{element.content.img}}">
+      <h2 *ngIf="element.content.title">{{element.content.title}}</h2>
+      <p *ngIf="element.content.text">{{element.content.text}}</p>
+      <a *ngFor="let btn of element.content.btn" class="cd-btn {{btn.type}}" href="{{btn.link}}">{{btn.title}}</a>
     </div>
-    <div class="cd-half-width">
-      <h2>Heroes of the Storm</h2>
-      <p>Les héros légendaires de Warcraft, StarCraft et Diablo sont téléportés dans le Nexus. Choisissez votre héros et battez-vous dans Heroes of the Storm !</p>
-      <a href="#" class="cd-btn">Rejoindre l'équipe</a>
-      <a href="#" class="cd-btn secondary">Contacter nos Leader</a>
+    <div *ngIf="element.src.img && element.orientation == 'right'" class="{{element.type}} cd-img-container">
+      <img src="{{element.src.img}}" alt="{{element.name}} slider image">
     </div>
-    <div class="cd-bg-video-wrapper">
-      <video widh="100%" autoplay="" loop="">
-        <source src="/assets/videos/heroes_trailer.webm" type="video/webm" />
-      </video>
-    </div>
-  </li>
-  <li>
-    <div class="cd-half-width">
-      <h2>World of Warcraft</h2>
-      <p>Champions d'Azeroth ! Unissons nos forces pour vaincre ensembles les forces démoniaques de Sargeras et sa légion ardente !</p>
-      <a href="#" class="cd-btn">Rejoindre la Guilde</a>
-      <a href="#" class="cd-btn secondary">Contacter nos Officiers</a>
-    </div>
-    <div class="cd-bg-video-wrapper">
-      <video widh="100%" autoplay="" loop="">
-        <source src="/assets/videos/wow_animated.webm" type="video/webm" />
-      </video>
-    </div>
-  </li>
-  <li>
-    <div class="cd-full-width">
-      <h2>League of Legends</h2>
-      <p>Casser des culs c'est bien, mais avec des amis c'est mieux !</p>
-      <a href="#" class="cd-btn">Rejoindre la Team</a>
-      <a href="#" class="cd-btn secondary">Contacter nos Leader</a>
-    </div>
-    <div class="cd-bg-video-wrapper">
-      <video widh="100%" autoplay="" loop="">
-        <source src="/assets/videos/lol_trailer.webm" type="video/webm" />
-      </video>
-    </div>
-  </li>
-  <li>
-    <div class="cd-half-width">
-      <h2>Grand Theft Auto 5</h2>
-      <p>Braquages, Courses, Fusillades, bref venez vous éclater en Crew !</p>
-      <a href="https://fr.socialclub.rockstargames.com/crew/the_starbreakers" class="cd-btn">Rejoindre le Crew</a>
-    </div>
-    <div class="cd-half-width cd-img-container">
-      <img src="/assets/images/char/char_gtav.png" alt="GTA V" />
-    </div>
-    <div class="cd-bg-video-wrapper">
-      <video width="100%" autoplay="" loop="">
-        <source src="/assets/videos/gtav_trailer.webm" type="video/webm" />
-      </video>
-    </div>
-  </li>
-  <li>
-    <div class="cd-half-width">
-      <h2>Counter Strike : Global Offensive</h2>
-      <p>Tactique et précision sont maîtres mots. Compétition pour but et amusement pour rêgle, les StarBreakers vous attendent sur le champ de tir !</p>
-      <a href="#" class="cd-btn">Rejoindre l'escouade</a>
-      <a href="#" class="cd-btn secondary">Contacter nos Chefs d'escouades</a>
-    </div>
-    <div class="cd-half-width cd-img-container">
-      <img src="/assets/images/char/char_csgo.png" alt="CS:GO" />
-    </div>
-    <div class="cd-bg-video-wrapper">
-      <video width="100%" autoplay="" loop="">
-        <source src="/assets/videos/csgo_trailer.webm" type="video/webm" />
+    <div *ngIf="element.src.video" class="cd-bg-video-wrapper">
+      <video autoplay loop>
+        <source src="{{element.src.video}}">
       </video>
     </div>
   </li>
 </ul>
+
+<li class="selected">
+  <div class="cd-full-width">
+    <img style="width: 25vw; height: auto" id="logo-strb" src="/assets/images/logo.png" />
+    <h2>La Team dont <strong>vous</strong> êtes le joueur</h2>
+    <p>Une grande famille ouverte à tous, surtout aux plus marrant</p>
+    <a href="http://starbreakersgaming.com/forum/member.php?action=register" class="cd-btn">Devenir membre</a>
+    <a href="#" class="cd-btn cd-next secondary">En savoir plus</a>
+  </div>
+</li>
+<li>
+  <div class="cd-half-width cd-img-container">
+    <img src="/assets/images/char/char_heroes_kael.png" style="right: 16em" alt="Kael'Thas" />
+  </div>
+  <div class="cd-half-width">
+    <h2>Heroes of the Storm</h2>
+    <p>Les héros légendaires de Warcraft, StarCraft et Diablo sont téléportés dans le Nexus. Choisissez votre héros et battez-vous dans Heroes of the Storm !</p>
+    <a href="#" class="cd-btn">Rejoindre l'équipe</a>
+    <a href="#" class="cd-btn secondary">Contacter nos Leader</a>
+  </div>
+  <div class="cd-bg-video-wrapper">
+    <video widh="100%" autoplay="" loop="">
+      <source src="/assets/videos/heroes_trailer.webm" type="video/webm" />
+    </video>
+  </div>
+</li>
+<li>
+  <div class="cd-half-width">
+    <h2>World of Warcraft</h2>
+    <p>Champions d'Azeroth ! Unissons nos forces pour vaincre ensembles les forces démoniaques de Sargeras et sa légion ardente !</p>
+    <a href="#" class="cd-btn">Rejoindre la Guilde</a>
+    <a href="#" class="cd-btn secondary">Contacter nos Officiers</a>
+  </div>
+  <div class="cd-bg-video-wrapper">
+    <video widh="100%" autoplay="" loop="">
+      <source src="/assets/videos/wow_animated.webm" type="video/webm" />
+    </video>
+  </div>
+</li>
+<li>
+  <div class="cd-full-width">
+    <h2>League of Legends</h2>
+    <p>Casser des culs c'est bien, mais avec des amis c'est mieux !</p>
+    <a href="#" class="cd-btn">Rejoindre la Team</a>
+    <a href="#" class="cd-btn secondary">Contacter nos Leader</a>
+  </div>
+  <div class="cd-bg-video-wrapper">
+    <video widh="100%" autoplay="" loop="">
+      <source src="/assets/videos/lol_trailer.webm" type="video/webm" />
+    </video>
+  </div>
+</li>
+<li>
+  <div class="cd-half-width">
+    <h2>Grand Theft Auto 5</h2>
+    <p>Braquages, Courses, Fusillades, bref venez vous éclater en Crew !</p>
+    <a href="https://fr.socialclub.rockstargames.com/crew/the_starbreakers" class="cd-btn">Rejoindre le Crew</a>
+  </div>
+  <div class="cd-half-width cd-img-container">
+    <img src="/assets/images/char/char_gtav.png" alt="GTA V" />
+  </div>
+  <div class="cd-bg-video-wrapper">
+    <video width="100%" autoplay="" loop="">
+      <source src="/assets/videos/gtav_trailer.webm" type="video/webm" />
+    </video>
+  </div>
+</li>
+<li>
+  <div class="cd-half-width">
+    <h2>Counter Strike : Global Offensive</h2>
+    <p>Tactique et précision sont maîtres mots. Compétition pour but et amusement pour rêgle, les StarBreakers vous attendent sur le champ de tir !</p>
+    <a href="#" class="cd-btn">Rejoindre l'escouade</a>
+    <a href="#" class="cd-btn secondary">Contacter nos Chefs d'escouades</a>
+  </div>
+  <div class="cd-half-width cd-img-container">
+    <img src="/assets/images/char/char_csgo.png" alt="CS:GO" />
+  </div>
+  <div class="cd-bg-video-wrapper">
+    <video width="100%" autoplay="" loop="">
+      <source src="/assets/videos/csgo_trailer.webm" type="video/webm" />
+    </video>
+  </div>
+</li>
 <app-slider-nav></app-slider-nav>
