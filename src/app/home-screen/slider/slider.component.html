@@ -18,7 +18,7 @@
         <p *ngIf="element.content.text">{{element.content.text}}</p>
         <div>
           <a *ngFor="let btn of element.content.btn"
-             class="cd-btn {{btn.type}}"
+             class="ui {{btn.type}} button"
              href="{{btn.link}}">{{btn.title}}</a>
         </div>
       </div>

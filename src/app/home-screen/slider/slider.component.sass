@@ -149,36 +149,28 @@ table
     font-size: 1.8vmin
     line-height: 1.4
 
-  .cd-btn-container-left
-    text-align: left
-
-  .cd-btn
-    display: inline-block
+  .ui.button
+    position: relative
+    overflow: hidden
     padding: 1.2em 1.4em
     margin-top: .8em
-    margin-right: 1em
-    background-color: rgba(205, 4, 21, 0.9)
+    margin-left: 0
+    margin-right: 0
     font-size: 1.8vmin
-    font-weight: 500
-    letter-spacing: 1px
     color: white
     text-transform: uppercase
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1)
     transition: background-color 0.2s
-    text-shadow: none
 
-    &.secondary
-      background-color: rgba(22, 26, 30, 0.8)
-
-    &:hover
-      background-color: #9b0310
+    &:not(:last-child)
+      margin-right: 1em
 
     &:before
       content: ""
       position: absolute
       z-index: -1
-      left: 50%
-      right: 50%
+      left: 51%
+      right: 51%
       bottom: 0
       background: #CD0415
       height: 10%
@@ -186,21 +178,10 @@ table
       transition-duration: 0.3s
       transition-timing-function: ease-out
 
-    &:hover:before
-      left: 0
-      right: 0
-
-  &:focus:before
-    left: 0
-    right: 0
-
-  .cd-btn
-    &:active:before
-      left: 0
-      right: 0
-
-    &.secondary:hover
-      background-color: #161a1e
+    &:hover, &:focus, &:active
+      &:before
+        left: 0
+        right: 0
 
   li
     &:nth-of-type(1)
@@ -245,46 +226,46 @@ table
     display: block
 
   .cd-half-width
-    h2, p, img, .cd-btn
+    h2, p, img, .ui.button
       opacity: 0
       transform: translateX(100px)
 
   .move-left .cd-half-width
-    h2, p, img, .cd-btn
+    h2, p, img, .ui.button
       opacity: 0
       transform: translateX(-100px)
 
   .selected .cd-half-width
-    h2, p, img, .cd-btn
+    h2, p, img, .ui.button
       /* this is the visible slide
       opacity: 1
       transform: translateX(0)
 
   li.is-moving .cd-half-width
-    h2, p, img, .cd-btn
+    h2, p, img, .ui.button
       /*      this is the slide moving outside the viewport
        * wait for the end of the transition on the li parent before set opacity to 0 and translate to 100px/-100px
       transition: opacity 0s 0.5s, transform 0s 0.5s
 
   .cd-full-width
-    h2, p, img, .cd-btn
+    h2, p, img, .ui.button
       opacity: 0
       transform: translateX(100px)
 
   .move-left .cd-full-width
-    h2, p, img, .cd-btn
+    h2, p, img, .ui.button
       opacity: 0
       transform: translateX(-100px)
 
   .selected .cd-full-width
-    h2, p, img, .cd-btn
+    h2, p, img, .ui.button
       /* this is the visible slide
       opacity: 1
       transform: translateX(0)
 
   li
     &.is-moving .cd-full-width
-      h2, p, img, .cd-btn
+      h2, p, img, .ui.button
         /*      this is the slide moving outside the viewport
          * wait for the end of the transition on the li parent before set opacity to 0 and translate to 100px/-100px
         transition: opacity 0s 0.5s, transform 0s 0.5s
@@ -296,7 +277,7 @@ table
       p
         transition: opacity 0.4s 0.3s, transform 0.5s 0.3s
 
-      .cd-btn
+      .ui.button
         transition: opacity 0.4s 0.4s, transform 0.5s 0.4s, background-color 0.2s 0s
 
       img
