@@ -74,17 +74,43 @@ table
     backface-visibility: hidden
     transform: translateZ(0)
 
+  .cd-half-width.content
+    display: flex
+    flex-direction: column
+
+    &.left
+      align-items: flex-start
+      align-self: flex-start
+      text-align: left
+
+    &.right
+      align-items: flex-end
+      align-self: flex-end
+      justify-self: flex-end
+      text-align: right
+
   .cd-img-container
     display: flex
-    justify-content: flex-end
+    position: absolute
     height: 100%
     z-index: 1
+    margin-left: auto
+    margin-right: 0
+    padding-left: 0
+    padding-right: 0
 
     img
       position: absolute
-      bottom: -35px
-      height: 80vmin
+      bottom: -100px
+      height: 85vmin
       width: auto
+      max-height: 90vh
+
+    &.left
+      justify-content: flex-start
+
+    &.right
+      justify-content: flex-end
 
   .cd-bg-video-wrapper
     display: none
@@ -212,8 +238,8 @@ table
     padding-top: 15vh
     text-align: left
 
-    &.content
-      max-width: 1100px
+  .cd-half-width-container
+    max-width: 800px
 
   .cd-bg-video-wrapper
     display: block
