@@ -128,14 +128,14 @@
 -------------- */
 
 .primary.toast {
-  background-color: #2185D0;
+  background-color: #CD0415;
 }
 .inverted.primary.toast,
 .toast-box .inverted.primary.attached.progress .bar {
   background-color: #54C8FF;
 }
 .secondary.toast {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
 }
 .inverted.secondary.toast,
 .toast-box .inverted.secondary.attached.progress .bar {

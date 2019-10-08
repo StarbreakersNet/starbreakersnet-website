@@ -670,16 +670,16 @@
 --------------------*/
 
 .ui.primary.table {
-  border-top: 0.2em solid #2185D0;
+  border-top: 0.2em solid #CD0415;
 }
 .ui.inverted.primary.table {
-  background-color: #2185D0;
+  background-color: #CD0415;
   color: #FFFFFF;
 }
 .ui.ui.ui.ui.table tr.primary,
 .ui.ui.table td.primary {
-  -webkit-box-shadow: 0 0 0 #1a69a4 inset;
-          box-shadow: 0 0 0 #1a69a4 inset;
+  -webkit-box-shadow: 0 0 0 #9b0310 inset;
+          box-shadow: 0 0 0 #9b0310 inset;
   background: #ddf4ff;
   color: rgba(255, 255, 255, 0.9);
 }
@@ -690,16 +690,16 @@
   color: rgba(255, 255, 255, 0.9);
 }
 .ui.secondary.table {
-  border-top: 0.2em solid #1B1C1D;
+  border-top: 0.2em solid #161A1E;
 }
 .ui.inverted.secondary.table {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
   color: #FFFFFF;
 }
 .ui.ui.ui.ui.table tr.secondary,
 .ui.ui.table td.secondary {
-  -webkit-box-shadow: 0 0 0 #020203 inset;
-          box-shadow: 0 0 0 #020203 inset;
+  -webkit-box-shadow: 0 0 0 #000001 inset;
+          box-shadow: 0 0 0 #000001 inset;
   background: #dddddd;
   color: rgba(255, 255, 255, 0.9);
 }

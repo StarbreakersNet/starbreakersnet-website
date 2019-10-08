@@ -555,7 +555,7 @@
 }
 .ui.toggle.checkbox input:checked ~ .box:before,
 .ui.toggle.checkbox input:checked ~ label:before {
-  background-color: #2185D0 !important;
+  background-color: #CD0415 !important;
 }
 .ui.toggle.checkbox input:checked ~ .box:after,
 .ui.toggle.checkbox input:checked ~ label:after {
@@ -571,7 +571,7 @@
 }
 .ui.toggle.checkbox input:focus:checked ~ .box:before,
 .ui.toggle.checkbox input:focus:checked ~ label:before {
-  background-color: #0d71bb !important;
+  background-color: #a8000e !important;
 }
 
 
@@ -670,7 +670,7 @@
 }
 .ui.inverted.toggle.checkbox input:checked ~ .box:before,
 .ui.inverted.toggle.checkbox input:checked ~ label:before {
-  background-color: #2185D0 !important;
+  background-color: #CD0415 !important;
 }
 
 /* Toggle Active Focus */
@@ -680,7 +680,7 @@
 }
 .ui.inverted.toggle.checkbox input:focus:checked ~ .box:before,
 .ui.inverted.toggle.checkbox input:focus:checked ~ label:before {
-  background-color: #0d71bb !important;
+  background-color: #a8000e !important;
 }
 
 /*--------------------

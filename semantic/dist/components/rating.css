@@ -80,21 +80,21 @@
 
 .ui.primary.rating .active.icon {
   color: #54C8FF;
-  text-shadow: 0px -1px 0px #2185D0, -1px 0px 0px #2185D0, 0px 1px 0px #2185D0, 1px 0px 0px #2185D0;
+  text-shadow: 0px -1px 0px #CD0415, -1px 0px 0px #CD0415, 0px 1px 0px #CD0415, 1px 0px 0px #CD0415;
 }
 .ui.primary.rating .icon.selected,
 .ui.primary.rating .icon.selected.active {
   color: #21b8ff;
-  text-shadow: 0px -1px 0px #1678c2, -1px 0px 0px #1678c2, 0px 1px 0px #1678c2, 1px 0px 0px #1678c2;
+  text-shadow: 0px -1px 0px #b80010, -1px 0px 0px #b80010, 0px 1px 0px #b80010, 1px 0px 0px #b80010;
 }
 .ui.secondary.rating .active.icon {
   color: #545454;
-  text-shadow: 0px -1px 0px #1B1C1D, -1px 0px 0px #1B1C1D, 0px 1px 0px #1B1C1D, 1px 0px 0px #1B1C1D;
+  text-shadow: 0px -1px 0px #161A1E, -1px 0px 0px #161A1E, 0px 1px 0px #161A1E, 1px 0px 0px #161A1E;
 }
 .ui.secondary.rating .icon.selected,
 .ui.secondary.rating .icon.selected.active {
   color: #6e6e6e;
-  text-shadow: 0px -1px 0px #27292a, -1px 0px 0px #27292a, 0px 1px 0px #27292a, 1px 0px 0px #27292a;
+  text-shadow: 0px -1px 0px #20272d, -1px 0px 0px #20272d, 0px 1px 0px #20272d, 1px 0px 0px #20272d;
 }
 .ui.red.rating .active.icon {
   color: #FF695E;

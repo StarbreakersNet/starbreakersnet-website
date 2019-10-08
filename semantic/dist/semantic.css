@@ -2203,7 +2203,7 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
 
 .ui.primary.buttons .button,
 .ui.primary.button {
-  background-color: #2185D0;
+  background-color: #CD0415;
   color: #FFFFFF;
   text-shadow: none;
   background-image: none;
@@ -2216,21 +2216,21 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
 
 .ui.primary.buttons .button:hover,
 .ui.primary.button:hover {
-  background-color: #1678c2;
+  background-color: #b80010;
   color: #FFFFFF;
   text-shadow: none;
 }
 
 .ui.primary.buttons .button:focus,
 .ui.primary.button:focus {
-  background-color: #0d71bb;
+  background-color: #a8000e;
   color: #FFFFFF;
   text-shadow: none;
 }
 
 .ui.primary.buttons .button:active,
 .ui.primary.button:active {
-  background-color: #1a69a4;
+  background-color: #9b0310;
   color: #FFFFFF;
   text-shadow: none;
 }
@@ -2239,7 +2239,7 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
 .ui.primary.buttons .active.button:active,
 .ui.primary.active.button,
 .ui.primary.button .active.button:active {
-  background-color: #1279c6;
+  background-color: #b80010;
   color: #FFFFFF;
   text-shadow: none;
 }
@@ -2249,40 +2249,40 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
 .ui.basic.primary.buttons .button,
 .ui.basic.primary.button {
   background: transparent;
-  -webkit-box-shadow: 0 0 0 1px #2185D0 inset;
-  box-shadow: 0 0 0 1px #2185D0 inset;
-  color: #2185D0;
+  -webkit-box-shadow: 0 0 0 1px #CD0415 inset;
+  box-shadow: 0 0 0 1px #CD0415 inset;
+  color: #CD0415;
 }
 
 .ui.basic.primary.buttons .button:hover,
 .ui.basic.primary.button:hover {
   background: transparent;
-  -webkit-box-shadow: 0 0 0 1px #1678c2 inset;
-  box-shadow: 0 0 0 1px #1678c2 inset;
-  color: #1678c2;
+  -webkit-box-shadow: 0 0 0 1px #b80010 inset;
+  box-shadow: 0 0 0 1px #b80010 inset;
+  color: #b80010;
 }
 
 .ui.basic.primary.buttons .button:focus,
 .ui.basic.primary.button:focus {
   background: transparent;
-  -webkit-box-shadow: 0 0 0 1px #0d71bb inset;
-  box-shadow: 0 0 0 1px #0d71bb inset;
-  color: #1678c2;
+  -webkit-box-shadow: 0 0 0 1px #a8000e inset;
+  box-shadow: 0 0 0 1px #a8000e inset;
+  color: #b80010;
 }
 
 .ui.basic.primary.buttons .active.button,
 .ui.basic.primary.active.button {
   background: transparent;
-  -webkit-box-shadow: 0 0 0 1px #1279c6 inset;
-  box-shadow: 0 0 0 1px #1279c6 inset;
-  color: #1a69a4;
+  -webkit-box-shadow: 0 0 0 1px #b80010 inset;
+  box-shadow: 0 0 0 1px #b80010 inset;
+  color: #9b0310;
 }
 
 .ui.basic.primary.buttons .button:active,
 .ui.basic.primary.button:active {
-  -webkit-box-shadow: 0 0 0 1px #1a69a4 inset;
-  box-shadow: 0 0 0 1px #1a69a4 inset;
-  color: #1a69a4;
+  -webkit-box-shadow: 0 0 0 1px #9b0310 inset;
+  box-shadow: 0 0 0 1px #9b0310 inset;
+  color: #9b0310;
 }
 
 .ui.buttons:not(.vertical) > .basic.primary.button:not(:first-child) {
@@ -2383,23 +2383,23 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
   background: transparent;
   -webkit-box-shadow: none;
   box-shadow: none;
-  color: #2185D0;
+  color: #CD0415;
 }
 
 .ui.tertiary.primary.buttons .button:hover,
 .ui.tertiary.primary.buttons button:hover,
 .ui.tertiary.primary.button:hover {
-  -webkit-box-shadow: inset 0 -0.2em 0 #2b75ac;
-  box-shadow: inset 0 -0.2em 0 #2b75ac;
-  color: #2b75ac;
+  -webkit-box-shadow: inset 0 -0.2em 0 #a5121f;
+  box-shadow: inset 0 -0.2em 0 #a5121f;
+  color: #a5121f;
 }
 
 .ui.tertiary.primary.buttons .button:focus,
 .ui.tertiary.primary.buttons .tertiary.button:focus,
 .ui.tertiary.primary.button:focus {
-  -webkit-box-shadow: inset 0 -0.2em 0 #216ea7;
-  box-shadow: inset 0 -0.2em 0 #216ea7;
-  color: #216ea7;
+  -webkit-box-shadow: inset 0 -0.2em 0 #97111c;
+  box-shadow: inset 0 -0.2em 0 #97111c;
+  color: #97111c;
 }
 
 .ui.tertiary.primary.buttons .active.button,
@@ -2408,14 +2408,14 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
 .ui.tertiary.primary.buttons .button:active,
 .ui.tertiary.primary.buttons .tertiary.button:active,
 .ui.tertiary.primary.button:active {
-  -webkit-box-shadow: inset 0 -0.2em 0 #007bd8;
-  box-shadow: inset 0 -0.2em 0 #007bd8;
-  color: #1279c6;
+  -webkit-box-shadow: inset 0 -0.2em 0 #b80010;
+  box-shadow: inset 0 -0.2em 0 #b80010;
+  color: #b80010;
 }
 
 .ui.secondary.buttons .button,
 .ui.secondary.button {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
   color: #FFFFFF;
   text-shadow: none;
   background-image: none;
@@ -2428,21 +2428,21 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
 
 .ui.secondary.buttons .button:hover,
 .ui.secondary.button:hover {
-  background-color: #27292a;
+  background-color: #20272d;
   color: #FFFFFF;
   text-shadow: none;
 }
 
 .ui.secondary.buttons .button:focus,
 .ui.secondary.button:focus {
-  background-color: #2e3032;
+  background-color: #262e37;
   color: #FFFFFF;
   text-shadow: none;
 }
 
 .ui.secondary.buttons .button:active,
 .ui.secondary.button:active {
-  background-color: #343637;
+  background-color: #2c333b;
   color: #FFFFFF;
   text-shadow: none;
 }
@@ -2451,7 +2451,7 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
 .ui.secondary.buttons .active.button:active,
 .ui.secondary.active.button,
 .ui.secondary.button .active.button:active {
-  background-color: #27292a;
+  background-color: #20272e;
   color: #FFFFFF;
   text-shadow: none;
 }
@@ -2461,40 +2461,40 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
 .ui.basic.secondary.buttons .button,
 .ui.basic.secondary.button {
   background: transparent;
-  -webkit-box-shadow: 0 0 0 1px #1B1C1D inset;
-  box-shadow: 0 0 0 1px #1B1C1D inset;
-  color: #1B1C1D;
+  -webkit-box-shadow: 0 0 0 1px #161A1E inset;
+  box-shadow: 0 0 0 1px #161A1E inset;
+  color: #161A1E;
 }
 
 .ui.basic.secondary.buttons .button:hover,
 .ui.basic.secondary.button:hover {
   background: transparent;
-  -webkit-box-shadow: 0 0 0 1px #27292a inset;
-  box-shadow: 0 0 0 1px #27292a inset;
-  color: #27292a;
+  -webkit-box-shadow: 0 0 0 1px #20272d inset;
+  box-shadow: 0 0 0 1px #20272d inset;
+  color: #20272d;
 }
 
 .ui.basic.secondary.buttons .button:focus,
 .ui.basic.secondary.button:focus {
   background: transparent;
-  -webkit-box-shadow: 0 0 0 1px #2e3032 inset;
-  box-shadow: 0 0 0 1px #2e3032 inset;
-  color: #27292a;
+  -webkit-box-shadow: 0 0 0 1px #262e37 inset;
+  box-shadow: 0 0 0 1px #262e37 inset;
+  color: #20272d;
 }
 
 .ui.basic.secondary.buttons .active.button,
 .ui.basic.secondary.active.button {
   background: transparent;
-  -webkit-box-shadow: 0 0 0 1px #27292a inset;
-  box-shadow: 0 0 0 1px #27292a inset;
-  color: #343637;
+  -webkit-box-shadow: 0 0 0 1px #20272e inset;
+  box-shadow: 0 0 0 1px #20272e inset;
+  color: #2c333b;
 }
 
 .ui.basic.secondary.buttons .button:active,
 .ui.basic.secondary.button:active {
-  -webkit-box-shadow: 0 0 0 1px #343637 inset;
-  box-shadow: 0 0 0 1px #343637 inset;
-  color: #343637;
+  -webkit-box-shadow: 0 0 0 1px #2c333b inset;
+  box-shadow: 0 0 0 1px #2c333b inset;
+  color: #2c333b;
 }
 
 .ui.buttons:not(.vertical) > .basic.secondary.button:not(:first-child) {
@@ -2595,23 +2595,23 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
   background: transparent;
   -webkit-box-shadow: none;
   box-shadow: none;
-  color: #1B1C1D;
+  color: #161A1E;
 }
 
 .ui.tertiary.secondary.buttons .button:hover,
 .ui.tertiary.secondary.buttons button:hover,
 .ui.tertiary.secondary.button:hover {
-  -webkit-box-shadow: inset 0 -0.2em 0 #292929;
-  box-shadow: inset 0 -0.2em 0 #292929;
-  color: #292929;
+  -webkit-box-shadow: inset 0 -0.2em 0 #272727;
+  box-shadow: inset 0 -0.2em 0 #272727;
+  color: #272727;
 }
 
 .ui.tertiary.secondary.buttons .button:focus,
 .ui.tertiary.secondary.buttons .tertiary.button:focus,
 .ui.tertiary.secondary.button:focus {
-  -webkit-box-shadow: inset 0 -0.2em 0 #303030;
-  box-shadow: inset 0 -0.2em 0 #303030;
-  color: #303030;
+  -webkit-box-shadow: inset 0 -0.2em 0 #2e2e2e;
+  box-shadow: inset 0 -0.2em 0 #2e2e2e;
+  color: #2e2e2e;
 }
 
 .ui.tertiary.secondary.buttons .active.button,
@@ -2620,9 +2620,9 @@ body .ui.inverted:not(.dimmer)::-webkit-scrollbar-thumb:hover {
 .ui.tertiary.secondary.buttons .button:active,
 .ui.tertiary.secondary.buttons .tertiary.button:active,
 .ui.tertiary.secondary.button:active {
-  -webkit-box-shadow: inset 0 -0.2em 0 #1f2933;
-  box-shadow: inset 0 -0.2em 0 #1f2933;
-  color: #27292a;
+  -webkit-box-shadow: inset 0 -0.2em 0 #182735;
+  box-shadow: inset 0 -0.2em 0 #182735;
+  color: #20272e;
 }
 
 .ui.red.buttons .button,
@@ -7753,15 +7753,15 @@ h5.ui.header .sub.header {
 --------------------*/
 
 .ui.primary.header {
-  color: #2185D0;
+  color: #CD0415;
 }
 
 a.ui.primary.header:hover {
-  color: #1678c2;
+  color: #b80010;
 }
 
 .ui.primary.dividing.header {
-  border-bottom: 2px solid #2185D0;
+  border-bottom: 2px solid #CD0415;
 }
 
 .ui.inverted.primary.header.header.header {
@@ -7777,15 +7777,15 @@ a.ui.inverted.primary.header.header.header:hover {
 }
 
 .ui.secondary.header {
-  color: #1B1C1D;
+  color: #161A1E;
 }
 
 a.ui.secondary.header:hover {
-  color: #27292a;
+  color: #20272d;
 }
 
 .ui.secondary.dividing.header {
-  border-bottom: 2px solid #1B1C1D;
+  border-bottom: 2px solid #161A1E;
 }
 
 .ui.inverted.secondary.header.header.header {
@@ -8535,7 +8535,7 @@ i.inverted.icon {
 --------------------*/
 
 i.primary.icon.icon.icon.icon {
-  color: #2185D0;
+  color: #CD0415;
 }
 
 i.inverted.primary.icon.icon.icon.icon {
@@ -8544,12 +8544,12 @@ i.inverted.primary.icon.icon.icon.icon {
 
 i.inverted.bordered.primary.icon.icon.icon.icon,
 i.inverted.circular.primary.icon.icon.icon.icon {
-  background-color: #2185D0;
+  background-color: #CD0415;
   color: #FFFFFF;
 }
 
 i.secondary.icon.icon.icon.icon {
-  color: #1B1C1D;
+  color: #161A1E;
 }
 
 i.inverted.secondary.icon.icon.icon.icon {
@@ -8558,7 +8558,7 @@ i.inverted.secondary.icon.icon.icon.icon {
 
 i.inverted.bordered.secondary.icon.icon.icon.icon,
 i.inverted.circular.secondary.icon.icon.icon.icon {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
   color: #FFFFFF;
 }
 
@@ -18604,8 +18604,8 @@ a.ui.basic.label:hover {
 
 .ui.primary.labels .label,
 .ui.ui.ui.primary.label {
-  background-color: #2185D0;
-  border-color: #2185D0;
+  background-color: #CD0415;
+  border-color: #CD0415;
   color: rgba(255, 255, 255, 0.9);
 }
 
@@ -18613,15 +18613,15 @@ a.ui.basic.label:hover {
 
 .ui.primary.labels a.label:hover,
 a.ui.ui.ui.primary.label:hover {
-  background-color: #1678c2;
-  border-color: #1678c2;
+  background-color: #b80010;
+  border-color: #b80010;
   color: #FFFFFF;
 }
 
 /* Ribbon */
 
 .ui.ui.ui.primary.ribbon.label {
-  border-color: #1a69a4;
+  border-color: #9b0310;
 }
 
 /* Basic */
@@ -18629,15 +18629,15 @@ a.ui.ui.ui.primary.label:hover {
 .ui.basic.labels .primary.label,
 .ui.ui.ui.basic.primary.label {
   background: none #FFFFFF;
-  border-color: #2185D0;
-  color: #2185D0;
+  border-color: #CD0415;
+  color: #CD0415;
 }
 
 .ui.basic.labels a.primary.label:hover,
 a.ui.ui.ui.basic.primary.label:hover {
   background: none #FFFFFF;
-  border-color: #1678c2;
-  color: #1678c2;
+  border-color: #b80010;
+  color: #b80010;
 }
 
 /* Inverted */
@@ -18698,8 +18698,8 @@ a.ui.ui.ui.inverted.basic.primary.label:hover {
 
 .ui.secondary.labels .label,
 .ui.ui.ui.secondary.label {
-  background-color: #1B1C1D;
-  border-color: #1B1C1D;
+  background-color: #161A1E;
+  border-color: #161A1E;
   color: rgba(255, 255, 255, 0.9);
 }
 
@@ -18707,15 +18707,15 @@ a.ui.ui.ui.inverted.basic.primary.label:hover {
 
 .ui.secondary.labels a.label:hover,
 a.ui.ui.ui.secondary.label:hover {
-  background-color: #27292a;
-  border-color: #27292a;
+  background-color: #20272d;
+  border-color: #20272d;
   color: #FFFFFF;
 }
 
 /* Ribbon */
 
 .ui.ui.ui.secondary.ribbon.label {
-  border-color: #020203;
+  border-color: #000001;
 }
 
 /* Basic */
@@ -18723,15 +18723,15 @@ a.ui.ui.ui.secondary.label:hover {
 .ui.basic.labels .secondary.label,
 .ui.ui.ui.basic.secondary.label {
   background: none #FFFFFF;
-  border-color: #1B1C1D;
-  color: #1B1C1D;
+  border-color: #161A1E;
+  color: #161A1E;
 }
 
 .ui.basic.labels a.secondary.label:hover,
 a.ui.ui.ui.basic.secondary.label:hover {
   background: none #FFFFFF;
-  border-color: #27292a;
-  color: #27292a;
+  border-color: #20272d;
+  color: #20272d;
 }
 
 /* Inverted */
@@ -21704,7 +21704,7 @@ ol.ui.suffixed.list li:before,
 .ui.primary.loading.loading.loading.loading .input > i.icon:after,
 .ui.primary.loading.loading.loading.loading > i.icon:after,
 .ui.primary.loader.loader.loader:after {
-  color: #2185D0;
+  color: #CD0415;
 }
 
 .ui.inverted.primary.elastic.loader:before,
@@ -21728,7 +21728,7 @@ ol.ui.suffixed.list li:before,
 .ui.secondary.loading.loading.loading.loading .input > i.icon:after,
 .ui.secondary.loading.loading.loading.loading > i.icon:after,
 .ui.secondary.loader.loader.loader:after {
-  color: #1B1C1D;
+  color: #161A1E;
 }
 
 .ui.inverted.secondary.elastic.loader:before,
@@ -24825,7 +24825,7 @@ ol.ui.suffixed.list li:before,
 *******************************/
 
 span.ui.primary.text {
-  color: #2185D0;
+  color: #CD0415;
 }
 
 span.ui.inverted.primary.text {
@@ -24833,7 +24833,7 @@ span.ui.inverted.primary.text {
 }
 
 span.ui.secondary.text {
-  color: #1B1C1D;
+  color: #161A1E;
 }
 
 span.ui.inverted.secondary.text {
@@ -27936,14 +27936,14 @@ span.ui.massive.text {
 .ui.grid > .primary.row,
 .ui.grid > .primary.column,
 .ui.grid > .row > .primary.column {
-  background-color: #2185D0;
+  background-color: #CD0415;
   color: #FFFFFF;
 }
 
 .ui.grid > .secondary.row,
 .ui.grid > .secondary.column,
 .ui.grid > .row > .secondary.column {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
   color: #FFFFFF;
 }
 
@@ -30287,7 +30287,7 @@ Floated Menu / Item
 .ui.ui.menu .primary.active.item,
 .ui.ui.primary.menu .active.item:hover,
 .ui.ui.primary.menu .active.item {
-  color: #2185D0;
+  color: #CD0415;
 }
 
 .ui.ui.menu .red.active.item,
@@ -30502,7 +30502,7 @@ Floated Menu / Item
 
 .ui.ui.inverted.menu .primary.active.item,
 .ui.ui.inverted.primary.menu {
-  background-color: #2185D0;
+  background-color: #CD0415;
 }
 
 .ui.inverted.primary.menu .item:before {
@@ -30514,7 +30514,7 @@ Floated Menu / Item
 }
 
 .ui.inverted.pointing.primary.menu .active.item {
-  background-color: #1678c2;
+  background-color: #b80010;
 }
 
 .ui.ui.inverted.menu .red.active.item,
@@ -31046,11 +31046,11 @@ Floated Menu / Item
 }
 
 .ui.inverted.pointing.menu .primary.active.item:after {
-  background-color: #2185D0;
+  background-color: #CD0415;
 }
 
 .ui.inverted.pointing.menu .secondary.active.item:after {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
 }
 
 .ui.inverted.pointing.menu .red.active.item:after {
@@ -31784,13 +31784,13 @@ Floated Menu / Item
 
 .ui.primary.message,
 .ui.attached.primary.message {
-  -webkit-box-shadow: 0 0 0 1px #2185D0 inset, 0 0 0 0 rgba(0, 0, 0, 0);
-  box-shadow: 0 0 0 1px #2185D0 inset, 0 0 0 0 rgba(0, 0, 0, 0);
+  -webkit-box-shadow: 0 0 0 1px #CD0415 inset, 0 0 0 0 rgba(0, 0, 0, 0);
+  box-shadow: 0 0 0 1px #CD0415 inset, 0 0 0 0 rgba(0, 0, 0, 0);
 }
 
 .ui.floating.primary.message {
-  -webkit-box-shadow: 0 0 0 1px #2185D0 inset, 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
-  box-shadow: 0 0 0 1px #2185D0 inset, 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
+  -webkit-box-shadow: 0 0 0 1px #CD0415 inset, 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
+  box-shadow: 0 0 0 1px #CD0415 inset, 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
 }
 
 .ui.primary.message .header {
@@ -31804,13 +31804,13 @@ Floated Menu / Item
 
 .ui.secondary.message,
 .ui.attached.secondary.message {
-  -webkit-box-shadow: 0 0 0 1px #1B1C1D inset, 0 0 0 0 rgba(0, 0, 0, 0);
-  box-shadow: 0 0 0 1px #1B1C1D inset, 0 0 0 0 rgba(0, 0, 0, 0);
+  -webkit-box-shadow: 0 0 0 1px #161A1E inset, 0 0 0 0 rgba(0, 0, 0, 0);
+  box-shadow: 0 0 0 1px #161A1E inset, 0 0 0 0 rgba(0, 0, 0, 0);
 }
 
 .ui.floating.secondary.message {
-  -webkit-box-shadow: 0 0 0 1px #1B1C1D inset, 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
-  box-shadow: 0 0 0 1px #1B1C1D inset, 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
+  -webkit-box-shadow: 0 0 0 1px #161A1E inset, 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
+  box-shadow: 0 0 0 1px #161A1E inset, 0 2px 4px 0 rgba(34, 36, 38, 0.12), 0 2px 10px 0 rgba(34, 36, 38, 0.15);
 }
 
 .ui.secondary.message .header {
@@ -32845,18 +32845,18 @@ Floated Menu / Item
 --------------------*/
 
 .ui.primary.table {
-  border-top: 0.2em solid #2185D0;
+  border-top: 0.2em solid #CD0415;
 }
 
 .ui.inverted.primary.table {
-  background-color: #2185D0;
+  background-color: #CD0415;
   color: #FFFFFF;
 }
 
 .ui.ui.ui.ui.table tr.primary,
 .ui.ui.table td.primary {
-  -webkit-box-shadow: 0 0 0 #1a69a4 inset;
-  box-shadow: 0 0 0 #1a69a4 inset;
+  -webkit-box-shadow: 0 0 0 #9b0310 inset;
+  box-shadow: 0 0 0 #9b0310 inset;
   background: #ddf4ff;
   color: rgba(255, 255, 255, 0.9);
 }
@@ -32869,18 +32869,18 @@ Floated Menu / Item
 }
 
 .ui.secondary.table {
-  border-top: 0.2em solid #1B1C1D;
+  border-top: 0.2em solid #161A1E;
 }
 
 .ui.inverted.secondary.table {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
   color: #FFFFFF;
 }
 
 .ui.ui.ui.ui.table tr.secondary,
 .ui.ui.table td.secondary {
-  -webkit-box-shadow: 0 0 0 #020203 inset;
-  box-shadow: 0 0 0 #020203 inset;
+  -webkit-box-shadow: 0 0 0 #000001 inset;
+  box-shadow: 0 0 0 #000001 inset;
   background: #dddddd;
   color: rgba(255, 255, 255, 0.9);
 }
@@ -34594,15 +34594,15 @@ a.ui.card:hover,
 .ui.primary.cards > .card,
 .ui.cards > .primary.card,
 .ui.primary.card {
-  -webkit-box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #2185D0, 0 1px 3px 0 #D4D4D5;
-  box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #2185D0, 0 1px 3px 0 #D4D4D5;
+  -webkit-box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #CD0415, 0 1px 3px 0 #D4D4D5;
+  box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #CD0415, 0 1px 3px 0 #D4D4D5;
 }
 
 .ui.primary.cards > .card:hover,
 .ui.cards > .primary.card:hover,
 .ui.primary.card:hover {
-  -webkit-box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #1678c2, 0 1px 3px 0 #BCBDBD;
-  box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #1678c2, 0 1px 3px 0 #BCBDBD;
+  -webkit-box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #b80010, 0 1px 3px 0 #BCBDBD;
+  box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #b80010, 0 1px 3px 0 #BCBDBD;
 }
 
 .ui.inverted.primary.cards > .card,
@@ -34622,15 +34622,15 @@ a.ui.card:hover,
 .ui.secondary.cards > .card,
 .ui.cards > .secondary.card,
 .ui.secondary.card {
-  -webkit-box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #1B1C1D, 0 1px 3px 0 #D4D4D5;
-  box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #1B1C1D, 0 1px 3px 0 #D4D4D5;
+  -webkit-box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #161A1E, 0 1px 3px 0 #D4D4D5;
+  box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #161A1E, 0 1px 3px 0 #D4D4D5;
 }
 
 .ui.secondary.cards > .card:hover,
 .ui.cards > .secondary.card:hover,
 .ui.secondary.card:hover {
-  -webkit-box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #27292a, 0 1px 3px 0 #BCBDBD;
-  box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #27292a, 0 1px 3px 0 #BCBDBD;
+  -webkit-box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #20272d, 0 1px 3px 0 #BCBDBD;
+  box-shadow: 0 0 0 1px #D4D4D5, 0 2px 0 0 #20272d, 0 1px 3px 0 #BCBDBD;
 }
 
 .ui.inverted.secondary.cards > .card,
@@ -37066,7 +37066,7 @@ a.inverted.ui.card:hover,
 .ui.primary.statistics .statistic > .value,
 .ui.statistics .primary.statistic > .value,
 .ui.primary.statistic > .value {
-  color: #2185D0;
+  color: #CD0415;
 }
 
 .ui.inverted.primary.statistics .statistic > .value,
@@ -37078,7 +37078,7 @@ a.inverted.ui.card:hover,
 .ui.secondary.statistics .statistic > .value,
 .ui.statistics .secondary.statistic > .value,
 .ui.secondary.statistic > .value {
-  color: #1B1C1D;
+  color: #161A1E;
 }
 
 .ui.inverted.secondary.statistics .statistic > .value,
@@ -38428,7 +38428,7 @@ a.inverted.ui.card:hover,
 
 .ui.toggle.checkbox input:checked ~ .box:before,
 .ui.toggle.checkbox input:checked ~ label:before {
-  background-color: #2185D0 !important;
+  background-color: #CD0415 !important;
 }
 
 .ui.toggle.checkbox input:checked ~ .box:after,
@@ -38447,7 +38447,7 @@ a.inverted.ui.card:hover,
 
 .ui.toggle.checkbox input:focus:checked ~ .box:before,
 .ui.toggle.checkbox input:focus:checked ~ label:before {
-  background-color: #0d71bb !important;
+  background-color: #a8000e !important;
 }
 
 /*******************************
@@ -38560,7 +38560,7 @@ a.inverted.ui.card:hover,
 
 .ui.inverted.toggle.checkbox input:checked ~ .box:before,
 .ui.inverted.toggle.checkbox input:checked ~ label:before {
-  background-color: #2185D0 !important;
+  background-color: #CD0415 !important;
 }
 
 /* Toggle Active Focus */
@@ -38572,7 +38572,7 @@ a.inverted.ui.card:hover,
 
 .ui.inverted.toggle.checkbox input:focus:checked ~ .box:before,
 .ui.inverted.toggle.checkbox input:focus:checked ~ label:before {
-  background-color: #0d71bb !important;
+  background-color: #a8000e !important;
 }
 
 /*--------------------
@@ -43733,7 +43733,7 @@ a.ui.nag {
 .ui.indeterminate.primary.progress .bar::before,
 .ui.primary.progress .bar,
 .ui.progress .primary.bar {
-  background-color: #2185D0;
+  background-color: #CD0415;
 }
 
 .ui.inverted.indeterminate.primary.progress .bar::before,
@@ -43745,7 +43745,7 @@ a.ui.nag {
 .ui.indeterminate.secondary.progress .bar::before,
 .ui.secondary.progress .bar,
 .ui.progress .secondary.bar {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
 }
 
 .ui.inverted.indeterminate.secondary.progress .bar::before,
@@ -44448,7 +44448,7 @@ a.ui.nag {
 /* Standard */
 
 .ui.primary.slider .inner .track-fill {
-  background-color: #2185D0;
+  background-color: #CD0415;
 }
 
 .ui.primary.inverted.slider .inner .track-fill {
@@ -44458,12 +44458,12 @@ a.ui.nag {
 /* Basic */
 
 .ui.primary.slider.basic .inner .thumb {
-  background-color: #2185D0;
+  background-color: #CD0415;
 }
 
 .ui.primary.slider.basic .inner .thumb:hover,
 .ui.primary.slider.basic:focus .inner .thumb {
-  background-color: #1678c2;
+  background-color: #b80010;
 }
 
 /* Basic Inverted */
@@ -44480,7 +44480,7 @@ a.ui.nag {
 /* Standard */
 
 .ui.secondary.slider .inner .track-fill {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
 }
 
 .ui.secondary.inverted.slider .inner .track-fill {
@@ -44490,12 +44490,12 @@ a.ui.nag {
 /* Basic */
 
 .ui.secondary.slider.basic .inner .thumb {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
 }
 
 .ui.secondary.slider.basic .inner .thumb:hover,
 .ui.secondary.slider.basic:focus .inner .thumb {
-  background-color: #27292a;
+  background-color: #20272d;
 }
 
 /* Basic Inverted */
@@ -45186,24 +45186,24 @@ a.ui.nag {
 
 .ui.primary.rating .active.icon {
   color: #54C8FF;
-  text-shadow: 0px -1px 0px #2185D0, -1px 0px 0px #2185D0, 0px 1px 0px #2185D0, 1px 0px 0px #2185D0;
+  text-shadow: 0px -1px 0px #CD0415, -1px 0px 0px #CD0415, 0px 1px 0px #CD0415, 1px 0px 0px #CD0415;
 }
 
 .ui.primary.rating .icon.selected,
 .ui.primary.rating .icon.selected.active {
   color: #21b8ff;
-  text-shadow: 0px -1px 0px #1678c2, -1px 0px 0px #1678c2, 0px 1px 0px #1678c2, 1px 0px 0px #1678c2;
+  text-shadow: 0px -1px 0px #b80010, -1px 0px 0px #b80010, 0px 1px 0px #b80010, 1px 0px 0px #b80010;
 }
 
 .ui.secondary.rating .active.icon {
   color: #545454;
-  text-shadow: 0px -1px 0px #1B1C1D, -1px 0px 0px #1B1C1D, 0px 1px 0px #1B1C1D, 1px 0px 0px #1B1C1D;
+  text-shadow: 0px -1px 0px #161A1E, -1px 0px 0px #161A1E, 0px 1px 0px #161A1E, 1px 0px 0px #161A1E;
 }
 
 .ui.secondary.rating .icon.selected,
 .ui.secondary.rating .icon.selected.active {
   color: #6e6e6e;
-  text-shadow: 0px -1px 0px #27292a, -1px 0px 0px #27292a, 0px 1px 0px #27292a, 1px 0px 0px #27292a;
+  text-shadow: 0px -1px 0px #20272d, -1px 0px 0px #20272d, 0px 1px 0px #20272d, 1px 0px 0px #20272d;
 }
 
 .ui.red.rating .active.icon {
@@ -47039,7 +47039,7 @@ body.pushable > .pusher {
 -------------- */
 
 .primary.toast {
-  background-color: #2185D0;
+  background-color: #CD0415;
 }
 
 .inverted.primary.toast,
@@ -47048,7 +47048,7 @@ body.pushable > .pusher {
 }
 
 .secondary.toast {
-  background-color: #1B1C1D;
+  background-color: #161A1E;
 }
 
 .inverted.secondary.toast,
