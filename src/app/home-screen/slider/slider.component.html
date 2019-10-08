@@ -1,15 +1,15 @@
 <ul class="cd-hero-slider autoplay">
-  <li *ngFor="let element of elements; first as isFirst" [class.selected]="isFirst">
-    <div *ngIf="element.src.img && element.orientation == 'left'" class="{{element.type}} cd-img-container">
+  <li class="ui stackable grid" *ngFor="let element of elements; first as isFirst" [class.selected]="isFirst">
+    <div *ngIf="element.src.img && element.orientation == 'left'" class="column {{element.type}} cd-img-container left">
       <img src="{{element.src.img}}" alt="{{element.name}} slider image">
     </div>
-    <div class="{{element.type}}">
+    <div class="column {{element.type}} content">
       <img *ngIf="element.content.img" style="width: 25vw; height: auto" src="{{element.content.img}}" alt="{{element.name}} content image">
       <h2 *ngIf="element.content.title">{{element.content.title}}</h2>
       <p *ngIf="element.content.text">{{element.content.text}}</p>
       <a *ngFor="let btn of element.content.btn" class="cd-btn {{btn.type}}" href="{{btn.link}}">{{btn.title}}</a>
     </div>
-    <div *ngIf="element.src.img && element.orientation == 'right'" class="{{element.type}} cd-img-container">
+    <div *ngIf="element.src.img && element.orientation == 'right'" class="column {{element.type}} cd-img-container right">
       <img src="{{element.src.img}}" alt="{{element.name}} slider image">
     </div>
     <div *ngIf="element.src.video" class="cd-bg-video-wrapper">
