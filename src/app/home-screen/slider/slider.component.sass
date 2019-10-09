@@ -161,10 +161,17 @@ table
     color: white
     text-transform: uppercase
     box-shadow: 0 0 28px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0,0,0,0.5)
-    transition: background-color 0.2s
+    transition-property: background-color, transform
+    transition-duration: 0.2s
+
+    &:hover, &:focus
+      transform: scale(1.1)
+
+    &:active
+      transform: scale(1.05)
 
     &:not(:last-child)
-      margin-right: 1em
+      margin-right: 2em
 
     &:before
       content: ""
@@ -227,46 +234,46 @@ table
     display: block
 
   .cd-half-width
-    h2, p, img, .ui.button
+    h2, p, img, .cd-btn-group
       opacity: 0
       transform: translateX(100px)
 
   .move-left .cd-half-width
-    h2, p, img, .ui.button
+    h2, p, img, .cd-btn-group
       opacity: 0
       transform: translateX(-100px)
 
   .selected .cd-half-width
-    h2, p, img, .ui.button
+    h2, p, img, .cd-btn-group
       /* this is the visible slide
       opacity: 1
       transform: translateX(0)
 
   li.is-moving .cd-half-width
-    h2, p, img, .ui.button
+    h2, p, img, .cd-btn-group
       /*      this is the slide moving outside the viewport
        * wait for the end of the transition on the li parent before set opacity to 0 and translate to 100px/-100px
       transition: opacity 0s 0.5s, transform 0s 0.5s
 
   .cd-full-width
-    h2, p, img, .ui.button
+    h2, p, img, .cd-btn-group
       opacity: 0
       transform: translateX(100px)
 
   .move-left .cd-full-width
-    h2, p, img, .ui.button
+    h2, p, img, .cd-btn-group
       opacity: 0
       transform: translateX(-100px)
 
   .selected .cd-full-width
-    h2, p, img, .ui.button
+    h2, p, img, .cd-btn-group
       /* this is the visible slide
       opacity: 1
       transform: translateX(0)
 
   li
     &.is-moving .cd-full-width
-      h2, p, img, .ui.button
+      h2, p, img, .cd-btn-group
         /*      this is the slide moving outside the viewport
          * wait for the end of the transition on the li parent before set opacity to 0 and translate to 100px/-100px
         transition: opacity 0s 0.5s, transform 0s 0.5s
@@ -278,7 +285,7 @@ table
       p
         transition: opacity 0.4s 0.3s, transform 0.5s 0.3s
 
-      .ui.button
+      .cd-btn-group
         transition: opacity 0.4s 0.4s, transform 0.5s 0.4s, background-color 0.2s 0s
 
       img
