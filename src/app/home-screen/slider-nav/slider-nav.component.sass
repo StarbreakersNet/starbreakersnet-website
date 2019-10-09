@@ -1,6 +1,10 @@
 $easeInOutBack: 0.68, -0.55, 0.265, 1.55
 
 .nav-container
+  display: flex
+  flex-direction: column
+  justify-content: center
+  align-items: center
   position: absolute
   bottom: 2vh
 
@@ -38,4 +42,14 @@ $easeInOutBack: 0.68, -0.55, 0.265, 1.55
 
 .item.selected .button
  transform: scale(1.1)
+
+.ui.grid.app-container
+  height: calc((16/9)*7vw)
+  width: 80vw
+
+  .column div
+    min-height: 10rem
+    height: 100%
+    width: 100%
+    border-radius: 0.75rem
 
