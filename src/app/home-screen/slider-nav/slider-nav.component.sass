@@ -1,14 +1,14 @@
 $easeInOutBack: 0.68, -0.55, 0.265, 1.55
 
 .nav-container
-  width: 100%
   position: absolute
   bottom: 2vh
 
 .ui.fluid.menu
   display: flex
   justify-content: center
-  height: 9vw
+  max-width: 95vw
+  padding: 1vmin 0.5vmin
   transition: all ease-in-out 0.3s
   background-color: rgba(255,255,255,0.3)
   backdrop-filter: blur(50px)
@@ -16,16 +16,20 @@ $easeInOutBack: 0.68, -0.55, 0.265, 1.55
 // Retrait de la bordure et shadow de Fomantic-UI pour qu'elle ne soit pas visible sur l'effet backdrop-filter
 .ui.menu
   border: 0
-  border-radius: 2vw
+  border-radius: 1.5vmin
   box-shadow: none
 
+.ui.menu > .item
+  padding-left: 1.2vw
+  padding-right: 1.2vw
+
 .ui.button
-  height: 7vw
-  width: 7vw
+  height: 5vmax
+  width: 5vmax
   transition: all cubic-bezier($easeInOutBack) 0.3s
 
 .ui.button
-  padding: 15px !important
+  padding: 0.5vmax !important
   border-radius: 22.37%
 
 .ui.button i
@@ -33,6 +37,5 @@ $easeInOutBack: 0.68, -0.55, 0.265, 1.55
   width: 90%
 
 .item.selected .button
-  height: 8vw
-  width: 8vw
+ transform: scale(1.1)
 

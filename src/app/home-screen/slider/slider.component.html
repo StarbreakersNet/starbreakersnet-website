@@ -11,7 +11,7 @@
          [class.right]="element.orientation == 'left'">
       <div [class.cd-half-width-container]="element.type == 'cd-half-width'">
         <img *ngIf="element.content.img"
-             style="width: 25vw; height: auto"
+             class="ui medium centered image"
              src="{{element.content.img}}"
              alt="{{element.name}} content image">
         <h2 *ngIf="element.content.title">{{element.content.title}}</h2>
