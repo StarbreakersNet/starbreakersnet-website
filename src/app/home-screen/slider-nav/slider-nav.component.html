@@ -1,13 +1,13 @@
 <div class="ui centered grid">
   <div class="nav-container">
-    <div class="ui fluid borderless menu">
+    <div class="ui fluid borderless menu app-navigation">
       <div class="item" *ngFor="let element of elements; let i = index; first as isFirst" [class.selected]="isFirst">
         <a class="ui fluid button" [ngStyle]="{'background-color': element.color}">
           <img class="ui image" src="{{element.src}}">
         </a>
       </div>
     </div>
-    <div class="ui stackable equal width grid app-container">
+    <div class="ui equal width grid app-container">
       <div class="column">
         <div style="background-color: red;">a</div>
       </div>

@@ -8,7 +8,9 @@ $easeInOutBack: 0.68, -0.55, 0.265, 1.55
   position: absolute
   bottom: 2vh
 
-.ui.fluid.menu
+  overflow: hidden
+
+.ui.fluid.menu.app-navigation
   display: flex
   justify-content: center
   max-width: 95vw
@@ -18,12 +20,12 @@ $easeInOutBack: 0.68, -0.55, 0.265, 1.55
   backdrop-filter: blur(50px)
 
 // Retrait de la bordure et shadow de Fomantic-UI pour qu'elle ne soit pas visible sur l'effet backdrop-filter
-.ui.menu
+.ui.menu.app-navigation
   border: 0
   border-radius: 1.5vmin
   box-shadow: none
 
-.ui.menu > .item
+.ui.menu.app-navigation > .item
   padding-left: 1.2vw
   padding-right: 1.2vw
 
@@ -44,12 +46,11 @@ $easeInOutBack: 0.68, -0.55, 0.265, 1.55
  transform: scale(1.1)
 
 .ui.grid.app-container
-  height: calc((16/9)*7vw)
   width: 80vw
 
   .column div
-    min-height: 10rem
-    height: 100%
+    min-height: 2rem
+    height: calc((16/9)*7vw)
     width: 100%
-    border-radius: 0.75rem
+    border-radius: 0.75em
 
