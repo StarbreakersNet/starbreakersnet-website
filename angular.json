@@ -34,6 +34,7 @@
             "scripts": [
               "node_modules/particlesjs/dist/particles.min.js",
               "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/atvImg/atvImg-min.js",
               "semantic/dist/semantic.min.js"
             ]
           },

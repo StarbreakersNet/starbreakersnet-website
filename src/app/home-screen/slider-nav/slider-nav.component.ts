@@ -1,6 +1,5 @@
 import {Component, AfterViewInit} from '@angular/core';
-//import * as atvImg from '/src/scripts/atvImg.js';
-// TODO: Regarder comment importer le JS pour le déclancher par le controleur Angular
+import * as atvImg from 'atvImg';
 
 @Component({
   selector: 'app-slider-nav',
@@ -45,6 +44,6 @@ export class SliderNavComponent implements AfterViewInit {
   constructor() { }
 
   ngAfterViewInit() {
-    // atvImg.atvStart();
+    atvImg.atvStart();
   }
 }
