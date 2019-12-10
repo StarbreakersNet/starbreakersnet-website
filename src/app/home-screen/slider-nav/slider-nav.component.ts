@@ -1,11 +1,12 @@
 import {Component, AfterViewInit} from '@angular/core';
-import * as atvImg from 'atvImg';
+import VanillaTilt from 'vanilla-tilt';
 
 @Component({
   selector: 'app-slider-nav',
   templateUrl: './slider-nav.component.html',
   styleUrls: ['./slider-nav.component.sass']
 })
+
 export class SliderNavComponent implements AfterViewInit {
 
   elements = [
@@ -44,6 +45,9 @@ export class SliderNavComponent implements AfterViewInit {
   constructor() { }
 
   ngAfterViewInit() {
-    atvImg.atvStart();
+    // @ts-ignore
+    VanillaTilt.init(document.querySelectorAll('.appTile'),
+      {perspective: 2000, max: 10, scale: 1.03, speed: 200}
+      );
   }
 }
