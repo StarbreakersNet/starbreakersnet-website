@@ -48,53 +48,53 @@ $easeInOutBack: 0.68, -0.55, 0.265, 1.55
   max-height: 25vh
   margin: 0
 
-  .column *
+  .column > *
     min-height: 2rem
     height: calc((16/9)*7vw)
     width: 100%
     border-radius: 0.75em
 
-.apps-container .ui.fluid.card
-  background: #1c2537
-  transition-property: background-color, transform
-  transition-duration: 0.2s
-  cursor: pointer
+  .ui.fluid.card
+    transition-property: background-color, transform
+    transition-duration: 0.2s
+    cursor: pointer
 
-  &:hover, &:focus
-    transform: scale(1.03)
+    &:hover, &:focus
+      transform: scale(1.03)
 
-    &:active
-      transform: scale(0.99)
+      &:active
+        transform: scale(0.99) !important
 
-  .image
+.atvButton
+  display: flex
+  justify-content: center
+  align-items: center
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5)
+  transition: all 0.2s ease-out !important
+  transform-style: preserve-3d
+
+  &:hover
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7)
+
+  .background-wrapper
+    height: 100%
+    width: 100%
+    overflow: hidden
+
+    .app-background
+      height: auto
+      width: 100%
+      overflow: hidden
+
+  .tilt-layer
     display: flex
-    justify-content: center
-    align-items: center
+    flex-direction: column
+    justify-content: stretch
+    position: absolute
+    height: 100%
+    width: 100%
 
     img
       height: 100%
       width: auto
       object-fit: contain
-
-  .image.logo img
-    padding: 5%
-
-
-.paralaxTile-container
-  transform-style: preserve-3d
-  transform: perspective(800px)
-
-  .poster
-    border-radius: 5px
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 1)
-    overflow: hidden
-
-    div
-      position: absolute
-      background-size: 100% auto
-      background-repeat: no-repeat
-      background-position: 0 0
-      transition: 0.1s
-
-.appTile
-  background-color: #0ea432

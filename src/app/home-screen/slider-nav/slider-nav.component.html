@@ -1,28 +1,21 @@
 <div class="ui centered grid">
   <div class="nav-container">
     <div class="ui fluid borderless menu app-navigation">
-      <div class="item" *ngFor="let element of elements; let i = index; first as isFirst" [class.selected]="isFirst">
+      <div class="item" *ngFor="let element of navElements; let i = index; first as isFirst" [class.selected]="isFirst">
         <a class="ui fluid button" [ngStyle]="{'background-color': element.color}">
           <img class="ui image" src="{{element.src}}">
         </a>
       </div>
     </div>
     <div class="ui equal width three column compact grid apps-container">
-      <div class="column paralaxTile-container">
-        <button class="ui fluid card poster">
-          <div class="image logo">
-            <img src="assets/images/applications/teamspeak/ts_stacked_bluelight.png">
+      <div class="column" *ngFor="let element of appElements;">
+        <button class="ui fluid card atvButton" [ngStyle]="{'background-color': element.color}">
+          <div *ngIf="element.img" class="background-wrapper">
+            <img class="app-background" src="{{element.img}}">
           </div>
-        </button>
-      </div>
-      <div class="column">
-        <div class="atvImg">
-          <img src="assets/images/applications/atvImg/back.png">
-        </div>
-      </div>
-      <div class="column">
-        <button class="appTile">
-          <span>Title</span>
+          <div class="tilt-layer" *ngFor="let logo of element.logo; let i = index;">
+            <img src="{{logo}}" [ngStyle]="{transform: 'translateZ(' + ((i * 5) + 5) + 'vmin) scale(0.7)'}">
+          </div>
         </button>
       </div>
     </div>

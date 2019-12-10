@@ -9,7 +9,7 @@ import VanillaTilt from 'vanilla-tilt';
 
 export class SliderNavComponent implements AfterViewInit {
 
-  elements = [
+  navElements = [
     {
       name: 'Accueil',
       src: '/assets/icons/icon_strb_active.png',
@@ -41,13 +41,46 @@ export class SliderNavComponent implements AfterViewInit {
       color: '#8D1C1A'
     },
   ];
+  appElements = [
+    {
+      name: 'TestTilt',
+      logo: [
+        'assets/icons/icon_wow_active.png',
+        'assets/images/applications/atvImg/front.png',
+      ],
+      img: 'assets/images/applications/atvImg/back.png',
+      color: '#1C2537'
+    },
+    {
+      name: 'TeamSpeak',
+      logo: [
+        'assets/images/applications/teamspeak/ts_stacked_bluelight.png'
+      ],
+      color: '#1C2537'
+    },
+    {
+      name: 'TeamSpeak',
+      logo: [
+        'assets/images/applications/teamspeak/ts_stacked_bluelight.png'
+      ],
+      color: '#1C2537'
+    },
+  ];
 
   constructor() { }
 
   ngAfterViewInit() {
     // @ts-ignore
-    VanillaTilt.init(document.querySelectorAll('.appTile'),
-      {perspective: 2000, max: 10, scale: 1.03, speed: 200}
-      );
+    VanillaTilt.init(document.querySelectorAll('.atvButton'),
+      {
+        perspective: 3000,
+        max: 7,
+        scale: 1.03,
+        speed: 300,
+        easing: 'ease-out',
+        glare: true,
+        'max-glare': 0.15
+      }
+    );
   }
 }
