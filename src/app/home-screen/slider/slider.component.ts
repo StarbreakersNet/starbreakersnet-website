@@ -185,7 +185,6 @@ export class SliderComponent implements OnInit {
         uploadVideo(slidesWrapper);
         setAutoplay(slidesWrapper, slidesNumber, autoPlayDelay);
         sliderNav.children().on('click', targetNavElement, function(event) {
-          console.log($(this).parent());
           event.preventDefault();
           const selectedItem = $(this).parent();
           if (!selectedItem.hasClass('selected')) {
