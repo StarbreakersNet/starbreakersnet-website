@@ -9,10 +9,7 @@
     </div>
     <div class="ui equal width three column compact grid apps-container">
       <div class="column" *ngFor="let element of appElements;">
-        <button class="ui fluid card atvButton" [ngStyle]="{'background-color': element.color}">
-          <div *ngIf="element.img" class="background-wrapper">
-            <img class="app-background" src="{{element.img}}">
-          </div>
+        <button class="ui fluid card atvButton" [ngStyle]="{'background-color': element.color, 'background-image': 'url(' + element.img + ')'}">
           <div class="tilt-layer" *ngFor="let logo of element.logo; let i = index;">
             <img src="{{logo}}" [ngStyle]="{transform: 'translateZ(' + ((i * 5) + 5) + 'vmin) scale(0.7)'}">
           </div>
