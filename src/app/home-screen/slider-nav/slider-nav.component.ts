@@ -43,27 +43,38 @@ export class SliderNavComponent implements AfterViewInit {
   ];
   appElements = [
     {
-      name: 'TestTilt',
-      logo: [
-        'assets/icons/icon_wow_active.png',
-        'assets/images/applications/atvImg/front.png',
-      ],
-      img: 'assets/images/applications/atvImg/back.png',
-      color: '#1C2537'
-    },
-    {
       name: 'TeamSpeak',
       logo: [
-        'assets/images/applications/teamspeak/ts_stacked_bluelight.png'
+        {
+          src: 'assets/images/applications/teamspeak/ts_stacked_bluelight.png',
+          scale: '0.7'
+        }
       ],
       color: '#1C2537'
     },
     {
-      name: 'TeamSpeak',
+      name: 'StarbreakersNet',
       logo: [
-        'assets/images/applications/teamspeak/ts_stacked_bluelight.png'
+        {
+          src: 'assets/images/applications/starbreakersnet/logo-circle.png',
+          scale: '0.9'
+        },
+        {
+          src: 'assets/images/applications/starbreakersnet/logo.png',
+          scale: '0.9'
+        }
       ],
-      color: '#1C2537'
+      color: '#282828'
+    },
+    {
+      name: 'Youtube',
+      logo: [
+        {
+          src: 'assets/images/applications/youtube/yt_icon_rgb.png',
+          scale: '0.5'
+        }
+      ],
+      color: '#FFFFFF'
     },
   ];
 
