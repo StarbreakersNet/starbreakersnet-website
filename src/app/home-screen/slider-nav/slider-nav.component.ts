@@ -12,33 +12,33 @@ export class SliderNavComponent implements AfterViewInit {
   navElements = [
     {
       name: 'Accueil',
-      src: '/assets/icons/icon_strb_active.png',
-      color: '#8D1C1A'
+      src: '/assets/images/applications/starbreakersnet/logo.png',
+      color: '#9A0310'
     },
     {
       name: 'Heroes of the Storm',
-      src: '/assets/icons/icon_heroes_active.png',
-      color: '#8D1C1A'
+      src: '/assets/images/applications/games/hots/icon_heroes.png',
+      color: '#393766'
     },
     {
       name: 'World of Warcraft',
-      src: '/assets/icons/icon_wow_active.png',
-      color: '#8D1C1A'
+      src: '/assets/images/applications/games/wow/icon_wow.png',
+      color: '#382314'
     },
     {
-      name: 'League of Legens',
-      src: '/assets/icons/icon_lol_active.png',
-      color: '#8D1C1A'
+      name: 'League of Legends',
+      src: '/assets/images/applications/games/lol/icon_lol.png',
+      color: '#1C3747'
     },
     {
-      name: 'Grand Theft Auto V',
-      src: '/assets/icons/icon_gtav_active.png',
-      color: '#8D1C1A'
+      name: 'Grand Theft Auto Online',
+      src: '/assets/images/applications/games/gtav/icon_gtav.png',
+      color: '#DAE5D6'
     },
     {
       name: 'Counter Striker: GO',
-      src: '/assets/icons/icon_csgo_active.png',
-      color: '#8D1C1A'
+      src: '/assets/images/applications/games/csgo/icon_csgo.png',
+      color: '#FFA200'
     },
   ];
   appElements = [

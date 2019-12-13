@@ -28,20 +28,22 @@ $easeInOutBack: 0.68, -0.55, 0.265, 1.55
   padding-right: 1.2vw
 
 .ui.button
+  display: flex
+  justify-content: center
+  align-items: center
   height: 5vmax
-  width: 5vmax
+  width: 7vmax
   transition: all cubic-bezier($easeInOutBack) 0.3s
-
-.ui.button
   padding: 0.5vmax !important
-  border-radius: 22.37%
+  border-radius: 0.75em
 
-.ui.button i
-  height: auto
-  width: 90%
+.ui.button img
+  height: 100%
+  width: auto
+  object-fit: contain
 
 .item.selected .button
- transform: scale(1.1)
+ transform: scale(1.15)
 
 .apps-container
   width: 80vw

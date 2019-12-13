@@ -1,5 +1,8 @@
 <ul class="cd-hero-slider autoplay">
-  <li class="ui stackable grid" *ngFor="let element of elements; first as isFirst" [class.selected]="isFirst">
+  <li class="ui stackable grid"
+      *ngFor="let element of elements; first as isFirst"
+      [class.selected]="isFirst"
+      [ngStyle]="{'background-image': 'url(' + element.src.slider + ')'}">
     <div *ngIf="element.src.img"
          class="column {{element.type}} cd-img-container"
          [class.left]="element.orientation == 'left'"
