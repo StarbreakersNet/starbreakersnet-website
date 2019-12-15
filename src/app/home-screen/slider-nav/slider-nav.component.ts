@@ -70,11 +70,11 @@ export class SliderNavComponent implements AfterViewInit {
       name: 'Youtube',
       logo: [
         {
-          src: 'assets/images/applications/youtube/yt_icon_rgb.png',
-          scale: '0.5'
+          src: 'assets/images/applications/youtube/yt_logo_rgb_dark.png',
+          scale: '0.6'
         }
       ],
-      color: '#FFFFFF'
+      color: '#282828'
     },
   ];
 
