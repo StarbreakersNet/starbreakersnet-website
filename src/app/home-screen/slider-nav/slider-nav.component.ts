@@ -1,5 +1,6 @@
 import {Component, AfterViewInit} from '@angular/core';
 import VanillaTilt from 'vanilla-tilt';
+import {NotificationService} from '../../services/notification/notification.service';
 
 @Component({
   selector: 'app-slider-nav',
@@ -78,7 +79,7 @@ export class SliderNavComponent implements AfterViewInit {
     },
   ];
 
-  constructor() { }
+  constructor(private notification: NotificationService) { }
 
   ngAfterViewInit() {
     // @ts-ignore

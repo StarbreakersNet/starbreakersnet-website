@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="ui equal width three column compact grid apps-container">
-      <div class="column" *ngFor="let element of appElements;">
+      <div class="column" *ngFor="let element of appElements;" (click)="this.notification.featureComing()">
         <button class="ui fluid card atvButton" [ngStyle]="{'background-color': element.color, 'background-image': 'url(' + element.img + ')'}">
           <div class="tilt-layer" *ngFor="let logo of element.logo; let i = index;">
             <img src="{{logo.src}}" [ngStyle]="{transform: 'translateZ(' + ((i * 5) + 5) + 'vmin) scale(' + logo.scale + ')'}">
