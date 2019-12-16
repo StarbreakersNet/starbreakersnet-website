@@ -79,7 +79,7 @@ export class SliderNavComponent implements AfterViewInit {
     },
   ];
 
-  constructor(private notification: NotificationService) { }
+  constructor(public notification: NotificationService) { }
 
   ngAfterViewInit() {
     // @ts-ignore

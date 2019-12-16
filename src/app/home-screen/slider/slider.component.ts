@@ -163,7 +163,7 @@ export class SliderComponent implements OnInit {
     },
   ];
 
-  constructor(private notification: NotificationService) { }
+  constructor(public notification: NotificationService) { }
 
   ngOnInit() {
     jQuery(document).ready(($) => {
