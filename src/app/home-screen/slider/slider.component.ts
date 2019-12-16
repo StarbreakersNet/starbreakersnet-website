@@ -14,7 +14,7 @@ export class SliderComponent implements OnInit {
       type: 'cd-full-width',
       name: 'Accueil',
       src: {
-        slider: '/assets/images/applications/starbreakersnet/slider/bg_strb.png'
+        particles: true
       },
       content: {
         img: '/assets/images/applications/starbreakersnet/logo.png',

@@ -28,7 +28,7 @@ export class NotificationService {
 
   featureComing() {
     jQuery('body').toast({
-      class: 'warning',
+      class: 'info',
       showIcon: 'info',
       message: 'Cette fonctionnalitée du site n\'est pas encore disponible',
     });

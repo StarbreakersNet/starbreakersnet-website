@@ -57,15 +57,15 @@ export class SliderNavComponent implements AfterViewInit {
       name: 'StarbreakersNet',
       logo: [
         {
-          src: 'assets/images/applications/starbreakersnet/logo-circle.png',
+          src: 'assets/images/applications/community/community-icon-b.png',
           scale: '0.9'
         },
         {
-          src: 'assets/images/applications/starbreakersnet/logo.png',
+          src: 'assets/images/applications/community/community-icon-a.png',
           scale: '0.9'
         }
       ],
-      color: '#282828'
+      color: '#2980B9'
     },
     {
       name: 'Youtube',

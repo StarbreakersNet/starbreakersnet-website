@@ -6,13 +6,15 @@ import { AppComponent } from './app.component';
 import { UnderConstructionComponent } from './under-construction/under-construction.component';
 import { SliderComponent } from './home-screen/slider/slider.component';
 import { SliderNavComponent } from './home-screen/slider-nav/slider-nav.component';
+import { ParticlesCanvaComponent } from './particles-canva/particles-canva.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     UnderConstructionComponent,
     SliderComponent,
-    SliderNavComponent
+    SliderNavComponent,
+    ParticlesCanvaComponent
   ],
   imports: [
     BrowserModule,
