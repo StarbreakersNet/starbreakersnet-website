@@ -3,10 +3,18 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { UnderConstructionComponent } from './under-construction/under-construction.component';
+import { SliderComponent } from './home-screen/slider/slider.component';
+import { SliderNavComponent } from './home-screen/slider-nav/slider-nav.component';
+import { ParticlesCanvaComponent } from './particles-canva/particles-canva.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    UnderConstructionComponent,
+    SliderComponent,
+    SliderNavComponent,
+    ParticlesCanvaComponent
   ],
   imports: [
     BrowserModule,
