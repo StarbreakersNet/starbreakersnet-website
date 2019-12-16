@@ -22,7 +22,7 @@
         <div class="cd-btn-group">
           <a *ngFor="let btn of element.content.btn"
              class="ui {{btn.type}} button"
-             href="{{btn.link}}">{{btn.title}}</a>
+             (click)="notify()">{{btn.title}}</a>
         </div>
       </div>
     </div>
