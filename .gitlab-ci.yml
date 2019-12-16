@@ -1,0 +1,29 @@
+image: trion/ng-cli-karma
+
+cache:
+  paths:
+    - node_modules/
+
+deploy_stage:
+  stage: deploy
+  environment: Staging
+  only:
+    - master
+  script:
+    - rm ./package-lock.json
+    - npm install
+    - ./node_modules/@angular/cli/bin/ng build --progress false --prod
+    - cd dist/
+    - ls
+
+deploy_production:
+  stage: deploy
+  environment: Production
+  only:
+    - tags
+  script:
+    - rm ./package-lock.json
+    - npm install
+    - ./node_modules/@angular/cli/bin/ng build --progress false --prod
+    - cd dist/
+    - ls
