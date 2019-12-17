@@ -20,6 +20,7 @@ deploy_stage:
     - npm install
     - ./node_modules/@angular/cli/bin/ng build --progress false --prod
     - cd dist/
+    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website/*'
     - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website/
 
 deploy_production:
