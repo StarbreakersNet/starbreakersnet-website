@@ -1,0 +1,132 @@
+.cd-slider-nav {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  z-index: 5;
+  text-align: center;
+  height: 7vmin;
+  background-color: #161A1E;
+}
+.cd-slider-nav nav, .cd-slider-nav ul, .cd-slider-nav li, .cd-slider-nav a {
+  height: 100%;
+}
+.cd-slider-nav nav {
+  display: inline-block;
+  position: relative;
+}
+.cd-slider-nav .cd-marker, .cd-slider-nav li {
+  width: 18vmin;
+}
+.cd-slider-nav .cd-marker {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 99%;
+  color: #CD0415;
+  background-color: white;
+  box-shadow: inset 0 2px 0 currentColor;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.cd-slider-nav .cd-marker.item-2 {
+  transform: translateX(100%);
+}
+.cd-slider-nav .cd-marker.item-3 {
+  transform: translateX(200%);
+}
+.cd-slider-nav .cd-marker.item-4 {
+  transform: translateX(300%);
+}
+.cd-slider-nav .cd-marker.item-5 {
+  transform: translateX(400%);
+}
+.cd-slider-nav .cd-marker.item-6 {
+  transform: translateX(500%);
+}
+.cd-slider-nav ul:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.cd-slider-nav li {
+  display: inline-block;
+  float: left;
+}
+.cd-slider-nav li.selected a {
+  color: #2c343b;
+}
+.cd-slider-nav li.selected a:hover {
+  background-color: transparent;
+}
+.cd-slider-nav a {
+  display: block;
+  position: relative;
+  padding-top: 4.5vmin;
+  font-size: 1.4vmin;
+  font-weight: 700;
+  color: #a8b4be;
+  text-transform: uppercase;
+  transition: background-color 0.2s;
+}
+.cd-slider-nav a::before {
+  content: "";
+  position: absolute;
+  width: 3vmin;
+  height: 3vmin;
+  top: 1vmin;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+.cd-slider-nav a:hover {
+  background-color: rgba(0, 1, 1, 0.5);
+}
+.cd-slider-nav li:first-of-type a::before {
+  background: url("/assets/icons/icon_strb.png");
+  background-size: cover;
+}
+.cd-slider-nav li.selected:first-of-type a::before {
+  background: url("/assets/icons/icon_strb_active.png");
+  background-size: cover;
+}
+.cd-slider-nav li:nth-of-type(2) a::before {
+  background: url("/assets/icons/icon_heroes.png");
+  background-size: cover;
+}
+.cd-slider-nav li.selected:nth-of-type(2) a::before {
+  background: url("/assets/icons/icon_heroes_active.png");
+  background-size: cover;
+}
+.cd-slider-nav li:nth-of-type(3) a::before {
+  background: url("/assets/icons/icon_wow.png");
+  background-size: cover;
+}
+.cd-slider-nav li.selected:nth-of-type(3) a::before {
+  background: url("/assets/icons/icon_wow_active.png");
+  background-size: cover;
+}
+.cd-slider-nav li:nth-of-type(4) a::before {
+  background: url("/assets/icons/icon_lol.png");
+  background-size: cover;
+}
+.cd-slider-nav li.selected:nth-of-type(4) a::before {
+  background: url("/assets/icons/icon_lol_active.png");
+  background-size: cover;
+}
+.cd-slider-nav li:nth-of-type(5) a::before {
+  background: url("/assets/icons/icon_gtav.png");
+  background-size: cover;
+}
+.cd-slider-nav li.selected:nth-of-type(5) a::before {
+  background: url("/assets/icons/icon_gtav_active.png");
+  background-size: cover;
+}
+.cd-slider-nav li:nth-of-type(6) a::before {
+  background: url("/assets/icons/icon_csgo.png");
+  background-size: cover;
+}
+.cd-slider-nav li.selected:nth-of-type(6) a::before {
+  background: url("/assets/icons/icon_csgo_active.png");
+  background-size: cover;
+}
+
+/*# sourceMappingURL=slider-nav.component.css.map */
