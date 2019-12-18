@@ -45,19 +45,18 @@ export class SliderComponent implements OnInit {
       },
       content: {
         title: 'Heroes of the Storm',
-        text: 'Les héros légendaires de Blizzard sont téléportés dans le Nexus.' +
-          'Menez des actions intenses sur des champs de bataille variés.' +
-          'Choisissez votre héros et battez-vous dans Heroes of the Storm !',
+        // tslint:disable-next-line:max-line-length
+        text: 'Les héros légendaires de Blizzard sont téléportés dans le Nexus. Menez des actions intenses sur des champs de bataille variés. Choisissez votre héros et battez-vous dans Heroes of the Storm !',
         btn: [
           {
             type: 'primary',
-            title: 'Rejoindre l\'Équipe',
+            title: 'Rejoindre le Nexus',
             link: '#0?register'
           },
           {
             type: 'secondary',
-            title: 'Contacter nos Leader',
-            link: '#0?contact'
+            title: 'Ouvrir la section',
+            link: '#0?open'
           }
         ]
       }
@@ -71,19 +70,18 @@ export class SliderComponent implements OnInit {
       },
       content: {
         title: 'World of Warcraft',
-        text: 'Le voile entre la vie et la mort s’est déchiré.' +
-          'Découvrez ce qui se terre au-delà du monde que vous connaissez dans le prochain chapitre de la saga World of Warcraft,' +
-          'Shadowlands !',
+        // tslint:disable-next-line:max-line-length
+        text: 'Le voile entre la vie et la mort s’est déchiré. Découvrez ce qui se terre au-delà du monde que vous connaissez dans le prochain chapitre de la saga World of Warcraft, Shadowlands !',
         btn: [
           {
             type: 'primary',
-            title: 'Rejoindre la Guilde',
+            title: 'Rejoindre Azeroth',
             link: '#0?register'
           },
           {
             type: 'secondary',
-            title: 'Contacter nos Officiers',
-            link: '#0?contact'
+            title: 'Ouvrir la section',
+            link: '#0?open'
           }
         ]
       }
@@ -101,13 +99,13 @@ export class SliderComponent implements OnInit {
         btn: [
           {
             type: 'primary',
-            title: 'Rejoindre l\'Équipe',
+            title: 'Rejoindre la faille de l\'invocateur',
             link: '#0?register'
           },
           {
             type: 'secondary',
-            title: 'Contacter nos Leader',
-            link: '#0?contact'
+            title: 'Ouvrir la section',
+            link: '#0?open'
           }
         ]
       }
@@ -123,12 +121,17 @@ export class SliderComponent implements OnInit {
       },
       content: {
         title: 'Grand Theft Auto Online',
-        text: 'Réalisez le braquage le plus sophistiqué et le plus audacieux jamais vu à Los Santos dans le Braquage du Diamond Casino',
+        text: 'Réalisez le braquage le plus sophistiqué et le plus audacieux jamais vu à Los Santos dans le casse du Diamond Casino',
         btn: [
           {
             type: 'primary',
-            title: 'Rejoindre le Crew',
+            title: 'Rejoindre l\'organisation',
             link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'Ouvrir la section',
+            link: '#0?open'
           }
         ]
       }
@@ -144,9 +147,8 @@ export class SliderComponent implements OnInit {
       },
       content: {
         title: 'Counter Strike: GO',
-        text: 'Tactique et précision sont maîtres mots.' +
-          'Compétition pour but et plaisir pour rêgle,' +
-          'l\'escouade vous attend sur le champ de tir !',
+        // tslint:disable-next-line:max-line-length
+        text: 'Tactique et précision sont maîtres mots. Compétition pour but et plaisir pour rêgle, l\'escouade vous attend sur le champ de tir !',
         btn: [
           {
             type: 'primary',
@@ -155,8 +157,8 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Contacter nos Chefs d\'escouades',
-            link: '#0?contact'
+            title: 'Ouvrir la section',
+            link: '#0?open'
           }
         ]
       }
