@@ -70,7 +70,6 @@ table
     z-index: 2
     left: 0
     top: 0
-    padding-top: 100px
     text-align: center
     backface-visibility: hidden
     transform: translateZ(0)
@@ -152,6 +151,11 @@ table
     max-width: 50vw
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.75), 0 0 15px rgba(0, 0, 0, 0.75), 0 0 25px rgba(0, 0, 0, 0.75)
 
+  .content img
+    height: 20vmin
+    width: auto
+    object-fit: contain
+
   .ui.button
     position: relative
     overflow: hidden
@@ -195,10 +199,6 @@ table
 
   li
     background-size: cover
-
-    > div
-      padding-top: 2vh
-      padding-bottom: 2vh
 
   .cd-full-width
     text-align: center
