@@ -5,15 +5,28 @@ cache:
     - node_modules/
 
 before_script:
-  - apt-get update -qq && apt-get install -y -qq sshpass
+  - apt-get update -qq && apt-get install -y -qq sshpass tree
   - mkdir -p ~/.ssh
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
   - chmod 700 ~/.ssh/id_rsa
 
-deploy_production:
+Build_Test:
+  stage: build
+  environment: Staging
+  only:
+    - develop
+  script:
+    - rm ./package-lock.json
+    - npm install
+    - ./node_modules/@angular/cli/bin/ng build --progress false --prod
+    - cd dist/
+    - tree ./
+
+Deploy_Production:
   stage: deploy
   environment: Production
   only:
+    - master
     - tags
   script:
     - rm ./package-lock.json
