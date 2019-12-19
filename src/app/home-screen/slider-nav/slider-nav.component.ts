@@ -17,9 +17,24 @@ export class SliderNavComponent implements AfterViewInit {
       color: '#9A0310'
     },
     {
+      name: 'Onset',
+      src: '/assets/images/applications/games/onset/icon_onset.png',
+      color: '#1D1D1D'
+    },
+    {
+      name: 'Battlefield V',
+      src: '/assets/images/applications/games/bfv/icon_bfv.png',
+      color: '#E68C33'
+    },
+    {
       name: 'Heroes of the Storm',
       src: '/assets/images/applications/games/hots/icon_heroes.png',
       color: '#393766'
+    },
+    {
+      name: 'Grand Theft Auto Online',
+      src: '/assets/images/applications/games/gtav/icon_gtav.png',
+      color: '#DAE5D6'
     },
     {
       name: 'World of Warcraft',
@@ -32,14 +47,14 @@ export class SliderNavComponent implements AfterViewInit {
       color: '#1C3747'
     },
     {
-      name: 'Grand Theft Auto Online',
-      src: '/assets/images/applications/games/gtav/icon_gtav.png',
-      color: '#DAE5D6'
-    },
-    {
       name: 'Counter Striker: GO',
       src: '/assets/images/applications/games/csgo/icon_csgo.png',
       color: '#FFA200'
+    },
+    {
+      name: 'Minecraft',
+      src: '/assets/images/applications/games/minecraft/icon_minecraft.png',
+      color: '#9BB490'
     },
   ];
   appElements = [
@@ -54,7 +69,7 @@ export class SliderNavComponent implements AfterViewInit {
       color: '#1C2537'
     },
     {
-      name: 'StarbreakersNet',
+      name: 'Community',
       logo: [
         {
           src: 'assets/images/applications/community/community-icon-b.png',
