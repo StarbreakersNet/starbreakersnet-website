@@ -37,6 +37,59 @@ export class SliderComponent implements OnInit {
     {
       type: 'cd-half-width',
       orientation: 'left',
+      name: 'Onset',
+      src: {
+        slider: '/assets/images/applications/games/onset/slider/bg_onset.png',
+        video: '/assets/videos/onset_trailer.webm',
+      },
+      content: {
+        title: 'Roleplay sur Onset',
+        // tslint:disable-next-line:max-line-length
+        text: 'Onset est un sandbox multijoueur à monde ouvert sans objectifs prédéfinis. Dans un scénario Roleplay, évoluez dans un monde ou le contacte avec les autres joueurs sont au coeur du gameplay',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre l\'univers',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'Ouvrir la section',
+            link: '#0?open'
+          }
+        ]
+      }
+    },
+    {
+      type: 'cd-half-width',
+      orientation: 'right',
+      name: 'BF V',
+      src: {
+        slider: '/assets/images/applications/games/bfv/slider/bg_bfv.png',
+        img: '/assets/images/applications/games/bfv/slider/char_bfv.png',
+        video: '/assets/videos/bfv_trailer.webm',
+      },
+      content: {
+        title: 'Battlefield V',
+        // tslint:disable-next-line:max-line-length
+        text: 'Êtes-vous prêts à rejoindre l\'invasion du Pacifique sur terre, dans les airs et en mer ? Le chapitre 5 Guerre du Pacifique introduit des assauts amphibies et la guerre totale sur des champs de bataille emblématiques opposant les armées américaine et japonaise.',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre le champ de bataille',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'Ouvrir la section',
+            link: '#0?open'
+          }
+        ]
+      }
+    },
+    {
+      type: 'cd-half-width',
+      orientation: 'left',
       name: 'HOTS',
       src: {
         slider: '/assets/images/applications/games/hots/slider/bg_heroes.png',
@@ -45,19 +98,44 @@ export class SliderComponent implements OnInit {
       },
       content: {
         title: 'Heroes of the Storm',
-        text: 'Les héros légendaires de Blizzard sont téléportés dans le Nexus.' +
-          'Menez des actions intenses sur des champs de bataille variés.' +
-          'Choisissez votre héros et battez-vous dans Heroes of the Storm !',
+        // tslint:disable-next-line:max-line-length
+        text: 'Les héros légendaires de Blizzard sont téléportés dans le Nexus. Menez des actions intenses sur des champs de bataille variés. Choisissez votre héros et battez-vous dans Heroes of the Storm !',
         btn: [
           {
             type: 'primary',
-            title: 'Rejoindre l\'Équipe',
+            title: 'Rejoindre le Nexus',
             link: '#0?register'
           },
           {
             type: 'secondary',
-            title: 'Contacter nos Leader',
-            link: '#0?contact'
+            title: 'Ouvrir la section',
+            link: '#0?open'
+          }
+        ]
+      }
+    },
+    {
+      type: 'cd-half-width',
+      orientation: 'right',
+      name: 'GTA V',
+      src: {
+        slider: '/assets/images/applications/games/gtav/slider/bg_gtav.png',
+        img: '/assets/images/applications/games/gtav/slider/char_gtav.png',
+        video: '/assets/videos/gtav_trailer.webm',
+      },
+      content: {
+        title: 'Grand Theft Auto Online',
+        text: 'Réalisez le braquage le plus sophistiqué et le plus audacieux jamais vu à Los Santos dans le casse du Diamond Casino',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre l\'organisation',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'Ouvrir la section',
+            link: '#0?open'
           }
         ]
       }
@@ -71,19 +149,18 @@ export class SliderComponent implements OnInit {
       },
       content: {
         title: 'World of Warcraft',
-        text: 'Le voile entre la vie et la mort s’est déchiré.' +
-          'Découvrez ce qui se terre au-delà du monde que vous connaissez dans le prochain chapitre de la saga World of Warcraft,' +
-          'Shadowlands !',
+        // tslint:disable-next-line:max-line-length
+        text: 'Le voile entre la vie et la mort s’est déchiré. Découvrez ce qui se terre au-delà du monde que vous connaissez dans le prochain chapitre de la saga World of Warcraft, Shadowlands !',
         btn: [
           {
             type: 'primary',
-            title: 'Rejoindre la Guilde',
+            title: 'Rejoindre Azeroth',
             link: '#0?register'
           },
           {
             type: 'secondary',
-            title: 'Contacter nos Officiers',
-            link: '#0?contact'
+            title: 'Ouvrir la section',
+            link: '#0?open'
           }
         ]
       }
@@ -101,34 +178,13 @@ export class SliderComponent implements OnInit {
         btn: [
           {
             type: 'primary',
-            title: 'Rejoindre l\'Équipe',
+            title: 'Rejoindre la faille de l\'invocateur',
             link: '#0?register'
           },
           {
             type: 'secondary',
-            title: 'Contacter nos Leader',
-            link: '#0?contact'
-          }
-        ]
-      }
-    },
-    {
-      type: 'cd-half-width',
-      orientation: 'right',
-      name: 'GTA V',
-      src: {
-        slider: '/assets/images/applications/games/gtav/slider/bg_gtav.png',
-        img: '/assets/images/applications/games/gtav/slider/char_gtav.png',
-        video: '/assets/videos/gtav_trailer.webm',
-      },
-      content: {
-        title: 'Grand Theft Auto Online',
-        text: 'Réalisez le braquage le plus sophistiqué et le plus audacieux jamais vu à Los Santos dans le Braquage du Diamond Casino',
-        btn: [
-          {
-            type: 'primary',
-            title: 'Rejoindre le Crew',
-            link: '#0?register'
+            title: 'Ouvrir la section',
+            link: '#0?open'
           }
         ]
       }
@@ -144,9 +200,8 @@ export class SliderComponent implements OnInit {
       },
       content: {
         title: 'Counter Strike: GO',
-        text: 'Tactique et précision sont maîtres mots.' +
-          'Compétition pour but et plaisir pour rêgle,' +
-          'l\'escouade vous attend sur le champ de tir !',
+        // tslint:disable-next-line:max-line-length
+        text: 'Tactique et précision sont maîtres mots. Compétition pour but et plaisir pour règle, l\'escouade vous attend sur le champ de tir !',
         btn: [
           {
             type: 'primary',
@@ -155,8 +210,33 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Contacter nos Chefs d\'escouades',
-            link: '#0?contact'
+            title: 'Ouvrir la section',
+            link: '#0?open'
+          }
+        ]
+      }
+    },
+    {
+      type: 'cd-full-width',
+      name: 'Minecraft',
+      src: {
+        slider: '/assets/images/applications/games/minecraft/slider/bg_minecraft.png',
+        video: '/assets/videos/minecraft_trailer.webm',
+      },
+      content: {
+        title: 'Minecraft',
+        // tslint:disable-next-line:max-line-length
+        text: 'Un monde d\'aventure aux possibilités illimitées, construction, casser des blocs, combattre des créatures ou explorer le paysage de Minecraft qui ne cesse de se réinventer',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre le serveur',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'Ouvrir la section',
+            link: '#0?open'
           }
         ]
       }
