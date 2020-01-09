@@ -115,6 +115,31 @@ export class SliderComponent implements OnInit {
       }
     },
     {
+      type: 'cd-full-width',
+      name: 'Wow',
+      src: {
+        slider: '/assets/images/applications/games/wow/slider/bg_wow.png',
+        video: '/assets/videos/wow_animated.webm',
+      },
+      content: {
+        title: 'World of Warcraft',
+        // tslint:disable-next-line:max-line-length
+        text: 'Le voile entre la vie et la mort s’est déchiré. Découvrez ce qui se terre au-delà du monde que vous connaissez dans le prochain chapitre de la saga World of Warcraft, Shadowlands !',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre Azeroth',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'Ouvrir la section',
+            link: '#0?open'
+          }
+        ]
+      }
+    },
+    {
       type: 'cd-half-width',
       orientation: 'right',
       name: 'GTA V',
@@ -130,31 +155,6 @@ export class SliderComponent implements OnInit {
           {
             type: 'primary',
             title: 'Rejoindre l\'organisation',
-            link: '#0?register'
-          },
-          {
-            type: 'secondary',
-            title: 'Ouvrir la section',
-            link: '#0?open'
-          }
-        ]
-      }
-    },
-    {
-      type: 'cd-full-width',
-      name: 'Wow',
-      src: {
-        slider: '/assets/images/applications/games/wow/slider/bg_wow.png',
-        video: '/assets/videos/wow_animated.webm',
-      },
-      content: {
-        title: 'World of Warcraft',
-        // tslint:disable-next-line:max-line-length
-        text: 'Le voile entre la vie et la mort s’est déchiré. Découvrez ce qui se terre au-delà du monde que vous connaissez dans le prochain chapitre de la saga World of Warcraft, Shadowlands !',
-        btn: [
-          {
-            type: 'primary',
-            title: 'Rejoindre Azeroth',
             link: '#0?register'
           },
           {
