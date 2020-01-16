@@ -54,7 +54,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -81,7 +81,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -108,7 +108,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -133,7 +133,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -159,7 +159,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -183,7 +183,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -210,7 +210,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -235,7 +235,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
