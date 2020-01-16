@@ -45,7 +45,7 @@ export class SliderComponent implements OnInit {
       content: {
         title: 'Roleplay sur Onset',
         // tslint:disable-next-line:max-line-length
-        text: 'Onset est un sandbox multijoueur à monde ouvert sans objectifs prédéfinis. Dans un scénario Roleplay, évoluez dans un monde ou le contacte avec les autres joueurs sont au coeur du gameplay',
+        text: 'Onset est un sandbox multijoueur à monde ouvert sans objectifs prédéfinis. Dans un scénario Roleplay, évoluez dans un monde ou le contact avec les autres joueurs sont au coeur du gameplay',
         btn: [
           {
             type: 'primary',
