@@ -7,6 +7,7 @@ import { UnderConstructionComponent } from './under-construction/under-construct
 import { SliderComponent } from './home-screen/slider/slider.component';
 import { SliderNavComponent } from './home-screen/slider-nav/slider-nav.component';
 import { ParticlesCanvaComponent } from './particles-canva/particles-canva.component';
+import { FeedbackComponent } from './developer/feedback/feedback.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { ParticlesCanvaComponent } from './particles-canva/particles-canva.compo
     UnderConstructionComponent,
     SliderComponent,
     SliderNavComponent,
-    ParticlesCanvaComponent
+    ParticlesCanvaComponent,
+    FeedbackComponent
   ],
   imports: [
     BrowserModule,
