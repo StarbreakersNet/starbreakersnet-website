@@ -32,14 +32,14 @@ export class SliderNavComponent implements AfterViewInit {
       color: '#393766'
     },
     {
-      name: 'Grand Theft Auto Online',
-      src: '/assets/images/applications/games/gtav/icon_gtav.png',
-      color: '#DAE5D6'
-    },
-    {
       name: 'World of Warcraft',
       src: '/assets/images/applications/games/wow/icon_wow.png',
       color: '#382314'
+    },
+    {
+      name: 'Grand Theft Auto Online',
+      src: '/assets/images/applications/games/gtav/icon_gtav.png',
+      color: '#DAE5D6'
     },
     {
       name: 'League of Legends',

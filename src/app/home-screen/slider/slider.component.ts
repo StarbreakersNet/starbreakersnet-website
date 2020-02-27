@@ -45,7 +45,7 @@ export class SliderComponent implements OnInit {
       content: {
         title: 'Roleplay sur Onset',
         // tslint:disable-next-line:max-line-length
-        text: 'Onset est un sandbox multijoueur à monde ouvert sans objectifs prédéfinis. Dans un scénario Roleplay, évoluez dans un monde ou le contacte avec les autres joueurs sont au coeur du gameplay',
+        text: 'Onset est un sandbox multijoueur à monde ouvert sans objectifs prédéfinis. Dans un scénario Roleplay, évoluez dans un monde ou le contact avec les autres joueurs sont au coeur du gameplay',
         btn: [
           {
             type: 'primary',
@@ -54,7 +54,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -81,7 +81,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -108,7 +108,32 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
+            link: '#0?open'
+          }
+        ]
+      }
+    },
+    {
+      type: 'cd-full-width',
+      name: 'Wow',
+      src: {
+        slider: '/assets/images/applications/games/wow/slider/bg_wow.png',
+        video: '/assets/videos/wow_animated.webm',
+      },
+      content: {
+        title: 'World of Warcraft',
+        // tslint:disable-next-line:max-line-length
+        text: 'Le voile entre la vie et la mort s’est déchiré. Découvrez ce qui se terre au-delà du monde que vous connaissez dans le prochain chapitre de la saga World of Warcraft, Shadowlands !',
+        btn: [
+          {
+            type: 'primary',
+            title: 'Rejoindre Azeroth',
+            link: '#0?register'
+          },
+          {
+            type: 'secondary',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -134,32 +159,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
-            link: '#0?open'
-          }
-        ]
-      }
-    },
-    {
-      type: 'cd-full-width',
-      name: 'Wow',
-      src: {
-        slider: '/assets/images/applications/games/wow/slider/bg_wow.png',
-        video: '/assets/videos/wow_animated.webm',
-      },
-      content: {
-        title: 'World of Warcraft',
-        // tslint:disable-next-line:max-line-length
-        text: 'Le voile entre la vie et la mort s’est déchiré. Découvrez ce qui se terre au-delà du monde que vous connaissez dans le prochain chapitre de la saga World of Warcraft, Shadowlands !',
-        btn: [
-          {
-            type: 'primary',
-            title: 'Rejoindre Azeroth',
-            link: '#0?register'
-          },
-          {
-            type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -183,7 +183,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -210,7 +210,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
@@ -235,7 +235,7 @@ export class SliderComponent implements OnInit {
           },
           {
             type: 'secondary',
-            title: 'Ouvrir la section',
+            title: 'En savoir plus',
             link: '#0?open'
           }
         ]
