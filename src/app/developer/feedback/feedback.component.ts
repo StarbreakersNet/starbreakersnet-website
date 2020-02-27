@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 declare var jQuery: any;
 
@@ -9,7 +10,9 @@ declare var jQuery: any;
 })
 export class FeedbackComponent implements OnInit {
 
-  constructor() { }
+  appVersion = environment.appVersion;
+
+  constructor() {}
 
   ngOnInit() {
     jQuery('.feedback-btn .icon.button').popup({
