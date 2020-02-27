@@ -19,6 +19,6 @@ export class FeedbackComponent implements OnInit {
   }
 
   navigateToBugTrack() {
-    window.location.href = 'https://gitlab.com/starbreakersdevteam/starbreakersnet-website/issues/new/';
+    window.open('https://gitlab.com/starbreakersdevteam/starbreakersnet-website/issues/new/');
   }
 }
