@@ -21,6 +21,8 @@ Build_Test:
     - ./node_modules/@angular/cli/bin/ng build --progress false --prod
     - cd dist/
     - tree ./
+    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website-beta/*'
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website-beta/
 
 Deploy_Production:
   stage: deploy
