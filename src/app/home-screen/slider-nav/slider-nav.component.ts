@@ -2,6 +2,8 @@ import {Component, AfterViewInit} from '@angular/core';
 import VanillaTilt from 'vanilla-tilt';
 import {NotificationService} from '../../services/notification/notification.service';
 
+declare var $: any;
+
 @Component({
   selector: 'app-slider-nav',
   templateUrl: './slider-nav.component.html',
@@ -9,6 +11,10 @@ import {NotificationService} from '../../services/notification/notification.serv
 })
 
 export class SliderNavComponent implements AfterViewInit {
+
+  APP_ONE = 'discord';
+  APP_TWO = 'community';
+  APP_THREE = 'youtube';
 
   navElements = [
     {
@@ -59,7 +65,7 @@ export class SliderNavComponent implements AfterViewInit {
   ];
   appElements = [
     {
-      name: 'TeamSpeak',
+      name: 'discord',
       logo: [
         {
           src: 'assets/images/applications/discord/discord-logo-white.svg',
@@ -69,7 +75,7 @@ export class SliderNavComponent implements AfterViewInit {
       color: '#7289DA'
     },
     {
-      name: 'Community',
+      name: 'community',
       logo: [
         {
           src: 'assets/images/applications/community/community-icon-b.png',
@@ -83,7 +89,7 @@ export class SliderNavComponent implements AfterViewInit {
       color: '#2980B9'
     },
     {
-      name: 'Youtube',
+      name: 'youtube',
       logo: [
         {
           src: 'assets/images/applications/youtube/yt_logo_rgb_dark.png',
@@ -109,5 +115,22 @@ export class SliderNavComponent implements AfterViewInit {
         'max-glare': 0.15
       }
     );
+  }
+
+  showApp(appName) {
+    switch (appName) {
+      case this.APP_ONE:
+        $('.modal' + '.' + this.APP_ONE)
+          .modal('show');
+        break;
+      case this.APP_TWO:
+        $('.modal' + '.' + this.APP_TWO).modal('show');
+        break;
+      case this.APP_THREE:
+        $('.modal' + '.' + this.APP_THREE).modal('show');
+        break;
+      default:
+        break;
+    }
   }
 }
