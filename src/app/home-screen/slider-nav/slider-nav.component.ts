@@ -62,11 +62,11 @@ export class SliderNavComponent implements AfterViewInit {
       name: 'TeamSpeak',
       logo: [
         {
-          src: 'assets/images/applications/teamspeak/ts_stacked_bluelight.png',
+          src: 'assets/images/applications/discord/discord-logo-white.svg',
           scale: '0.7'
         }
       ],
-      color: '#1C2537'
+      color: '#7289DA'
     },
     {
       name: 'Community',
