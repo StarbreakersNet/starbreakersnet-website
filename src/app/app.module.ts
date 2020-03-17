@@ -8,6 +8,7 @@ import { SliderComponent } from './home-screen/slider/slider.component';
 import { SliderNavComponent } from './home-screen/slider-nav/slider-nav.component';
 import { ParticlesCanvaComponent } from './particles-canva/particles-canva.component';
 import { FeedbackComponent } from './developer/feedback/feedback.component';
+import { DiscordComponent } from './applications/discord/discord.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { FeedbackComponent } from './developer/feedback/feedback.component';
     SliderComponent,
     SliderNavComponent,
     ParticlesCanvaComponent,
-    FeedbackComponent
+    FeedbackComponent,
+    DiscordComponent
   ],
   imports: [
     BrowserModule,
