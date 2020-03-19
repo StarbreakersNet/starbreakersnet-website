@@ -31,7 +31,7 @@ Test:
   only:
     - merge_requests
   script:
-    - ng test --watch=false --code-coveradge=true --single-run=true
+    - ng test StarbreakersNet-Website --watch=false
 
 Deploy_Beta:
   stage: deploy
