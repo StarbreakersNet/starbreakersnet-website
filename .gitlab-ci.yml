@@ -1,8 +1,14 @@
 image: trion/ng-cli-karma
 
+stages:
+  - build
+  - test
+  - deploy
+
 cache:
   paths:
     - node_modules/
+    - dist/
 
 before_script:
   - apt-get update -qq && apt-get install -y -qq sshpass tree
@@ -10,30 +16,51 @@ before_script:
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
   - chmod 700 ~/.ssh/id_rsa
 
-Build_Test:
+Build:
   stage: build
-  environment: Staging
+  environment:
+    name: Beta
   only:
-    - develop
+    - merge_requests
   script:
     - rm ./package-lock.json
     - npm install
-    - ./node_modules/@angular/cli/bin/ng build --progress false --prod
+    - ng build --progress false --prod
     - cd dist/
     - tree ./
-    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website-beta/*'
-    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website-beta/
+
+Test:
+  stage: test
+  environment:
+    name: Beta
+  only:
+    - merge_requests
+  script:
+    - tree ./ #Todo: à retirer
+    - npm test
+
+Deploy_Beta:
+  stage: deploy
+  environment:
+    name: Beta
+  only:
+    - develop
+  script:
+    - tree ./ #Todo: à retirer
+    - cd dist/
+    - tree ./
+#    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website-beta/*'
+#    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website-beta/
 
 Deploy_Production:
   stage: deploy
-  environment: Production
+  environment:
+    name: Production
   only:
     - master
     - tags
   script:
-    - rm ./package-lock.json
-    - npm install
-    - ./node_modules/@angular/cli/bin/ng build --progress false --prod
+    - tree ./ #Todo: à retirer
     - cd dist/
-    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website/*'
-    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website/
+#    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website/*'
+#    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website/
