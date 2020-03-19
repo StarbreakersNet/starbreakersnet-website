@@ -18,26 +18,20 @@ before_script:
 
 Build:
   stage: build
-  environment:
-    name: Beta
   only:
     - merge_requests
   script:
     - rm ./package-lock.json
     - npm install
     - ng build --progress false --prod
-    - cd dist/
-    - tree ./
+    - tree dist/
 
 Test:
   stage: test
-  environment:
-    name: Beta
   only:
     - merge_requests
   script:
-    - tree ./ #Todo: à retirer
-    - npm test
+    - ng test --watch=false --code-coveradge=true --single-run=true
 
 Deploy_Beta:
   stage: deploy
@@ -46,11 +40,9 @@ Deploy_Beta:
   only:
     - develop
   script:
-    - tree ./ #Todo: à retirer
-    - cd dist/
-    - tree ./
-#    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website-beta/*'
-#    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website-beta/
+    - ng build --progress false --prod
+    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website-beta/*'
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website-beta/
 
 Deploy_Production:
   stage: deploy
@@ -60,7 +52,6 @@ Deploy_Production:
     - master
     - tags
   script:
-    - tree ./ #Todo: à retirer
-    - cd dist/
-#    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website/*'
-#    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website/
+    - ng build --progress false --prod
+    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website/*'
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website/
