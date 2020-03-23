@@ -10,6 +10,7 @@ import { ParticlesCanvaComponent } from './particles-canva/particles-canva.compo
 import { FeedbackComponent } from './developer/feedback/feedback.component';
 import { DiscordComponent } from './applications/discord/discord.component';
 import { YoutubeComponent } from './applications/youtube/youtube.component';
+import { HomeScreenComponent } from './home-screen/home-screen.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { YoutubeComponent } from './applications/youtube/youtube.component';
     ParticlesCanvaComponent,
     FeedbackComponent,
     DiscordComponent,
-    YoutubeComponent
+    YoutubeComponent,
+    HomeScreenComponent
   ],
   imports: [
     BrowserModule,

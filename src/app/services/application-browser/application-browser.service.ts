@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {NotificationService} from '../notification/notification.service';
+import {Router} from '@angular/router';
 
 declare var $: any;
 
@@ -96,7 +97,7 @@ export class ApplicationBrowserService {
     },
   ];
 
-  constructor(public notification: NotificationService) { }
+  constructor(public notification: NotificationService, public router: Router) { }
 
   openApplication(applicationName: string) {
     if (this.isFeatureAvaible(applicationName)) {
@@ -121,20 +122,10 @@ export class ApplicationBrowserService {
   }
 
   showApp(applicationName) {
-    switch (applicationName) {
-      case this.APP_ONE:
-        $('.modal' + '.' + this.APP_ONE)
-          .modal('show');
-        break;
-      case this.APP_TWO:
-        $('.modal' + '.' + this.APP_TWO)
-          .modal('show');
-        break;
-      case this.APP_THREE:
-        NotificationService.notify('Youtube works !');
-        break;
-      default:
-        break;
+    if (applicationName === this.APP_ONE) {
+      $('.modal' + '.' + this.APP_ONE).modal('show');
+    } else {
+      this.router.navigate([applicationName]);
     }
   }
 }
