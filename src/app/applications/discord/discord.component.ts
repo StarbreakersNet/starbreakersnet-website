@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {ApplicationBrowserService} from '../../services/application-browser/application-browser.service';
 
@@ -9,7 +9,7 @@ declare var $: any;
   templateUrl: './discord.component.html',
   styleUrls: ['./discord.component.sass']
 })
-export class DiscordComponent implements OnInit {
+export class DiscordComponent implements OnInit, OnDestroy {
 
   APPLICATION_NAME = this.applicationBrowser.APP_ONE;
 
@@ -21,10 +21,13 @@ export class DiscordComponent implements OnInit {
   ngOnInit() {
     this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
     $('.modal' + '.' + this.APPLICATION_NAME).modal({
-      detachable: false,
       dimmerSettings: {
         dimmerName: this.APPLICATION_NAME
       }
     });
+  }
+
+  ngOnDestroy() {
+    $('.modal' + '.' + this.APPLICATION_NAME).remove();
   }
 }
