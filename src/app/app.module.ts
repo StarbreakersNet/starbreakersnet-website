@@ -11,6 +11,7 @@ import { FeedbackComponent } from './developer/feedback/feedback.component';
 import { DiscordComponent } from './applications/discord/discord.component';
 import { YoutubeComponent } from './applications/youtube/youtube.component';
 import { HomeScreenComponent } from './home-screen/home-screen.component';
+import { BackButtonComponent } from './elements/back-button/back-button.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { HomeScreenComponent } from './home-screen/home-screen.component';
     FeedbackComponent,
     DiscordComponent,
     YoutubeComponent,
-    HomeScreenComponent
+    HomeScreenComponent,
+    BackButtonComponent
   ],
   imports: [
     BrowserModule,
