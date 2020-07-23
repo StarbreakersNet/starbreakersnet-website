@@ -41,8 +41,8 @@ Deploy_Beta:
     - develop
   script:
     - ng build --progress false --prod
-    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website-beta/*'
-    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website-beta/
+    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /var/www/beta.starbreakersgaming.com/*'
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* gitlab-agent@starbreakersgaming.com:/var/www/beta.starbreakersgaming.com/
 
 Deploy_Production:
   stage: deploy
@@ -53,5 +53,5 @@ Deploy_Production:
     - tags
   script:
     - ng build --progress false --prod
-    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /srv/www/starbreakersnet-website/*'
-    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* gitlab-agent@starbreakersgaming.com:/srv/www/starbreakersnet-website/
+    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /var/www/starbreakersgaming.com/*'
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* gitlab-agent@starbreakersgaming.com:/var/www/starbreakersgaming.com/
