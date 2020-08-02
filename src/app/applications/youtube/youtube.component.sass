@@ -1,12 +1,47 @@
+@mixin aspect-ratio($width, $height)
+  position: relative
+  &:before
+    display: block
+    content: " "
+    width: 100%
+    padding-top: ($height / $width) * 100%
+
+  > .content
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+
 .youtubeContainer
+  display: flex
+  flex-grow: 1
+  justify-content: center
+  align-items: center
   overflow: hidden
-  height: 90%
-  width: 100%
+
+  .youtubePlayer
+    @include aspect-ratio(16,9)
+    display: flex
+    flex-grow: 1
+    justify-content: center
+    align-items: center
+    border-radius: 12px
+    overflow: hidden
+
+    iframe
+      position: absolute
+      height: 100%
+      width: 100%
+      border: none
 
 .overlayContainer
   display: flex
+  flex-grow: 1
   justify-content: center
   align-items: center
-  height: 10%
-  width: 100%
 
+.ui.container
+  display: flex
+  flex-direction: column
+  height: 100%
