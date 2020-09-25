@@ -12,6 +12,7 @@ import { DiscordComponent } from './applications/discord/discord.component';
 import { YoutubeComponent } from './applications/youtube/youtube.component';
 import { HomeScreenComponent } from './home-screen/home-screen.component';
 import { BackButtonComponent } from './elements/back-button/back-button.component';
+import { RouteAnimationComponent } from './elements/route-animation/route-animation.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { BackButtonComponent } from './elements/back-button/back-button.componen
     DiscordComponent,
     YoutubeComponent,
     HomeScreenComponent,
-    BackButtonComponent
+    BackButtonComponent,
+    RouteAnimationComponent
   ],
   imports: [
     BrowserModule,
