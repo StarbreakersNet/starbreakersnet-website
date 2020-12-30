@@ -26,54 +26,66 @@ export class RouterAnimationsComponent implements OnInit {
 export const slideInAnimation =
   trigger('routeAnimations', [
     transition('* <=> *', [
-      style({position: 'relative'}),
       query(':enter, :leave', [
         style({
           position: 'absolute',
-          top: 0,
-          left: 0,
           width: '100%'
         })
       ]),
       query(':enter', [
         style({
           opacity: 0,
-          transform: 'scale(0)',
+          transform: 'scale(0) translateY(50%)',
+        })
+      ]),
+      query(':leave', [
+        style({
+          opacity: 1,
+          transform: 'scale(1) translateY(0)',
+        })
+      ]),
+      group([
+        query(':enter', [
+          animate('600ms ease', style({opacity: 1, transform: 'scale(1) translateY(0)'}))
+        ]),
+        query(':leave', [
+          animate('600ms ease', style({opacity: 0, transform: 'scale(0.50) translateY(20%)'}))
+        ]),
+      ]),
+      query(':enter, :leave', animateChild()),
+    ])
+  ]);
+
+export const slideOutAnimation =
+  trigger('routeAnimations', [
+    transition('* <=> *', [
+      query(':enter, :leave', [
+        style({
+          position: 'absolute',
+          width: '100%'
         })
       ]),
       query(':enter', [
         style({
           opacity: 1,
-          transform: 'scale(1)',
+          transform: 'scale(1) translateY(0)',
+        })
+      ]),
+      query(':leave', [
+        style({
+          opacity: 0,
+          transform: 'scale(0) translateY(50%)',
         })
       ]),
       group([
-        query(':leave', [
-          animate('600ms ease', style({opacity: 0, transform: 'scale(0) translateY(20%)'}))
-        ]),
         query(':enter', [
+          animate('600ms ease', style({opacity: 0, transform: 'scale(0.50) translateY(20%)'}))
+        ]),
+        query(':leave', [
           animate('600ms ease', style({opacity: 1, transform: 'scale(1) translateY(0)'}))
-        ])
+        ]),
       ]),
+      query(':enter, :leave', animateChild()),
     ])
   ]);
 
-export const faderAnimation =
-  trigger('routeAnimations', [
-    transition('* <=> *', [
-      // Set a default  style for enter and leave
-      query(':enter, :leave', [
-        style({
-          position: 'absolute',
-          left: 0,
-          width: '100%',
-          opacity: 0,
-          transform: 'scale(0) translateY(100%)',
-        }),
-      ]),
-      // Animate the new page in
-      query(':enter', [
-        animate('600ms ease', style({ opacity: 1, transform: 'scale(1) translateY(0)' })),
-      ])
-    ]),
-  ]);
