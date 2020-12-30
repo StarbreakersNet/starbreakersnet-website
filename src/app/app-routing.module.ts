@@ -5,8 +5,8 @@ import {YoutubeComponent} from './applications/youtube/youtube.component';
 
 
 const routes: Routes = [
-  { path: '', component: HomeScreenComponent},
-  { path: 'youtube', component: YoutubeComponent },
+  { path: '', component: HomeScreenComponent, data: {animation: 'HomeScreenPage'}},
+  { path: 'youtube', component: YoutubeComponent, data: {animation: 'YoutubePage'}},
   { path: '**', redirectTo: '/' }
 ];
 
