@@ -17,16 +17,16 @@ export class NotificationService {
     jQuery.fn.toast.settings.closeEasing = 'easeInOut';
   }
 
-  notify() {
+  static notify(text: string) {
     jQuery('body').toast({
       class: 'info',
       showIcon: 'info',
-      message: 'Ceci est une notification',
+      message: text,
       showProgress: 'bottom',
     });
   }
 
-  featureComing() {
+  static featureComing() {
     jQuery('body').toast({
       class: 'info',
       showIcon: 'info',

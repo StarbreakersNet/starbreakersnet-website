@@ -1,8 +1,14 @@
 image: trion/ng-cli-karma
 
+stages:
+  - build
+  - test
+  - deploy
+
 cache:
   paths:
     - node_modules/
+    - dist/
 
 before_script:
   - apt-get update -qq && apt-get install -y -qq sshpass tree
@@ -10,24 +16,44 @@ before_script:
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
   - chmod 700 ~/.ssh/id_rsa
 
-Build_Test:
+Build:
   stage: build
-  environment: Staging
   only:
-    - develop
+    - merge_requests
   script:
     - rm ./package-lock.json
     - npm install
-    - ./node_modules/@angular/cli/bin/ng build --progress false --prod
-    - cd dist/
-    - tree ./
+    - ng build --progress false --prod
+    - tree dist/
+
+Test:
+  stage: test
+  only:
+    - merge_requests
+  script:
+    - ng test StarbreakersNet-Website --watch=false
+
+Deploy_Beta:
+  stage: deploy
+  environment:
+    name: Beta
+  only:
+    - develop
+    - tags
+    - .*-beta$
+  script:
+    - ng build --progress false --prod
+    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /var/www/beta.starbreakersgaming.com/*'
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* gitlab-agent@starbreakersgaming.com:/var/www/beta.starbreakersgaming.com/
 
 Deploy_Production:
   stage: deploy
-  environment: Production
+  environment:
+    name: Production
   only:
     - master
     - tags
+    - .*\d$
   script:
     - rm ./package-lock.json
     - npm install

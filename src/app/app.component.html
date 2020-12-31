@@ -1,4 +1,4 @@
-<!--<app-under-construction></app-under-construction>-->
-<app-slider></app-slider>
-<app-feedback></app-feedback>
-<router-outlet></router-outlet>
+<main [@routeAnimations]="prepareRoute(outlet)">
+  <!--<app-under-construction></app-under-construction>-->
+  <router-outlet #outlet="outlet"></router-outlet>
+</main>

@@ -1,15 +1,16 @@
 <div class="ui centered grid">
   <div class="nav-container">
     <div class="ui fluid borderless menu app-navigation">
-      <div class="item" *ngFor="let element of navElements; let i = index; first as isFirst" [class.selected]="isFirst">
+      <div class="item" *ngFor="let element of applicationBrowser.navElements; let i = index; first as isFirst" [class.selected]="isFirst">
         <a class="ui fluid button" [ngStyle]="{'background-color': element.color}">
           <img class="ui image" src="{{element.src}}" alt="{{element.name}} icon">
         </a>
       </div>
     </div>
     <div class="ui equal width three column compact grid apps-container">
-      <div class="column" *ngFor="let element of appElements;" (click)="this.notification.featureComing()">
-        <button class="ui fluid card atvButton" [ngStyle]="{'background-color': element.color, 'background-image': 'url(' + element.img + ')'}">
+      <div class="column" *ngFor="let element of applicationBrowser.appElements;" (click)="applicationBrowser.openApplication(element.name)">
+        <button class="ui fluid card atvButton"
+                [ngStyle]="{'background-color': element.color, 'background-image': 'url(' + element.img + ')'}">
           <div class="tilt-layer" *ngFor="let logo of element.logo; let i = index;">
             <img src="{{logo.src}}" [ngStyle]="{transform: 'translateZ(' + ((i * 5) + 5) + 'vmin) scale(' + logo.scale + ')'}" alt="{{element.name}} icon">
           </div>

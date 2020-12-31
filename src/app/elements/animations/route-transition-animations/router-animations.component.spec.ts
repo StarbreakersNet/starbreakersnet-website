@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UnderConstructionComponent } from './under-construction.component';
+import { RouterAnimationsComponent } from './router-animations.component';
 
-describe('UnderConstructionComponent', () => {
-  let component: UnderConstructionComponent;
-  let fixture: ComponentFixture<UnderConstructionComponent>;
+describe('RouteTransitionAnimationsComponent', () => {
+  let component: RouterAnimationsComponent;
+  let fixture: ComponentFixture<RouterAnimationsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UnderConstructionComponent ]
+      declarations: [ RouterAnimationsComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UnderConstructionComponent);
+    fixture = TestBed.createComponent(RouterAnimationsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

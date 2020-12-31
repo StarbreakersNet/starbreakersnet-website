@@ -1,0 +1,71 @@
+@mixin aspect-ratio($width, $height)
+  position: relative
+  &:before
+    display: block
+    content: " "
+    width: 100%
+    padding-top: ($height / $width) * 100%
+
+  > .content
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+
+.youtubeContainer
+  display: flex
+  flex-grow: 0.1
+  align-items: center
+
+  .youtubePlayer
+    @include aspect-ratio(16,9)
+    display: flex
+    flex-grow: 1
+    justify-content: center
+    align-items: center
+    background-color: black
+    border-radius: 12px
+    box-shadow: 0 0 15px 5px rgba(0,0,0,0.75)
+    overflow: hidden
+
+    iframe
+      position: absolute
+      top: 0
+      left: 0
+      height: 100%
+      width: 100%
+      border: none
+      border-radius: 12px
+      opacity: 0
+      animation: fader 1s ease-in-out 1s forwards
+
+.overlayContainer
+  display: flex
+  flex-grow: 0.1
+  justify-content: center
+  align-items: center
+
+.backgroundContainer
+  position: absolute
+  display: flex
+  justify-content: center
+  align-items: center
+  height: 100%
+  width: 100%
+
+  img
+    height: 100%
+    width: 100%
+
+.ui.container
+  display: flex
+  flex-direction: column
+  justify-content: center
+  height: 100vh
+
+@keyframes fader
+  0%
+    opacity: 0
+  100%
+    opacity: 1

@@ -1,24 +1,22 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SliderNavComponent } from './slider-nav.component';
+import { DiscordComponent } from './discord.component';
 import {RouterTestingModule} from '@angular/router/testing';
 
-describe('SliderNavComponent', () => {
-  let component: SliderNavComponent;
-  let fixture: ComponentFixture<SliderNavComponent>;
+describe('DiscordComponent', () => {
+  let component: DiscordComponent;
+  let fixture: ComponentFixture<DiscordComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
-      declarations: [ SliderNavComponent ]
+      imports: [RouterTestingModule],
+      declarations: [ DiscordComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SliderNavComponent);
+    fixture = TestBed.createComponent(DiscordComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
