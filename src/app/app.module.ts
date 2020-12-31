@@ -14,7 +14,7 @@ import { HomeScreenComponent } from './home-screen/home-screen.component';
 import { BackButtonComponent } from './elements/back-button/back-button.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterAnimationsComponent } from './elements/animations/route-transition-animations/router-animations.component';
-import { ParticlesModule } from 'angular-particle';
+import { NgParticlesModule } from 'ng-particles';
 
 @NgModule({
   declarations: [
@@ -34,7 +34,7 @@ import { ParticlesModule } from 'angular-particle';
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    ParticlesModule
+    NgParticlesModule
   ],
   providers: [
     Title
