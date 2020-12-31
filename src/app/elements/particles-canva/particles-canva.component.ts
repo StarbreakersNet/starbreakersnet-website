@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import * as Particles from 'particlesjs';
 
 @Component({
   selector: 'app-particles-canva',
@@ -8,32 +7,37 @@ import * as Particles from 'particlesjs';
 })
 export class ParticlesCanvaComponent implements OnInit {
 
+  myStyle: object = {};
+  myParams: object = {};
+  width = 100;
+  height = 100;
+
   constructor() { }
 
   ngOnInit() {
-    /*Particles.init({
-      selector: '.constructionBackground',
-      maxParticles: 100,
-      sizeVariations: 3,
-      speed: 0.1,
-      color: ['#FAED4F', '#8D1C1A'],
-      minDistance: 120,
-      connectParticles: true,
-      responsive: [
-        {
-          breakpoint: 1000,
-          options: {
-            maxParticles: 50
-          }
+    this.myStyle = {
+      position: 'absolute',
+      width: '100vw',
+      height: '100vh',
+      'z-index': -1,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    };
+    this.myParams = {
+      particles: {
+        number: {
+          value: 200,
         },
-        {
-          breakpoint: 500,
-          options: {
-            maxParticles: 25
-          }
-        }
-      ]
-    });*/
+        color: {
+          value: '#ff0000'
+        },
+        shape: {
+          type: 'triangle',
+        },
+      }
+    };
   }
 
 }
