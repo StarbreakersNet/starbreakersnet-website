@@ -39,6 +39,8 @@ Deploy_Beta:
     name: Beta
   only:
     - develop
+    - tags
+    - .*-beta$
   script:
     - ng build --progress false --prod
     - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /var/www/beta.starbreakersgaming.com/*'
@@ -51,6 +53,7 @@ Deploy_Production:
   only:
     - master
     - tags
+    - .*\d$
   script:
     - ng build --progress false --prod
     - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /var/www/starbreakersgaming.com/*'
