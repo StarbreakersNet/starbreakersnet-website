@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { YoutubeComponent } from './youtube.component';
+import {RouterTestingModule} from '@angular/router/testing';
+import {BackButtonComponent} from '../../elements/back-button/back-button.component';
 
 describe('YoutubeComponent', () => {
   let component: YoutubeComponent;
@@ -8,7 +10,11 @@ describe('YoutubeComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ YoutubeComponent ]
+      imports: [RouterTestingModule],
+      declarations: [
+        YoutubeComponent,
+        BackButtonComponent
+      ]
     })
     .compileComponents();
   }));

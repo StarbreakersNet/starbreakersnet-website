@@ -11,7 +11,7 @@ export class ParticlesCanvaComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    Particles.init({
+    /*Particles.init({
       selector: '.constructionBackground',
       maxParticles: 100,
       sizeVariations: 3,
@@ -33,7 +33,7 @@ export class ParticlesCanvaComponent implements OnInit {
           }
         }
       ]
-    });
+    });*/
   }
 
 }

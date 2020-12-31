@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DiscordComponent } from './discord.component';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('DiscordComponent', () => {
   let component: DiscordComponent;
@@ -8,6 +9,7 @@ describe('DiscordComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [RouterTestingModule],
       declarations: [ DiscordComponent ]
     })
     .compileComponents();

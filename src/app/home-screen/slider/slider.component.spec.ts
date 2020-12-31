@@ -4,6 +4,7 @@ import { SliderComponent } from './slider.component';
 import {SliderNavComponent} from '../slider-nav/slider-nav.component';
 import {ParticlesCanvaComponent} from '../../elements/particles-canva/particles-canva.component';
 import {DiscordComponent} from '../../applications/discord/discord.component';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('SliderComponent', () => {
   let component: SliderComponent;
@@ -11,6 +12,9 @@ describe('SliderComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule
+      ],
       declarations: [
         SliderComponent,
         SliderNavComponent,

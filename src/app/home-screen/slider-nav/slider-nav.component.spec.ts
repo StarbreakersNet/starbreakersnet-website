@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SliderNavComponent } from './slider-nav.component';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('SliderNavComponent', () => {
   let component: SliderNavComponent;
@@ -8,6 +9,9 @@ describe('SliderNavComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule
+      ],
       declarations: [ SliderNavComponent ]
     })
     .compileComponents();
