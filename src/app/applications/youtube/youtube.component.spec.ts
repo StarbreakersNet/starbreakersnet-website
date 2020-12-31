@@ -1,22 +1,26 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DiscordComponent } from './discord.component';
+import { YoutubeComponent } from './youtube.component';
 import {RouterTestingModule} from '@angular/router/testing';
+import {BackButtonComponent} from '../../elements/back-button/back-button.component';
 
-describe('DiscordComponent', () => {
-  let component: DiscordComponent;
-  let fixture: ComponentFixture<DiscordComponent>;
+describe('YoutubeComponent', () => {
+  let component: YoutubeComponent;
+  let fixture: ComponentFixture<YoutubeComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [ DiscordComponent ]
+      declarations: [
+        YoutubeComponent,
+        BackButtonComponent
+      ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DiscordComponent);
+    fixture = TestBed.createComponent(YoutubeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

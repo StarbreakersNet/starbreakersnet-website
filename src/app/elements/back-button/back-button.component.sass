@@ -1,0 +1,35 @@
+.ui.button
+  position: relative
+  overflow: hidden
+  color: white
+  text-transform: uppercase
+  box-shadow: 0 0 28px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0,0,0,0.5)
+  transition-property: background-color, transform
+  transition-duration: 0.2s
+
+  &:hover, &:focus
+    transform: scale(1.1)
+
+  &:active
+    transform: scale(1.05)
+
+  &:not(:last-child)
+    margin-right: 2em
+
+  &:before
+    content: ""
+    position: absolute
+    z-index: -1
+    left: 51%
+    right: 51%
+    bottom: 0
+    background: #CD0415
+    height: 10%
+    transition-property: left, right
+    transition-duration: 0.3s
+    transition-timing-function: ease-out
+
+  &:hover, &:focus, &:active
+    &:before
+      left: 0
+      right: 0

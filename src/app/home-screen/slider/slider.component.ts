@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as jQuery from 'jquery';
 import {NotificationService} from '../../services/notification/notification.service';
+import {ApplicationBrowserService} from '../../services/application-browser/application-browser.service';
 
 @Component({
   selector: 'app-slider',
@@ -243,7 +244,7 @@ export class SliderComponent implements OnInit {
     },
   ];
 
-  constructor(public notification: NotificationService) { }
+  constructor(public notification: NotificationService, public applicationBrowser: ApplicationBrowserService) { }
 
   ngOnInit() {
     jQuery(document).ready(($) => {

@@ -1,10 +1,10 @@
 import { TestBed, async } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
-import {UnderConstructionComponent} from './under-construction/under-construction.component';
+import {UnderConstructionComponent} from './developer/under-construction/under-construction.component';
 import {SliderComponent} from './home-screen/slider/slider.component';
 import {SliderNavComponent} from './home-screen/slider-nav/slider-nav.component';
-import {ParticlesCanvaComponent} from './particles-canva/particles-canva.component';
+import {ParticlesCanvaComponent} from './elements/particles-canva/particles-canva.component';
 import {FeedbackComponent} from './developer/feedback/feedback.component';
 import {DiscordComponent} from './applications/discord/discord.component';
 

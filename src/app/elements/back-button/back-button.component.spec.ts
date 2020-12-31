@@ -1,24 +1,22 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SliderNavComponent } from './slider-nav.component';
+import { BackButtonComponent } from './back-button.component';
 import {RouterTestingModule} from '@angular/router/testing';
 
-describe('SliderNavComponent', () => {
-  let component: SliderNavComponent;
-  let fixture: ComponentFixture<SliderNavComponent>;
+describe('BackButtonComponent', () => {
+  let component: BackButtonComponent;
+  let fixture: ComponentFixture<BackButtonComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule
-      ],
-      declarations: [ SliderNavComponent ]
+      imports: [RouterTestingModule],
+      declarations: [ BackButtonComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SliderNavComponent);
+    fixture = TestBed.createComponent(BackButtonComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
