@@ -19,7 +19,6 @@
     "@angular/platform-browser": "^8.2.14",
     "@angular/platform-browser-dynamic": "^8.2.14",
     "@angular/router": "^8.2.14",
-    "angular-particle": "^1.0.4",
     "fomantic-ui": "^2.8.7",
     "jquery": "^3.5.1",
     "ng-particles": "^2.1.11",
