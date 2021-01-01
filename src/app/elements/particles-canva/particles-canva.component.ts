@@ -20,7 +20,7 @@ export class ParticlesCanvaComponent implements OnInit {
         }
       },
       color: {
-        value: '#ffffff'
+        value: ['#8D1C1A', '#FAED4F']
       },
       shape: {
         type: 'circle',
@@ -60,13 +60,13 @@ export class ParticlesCanvaComponent implements OnInit {
       line_linked: {
         enable: true,
         distance: 150,
-        color: '#ffffff',
+        color: 'random',
         opacity: 0.4,
         width: 1
       },
       move: {
         enable: true,
-        speed: 6,
+        speed: 2,
         direction: 'none',
         random: false,
         straight: false,
