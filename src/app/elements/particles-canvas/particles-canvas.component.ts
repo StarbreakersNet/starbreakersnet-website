@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-particles-canva',
-  templateUrl: './particles-canva.component.html',
-  styleUrls: ['./particles-canva.component.sass']
+  templateUrl: './particles-canvas.component.html',
+  styleUrls: ['./particles-canvas.component.sass']
 })
-export class ParticlesCanvaComponent implements OnInit {
+export class ParticlesCanvasComponent implements OnInit {
 
   id = 'tsparticles';
 

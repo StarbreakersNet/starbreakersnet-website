@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { UnderConstructionComponent } from './developer/under-construction/under-construction.component';
 import { SliderComponent } from './home-screen/slider/slider.component';
 import { SliderNavComponent } from './home-screen/slider-nav/slider-nav.component';
-import { ParticlesCanvaComponent } from './elements/particles-canva/particles-canva.component';
+import { ParticlesCanvasComponent } from './elements/particles-canvas/particles-canvas.component';
 import { FeedbackComponent } from './developer/feedback/feedback.component';
 import { DiscordComponent } from './applications/discord/discord.component';
 import { YoutubeComponent } from './applications/youtube/youtube.component';
@@ -15,6 +15,7 @@ import { BackButtonComponent } from './elements/back-button/back-button.componen
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterAnimationsComponent } from './elements/animations/route-transition-animations/router-animations.component';
 import { NgParticlesModule } from 'ng-particles';
+import { FlowFieldCanvasComponent } from './elements/flow-field-canvas/flow-field-canvas.component';
 
 @NgModule({
   declarations: [
@@ -22,13 +23,14 @@ import { NgParticlesModule } from 'ng-particles';
     UnderConstructionComponent,
     SliderComponent,
     SliderNavComponent,
-    ParticlesCanvaComponent,
+    ParticlesCanvasComponent,
     FeedbackComponent,
     DiscordComponent,
     YoutubeComponent,
     HomeScreenComponent,
     BackButtonComponent,
-    RouterAnimationsComponent
+    RouterAnimationsComponent,
+    FlowFieldCanvasComponent
   ],
   imports: [
     BrowserModule,

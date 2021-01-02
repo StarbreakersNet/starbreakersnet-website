@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ParticlesCanvaComponent } from './particles-canva.component';
+import { FlowFieldCanvasComponent } from './flow-field-canvas.component';
 
-describe('ParticlesCanvaComponent', () => {
-  let component: ParticlesCanvaComponent;
-  let fixture: ComponentFixture<ParticlesCanvaComponent>;
+describe('FlowFieldCanvasComponent', () => {
+  let component: FlowFieldCanvasComponent;
+  let fixture: ComponentFixture<FlowFieldCanvasComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ParticlesCanvaComponent ]
+      declarations: [ FlowFieldCanvasComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ParticlesCanvaComponent);
+    fixture = TestBed.createComponent(FlowFieldCanvasComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
