@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as NoiseJS from './NoiseLib.js';
+import { makeNoise3D, Noise3D } from 'open-simplex-noise';
 
 @Component({
   selector: 'app-flow-field-canvas',
@@ -17,10 +17,11 @@ export class FlowFieldCanvasComponent implements OnInit {
   columns;
   rows;
   noiseZ;
+  noiseSeed;
 
   constructor() { }
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.setup();
     this.draw();
   }
@@ -47,8 +48,8 @@ export class FlowFieldCanvasComponent implements OnInit {
   calculateField() {
     for (let x = 0; x < this.columns; x++) {
       for (let y = 0; y < this.rows; y++) {
-        const angle = NoiseJS.simplex3(x / 50, y / 50, this.noiseZ) * Math.PI * 2;
-        const length = NoiseJS.simplex3(x / 100 + 40000, y / 100 + 40000, this.noiseZ);
+        const angle = this.noiseSeed(x / 50, y / 50, this.noiseZ) * Math.PI * 2;
+        const length = this.noiseSeed(x / 100 + 40000, y / 100 + 40000, this.noiseZ);
         this.field[x][y][0] = angle;
         this.field[x][y][1] = length;
       }
@@ -58,7 +59,7 @@ export class FlowFieldCanvasComponent implements OnInit {
   reset() {
     this.w = this.canvas.width = window.innerWidth;
     this.h = this.canvas.height = window.innerHeight;
-    NoiseJS.seed(Math.random());
+    this.noiseSeed = makeNoise3D(Math.random());
     this.columns = Math.floor(this.w / this.size) + 1;
     this.rows = Math.floor(this.h / this.size) + 1;
     this.initField();
