@@ -88,7 +88,8 @@ export class FlowFieldCanvasComponent implements OnInit {
         this.ctx.save();
         this.ctx.translate(x * this.size, y * this.size);
         this.ctx.rotate(angle);
-        this.ctx.strokeStyle = 'white';
+        // TODO: Changer pour contenir les couleurs dans une range de couleur définie
+        this.ctx.strokeStyle = `hsla(${(angle * 180) / Math.PI}, 100%, 50%, 1)`;;
         this.ctx.beginPath();
         this.ctx.moveTo(0, 0);
         this.ctx.lineTo(0, this.size * length);
