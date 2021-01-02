@@ -66,7 +66,9 @@ export class FlowFieldCanvasComponent implements OnInit {
   }
 
   draw() {
-    requestAnimationFrame(this.draw);
+    requestAnimationFrame(() => {
+      this.draw();
+    });
     this.calculateField();
     this.noiseZ += 0.004;
     this.clear();
