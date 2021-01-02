@@ -100,7 +100,6 @@
               "src/styles.sass"
             ],
             "scripts": [
-              "node_modules/particlesjs/dist/particles.min.js",
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/vanilla-tilt/dist/vanilla-tilt.min.js",
               "src/fomantic/dist/semantic.min.js"

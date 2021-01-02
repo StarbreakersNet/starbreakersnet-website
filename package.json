@@ -22,7 +22,6 @@
     "fomantic-ui": "^2.8.7",
     "jquery": "^3.5.1",
     "ng-particles": "^2.1.11",
-    "noisejs": "^2.1.0",
     "rxjs": "~6.6.3",
     "tslib": "^1.10.0",
     "tsparticles": "^1.18.11",

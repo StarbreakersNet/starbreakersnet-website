@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as NoiseJS from 'noisejs';
+import * as NoiseJS from './NoiseLib.js';
 
 @Component({
   selector: 'app-flow-field-canvas',
