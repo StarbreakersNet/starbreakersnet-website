@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UnderConstructionComponent } from './under-construction.component';
-import {ParticlesCanvaComponent} from '../../elements/particles-canvas/particles-canvas.component';
+import {ParticlesCanvasComponent} from '../../elements/particles-canvas/particles-canvas.component';
 
 describe('UnderConstructionComponent', () => {
   let component: UnderConstructionComponent;
@@ -11,7 +11,7 @@ describe('UnderConstructionComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         UnderConstructionComponent,
-        ParticlesCanvaComponent
+        ParticlesCanvasComponent
       ]
     })
     .compileComponents();

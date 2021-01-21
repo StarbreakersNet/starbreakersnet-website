@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ParticlesCanvasComponent } from './particles-canvas.component';
 
-describe('ParticlesCanvaComponent', () => {
+describe('ParticlesCanvasComponent', () => {
   let component: ParticlesCanvasComponent;
   let fixture: ComponentFixture<ParticlesCanvasComponent>;
 

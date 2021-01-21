@@ -4,7 +4,7 @@ import { AppComponent } from './app.component';
 import {UnderConstructionComponent} from './developer/under-construction/under-construction.component';
 import {SliderComponent} from './home-screen/slider/slider.component';
 import {SliderNavComponent} from './home-screen/slider-nav/slider-nav.component';
-import {ParticlesCanvaComponent} from './elements/particles-canvas/particles-canvas.component';
+import {ParticlesCanvasComponent} from './elements/particles-canvas/particles-canvas.component';
 import {FeedbackComponent} from './developer/feedback/feedback.component';
 import {DiscordComponent} from './applications/discord/discord.component';
 
@@ -19,7 +19,7 @@ describe('AppComponent', () => {
         UnderConstructionComponent,
         SliderComponent,
         SliderNavComponent,
-        ParticlesCanvaComponent,
+        ParticlesCanvasComponent,
         FeedbackComponent,
         DiscordComponent
       ],
