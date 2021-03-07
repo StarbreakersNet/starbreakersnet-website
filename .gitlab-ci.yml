@@ -31,7 +31,7 @@ Test:
   only:
     - merge_requests
   script:
-    - ng test StarbreakersNet-Website --watch=false
+    - ng test starbreakersnet-website --watch=false
 
 Deploy_Beta:
   stage: deploy
@@ -55,6 +55,9 @@ Deploy_Production:
   except:
     - branches
   script:
-    - ng build --progress false --prod
+    - rm ./package-lock.json
+    - npm install
+    - ./node_modules/@angular/cli/bin/ng build --progress false --prod
+    - cd dist/
     - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no gitlab-agent@starbreakersgaming.com 'rm -rf /var/www/starbreakersgaming.com/*'
-    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* gitlab-agent@starbreakersgaming.com:/var/www/starbreakersgaming.com/
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* gitlab-agent@starbreakersgaming.com:/var/www/starbreakersgaming.com/

@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ParticlesCanvaComponent } from './particles-canva.component';
+import { ParticlesCanvasComponent } from './particles-canvas.component';
 
-describe('ParticlesCanvaComponent', () => {
-  let component: ParticlesCanvaComponent;
-  let fixture: ComponentFixture<ParticlesCanvaComponent>;
+describe('ParticlesCanvasComponent', () => {
+  let component: ParticlesCanvasComponent;
+  let fixture: ComponentFixture<ParticlesCanvasComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ParticlesCanvaComponent ]
+      declarations: [ ParticlesCanvasComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ParticlesCanvaComponent);
+    fixture = TestBed.createComponent(ParticlesCanvasComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

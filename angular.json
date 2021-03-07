@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "StarbreakersNet-Website": {
+    "starbreakersnet-website": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,12 +17,12 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/StarbreakersNet-Website",
+            "outputPath": "dist/starbreakersnet-website",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "aot": false,
+            "aot": true,
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -32,7 +32,6 @@
               "src/styles.sass"
             ],
             "scripts": [
-              "node_modules/particlesjs/dist/particles.min.js",
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/vanilla-tilt/dist/vanilla-tilt.min.js",
               "src/fomantic/dist/semantic.min.js"
@@ -51,7 +50,6 @@
               "sourceMap": false,
               "extractCss": true,
               "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
@@ -60,6 +58,10 @@
                   "type": "initial",
                   "maximumWarning": "2mb",
                   "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
                 }
               ]
             }
@@ -68,18 +70,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "StarbreakersNet-Website:build"
+            "browserTarget": "starbreakersnet-website:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "StarbreakersNet-Website:build:production"
+              "browserTarget": "starbreakersnet-website:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "StarbreakersNet-Website:build"
+            "browserTarget": "starbreakersnet-website:build"
           }
         },
         "test": {
@@ -98,7 +100,6 @@
               "src/styles.sass"
             ],
             "scripts": [
-              "node_modules/particlesjs/dist/particles.min.js",
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/vanilla-tilt/dist/vanilla-tilt.min.js",
               "src/fomantic/dist/semantic.min.js"
@@ -122,15 +123,15 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "StarbreakersNet-Website:serve"
+            "devServerTarget": "starbreakersnet-website:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "StarbreakersNet-Website:serve:production"
+              "devServerTarget": "starbreakersnet-website:serve:production"
             }
           }
         }
       }
     }},
-  "defaultProject": "StarbreakersNet-Website"
+  "defaultProject": "starbreakersnet-website"
 }
