@@ -66,13 +66,15 @@ export class FlowFieldCanvasComponent implements OnInit {
   }
 
   draw() {
-    requestAnimationFrame(() => {
-      this.draw();
-    });
-    this.calculateField();
-    this.noiseZ += 0.004;
-    this.clear();
-    this.drawField();
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        this.draw();
+      });
+      this.calculateField();
+      this.noiseZ += 0.004;
+      this.clear();
+      this.drawField();
+    }, 25);
   }
 
   clear() {
@@ -89,7 +91,7 @@ export class FlowFieldCanvasComponent implements OnInit {
         this.ctx.translate(x * this.size, y * this.size);
         this.ctx.rotate(angle);
         // TODO: Changer pour contenir les couleurs dans une range de couleur définie
-        this.ctx.strokeStyle = `hsla(${(angle * 180) / Math.PI}, 100%, 50%, 1)`;;
+        this.ctx.strokeStyle = `hsla(${(angle * 180) / Math.PI}, 100%, 50%, 1)`;
         this.ctx.beginPath();
         this.ctx.moveTo(0, 0);
         this.ctx.lineTo(0, this.size * length);
