@@ -16,7 +16,6 @@ export class YoutubeComponent implements OnInit {
 
   ngOnInit() {
     this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
-    NotificationService.notify('Youtube works !');
   }
 
 }
