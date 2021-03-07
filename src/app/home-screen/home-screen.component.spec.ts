@@ -5,7 +5,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {SliderComponent} from './slider/slider.component';
 import {DiscordComponent} from '../applications/discord/discord.component';
 import {FeedbackComponent} from '../developer/feedback/feedback.component';
-import {ParticlesCanvaComponent} from '../elements/particles-canva/particles-canva.component';
+import {ParticlesCanvasComponent} from '../elements/particles-canvas/particles-canvas.component';
 import {SliderNavComponent} from './slider-nav/slider-nav.component';
 
 describe('HomeScreenComponent', () => {
@@ -21,7 +21,7 @@ describe('HomeScreenComponent', () => {
         SliderNavComponent,
         DiscordComponent,
         FeedbackComponent,
-        ParticlesCanvaComponent
+        ParticlesCanvasComponent
       ]
     })
     .compileComponents();

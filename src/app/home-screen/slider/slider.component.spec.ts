@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SliderComponent } from './slider.component';
 import {SliderNavComponent} from '../slider-nav/slider-nav.component';
-import {ParticlesCanvaComponent} from '../../elements/particles-canva/particles-canva.component';
+import {ParticlesCanvasComponent} from '../../elements/particles-canvas/particles-canvas.component';
 import {DiscordComponent} from '../../applications/discord/discord.component';
 import {RouterTestingModule} from '@angular/router/testing';
 
@@ -18,7 +18,7 @@ describe('SliderComponent', () => {
       declarations: [
         SliderComponent,
         SliderNavComponent,
-        ParticlesCanvaComponent,
+        ParticlesCanvasComponent,
         DiscordComponent
       ]
     })
