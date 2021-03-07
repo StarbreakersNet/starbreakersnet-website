@@ -52,7 +52,7 @@ export class ParticlesCanvasComponent implements OnInit {
           enable: true,
           value_area: 800
         },
-        value: 70
+        value: 40
       },
       opacity: {
         value: 0.5
