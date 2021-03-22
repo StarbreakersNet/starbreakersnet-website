@@ -43,8 +43,8 @@ Deploy_Beta:
     - branches
   script:
     - ng build --progress false --prod
-    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no starbreakers-agent@starbreakers.net 'rm -rf /beta.starbreakers.net/*'
-    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* starbreakers-agent@starbreakers.net:/beta.starbreakers.net/
+    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no starbreakers-agent@starbreakersgaming.com 'rm -rf /beta.starbreakersgaming.com/*'
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* starbreakers-agent@starbreakersgaming.com:/beta.starbreakersgaming.com/
 
 Deploy_Production:
   stage: deploy
