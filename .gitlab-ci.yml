@@ -35,7 +35,7 @@ Deploy_Beta:
   script:
     - npm run build
     - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no starbreakers-agent@starbreakers.net 'rm -rf /beta.starbreakers.net/*'
-    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* starbreakers-agent@starbreakers.net:/beta.starbreakers.net/
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/* starbreakers-agent@starbreakers.net:/beta.starbreakers.net/
 
 Deploy_Production:
   stage: deploy
@@ -47,6 +47,5 @@ Deploy_Production:
     - branches
   script:
     - npm run build
-    - cd dist/
     - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no starbreakers-agent@starbreakers.net 'rm -rf /httpdocs/*'
-    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* starbreakers-agent@starbreakers.net:/httpdocs/
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/* starbreakers-agent@starbreakers.net:/httpdocs/
