@@ -1,8 +1,7 @@
-image: trion/ng-cli-karma
+image: node:18.20.4
 
 stages:
   - build
-  - test
   - deploy
 
 cache:
@@ -21,17 +20,9 @@ Build:
   only:
     - merge_requests
   script:
-    - rm ./package-lock.json
     - npm install
-    - ng build --progress false --prod
+    - npm run build
     - tree dist/
-
-Test:
-  stage: test
-  only:
-    - merge_requests
-  script:
-    - ng test starbreakersnet-website --watch=false
 
 Deploy_Beta:
   stage: deploy
@@ -42,9 +33,9 @@ Deploy_Beta:
   except:
     - branches
   script:
-    - ng build --progress false --prod
-    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no starbreakers-agent@starbreakersgaming.com 'rm -rf /beta.starbreakersgaming.com/*'
-    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* starbreakers-agent@starbreakersgaming.com:/beta.starbreakersgaming.com/
+    - npm run build
+    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no starbreakers-agent@starbreakers.net 'rm -rf /beta.starbreakers.net/*'
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r dist/*/* starbreakers-agent@starbreakers.net:/beta.starbreakers.net/
 
 Deploy_Production:
   stage: deploy
@@ -55,9 +46,7 @@ Deploy_Production:
   except:
     - branches
   script:
-    - rm ./package-lock.json
-    - npm install
-    - ./node_modules/@angular/cli/bin/ng build --progress false --prod
+    - npm run build
     - cd dist/
-    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no starbreakers-agent@starbreakersgaming.com 'rm -rf $DEPLOY_PROD_PATH/*'
-    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* starbreakers-agent@starbreakersgaming.com:$DEPLOY_PROD_PATH/
+    - ssh -i ~/.ssh/id_rsa -o stricthostkeychecking=no starbreakers-agent@starbreakers.net 'rm -rf /httpdocs/*'
+    - scp -i ~/.ssh/id_rsa -o stricthostkeychecking=no -r ./*/* starbreakers-agent@starbreakers.net:/httpdocs/
