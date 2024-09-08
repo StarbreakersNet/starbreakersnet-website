@@ -1,5 +1,18 @@
 $timing-function: cubic-bezier(.9, 0, .1, 1)
-$default-duration: .5s
+$default-duration: .25s
+$default-animation: $default-duration $timing-function
+
+*:has(> .fade-x-enter-active),
+*:has(> .fade-x-leave-active),
+*:has(> .fade-y-enter-active),
+*:has(> .fade-y-leave-active),
+*:has(> .scale-enter-active),
+*:has(> .scale-leave-active),
+*:has(> .shrink-enter-active),
+*:has(> .shrink-leave-active),
+*:has(> .flip-enter-active),
+*:has(> .flip-leave-active)
+  overflow: clip
 
 .v-enter-active,
 .v-leave-active
@@ -79,3 +92,12 @@ $default-duration: .5s
   transform: translateX(25%) !important
   max-height: 0 !important
   max-width: 0 !important
+
+.carousel-slide-enter-from,
+.carousel-slide-leave-to
+  opacity: 0
+  transform: translateX(-100%)
+
+.carousel-slide-enter-active,
+.carousel-slide-leave-active
+  transition: all 0.3s ease

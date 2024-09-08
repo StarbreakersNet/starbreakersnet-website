@@ -1,24 +1,31 @@
 <script lang="ts" setup>
+import { MenuItem, menuItems } from "@/models/MenuItem";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-const routes = [
-  { name: "home", label: "Accueil" },
-  { name: "discord", label: "Discord" },
-  { name: "youtube", label: "Le Zap" },
-];
+function onClick(item: MenuItem) {
+  if (item.routeName) {
+    router.push({ name: item.routeName });
+  } else if (item.externalLink) {
+    window.open(item.externalLink, "_blank");
+  }
+}
 </script>
 
 <template>
-  <n-flex align="center" justify="center" class="component">
-    <div v-for="route in routes" class="item">
-      <router-link :to="{name: route.name}">
-        <n-button>
-          {{ route.label }}
-        </n-button>
-      </router-link>
-
+  <n-flex :size="30" align="center" class="component apple-blurred" justify="center">
+    <div v-for="item in menuItems" class="item">
+      <n-button
+        :color="item.color"
+        :text-color="item.textColor ?? (item.color ? 'white' : '')"
+        @click="onClick(item)">
+        <n-flex :size="10" align="center" justify="center" vertical>
+          <FontAwesomeIcon v-if="item.icon" :icon="item.icon" class="fa-icon" />
+          <span v-if="item.label" class="label">{{ item.label }}</span>
+        </n-flex>
+      </n-button>
     </div>
   </n-flex>
 </template>
@@ -29,24 +36,34 @@ const routes = [
 .component
   padding: 1em
   margin: unset
-  border: 1px solid rgba(255, 255, 255, 0.18)
-  border-radius: 16px
-  background: rgba(83, 83, 83, 0.25)
-  backdrop-filter: blur(13px)
 
   .item
-    padding: 1em .75em
-
     button
-      width: 10em
+      height: auto
+      width: 15vw
       aspect-ratio: 16 / 9
-      border-radius: $sn-main-border-radius
-      transition: transform .1s ease-in-out
+      border-radius: $sn-apple-border-radius
+      transition: transform .2s ease-in-out, box-shadow .2s ease-in-out
+      padding: .5em 1em
+      display: flex
+      flex-direction: column
+      align-items: center
+      justify-content: center
+      //background: rgb(255 255 255 / 0.1)
+      box-shadow: 0 4px 6px rgb(0 0 0 / 0.1)
 
       &:hover
-        transform: scale(1.1)
+        transform: scale(1.05)
+        box-shadow: 0 8px 12px rgb(0 0 0 / 0.2)
 
       &:active
         transform: scale(1)
+        box-shadow: 0 4px 6px rgb(0 0 0 / 0.1)
 
+      .fa-icon
+        font-size: 3vw
+
+      .label
+        font-size: 1vw
+        font-weight: bold
 </style>
