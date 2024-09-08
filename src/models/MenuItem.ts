@@ -10,7 +10,7 @@ export type MenuItem = {
 export const menuItems: MenuItem[] = [
   {
     label: "GitLab",
-    externalLink: "https://gitlab.com/starbreakersdevteam/sb-hardware-monitor",
+    externalLink: "https://gitlab.com/starbreakersdevteam",
     icon: ["fab", "gitlab"],
     color: "rgb(226, 67, 41)",
   },
