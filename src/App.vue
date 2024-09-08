@@ -16,7 +16,7 @@ const showHeader = ref(false);
 const showFooter = ref(false);
 const theme = ref(getNaiveTheme("dark"));
 const themeOverride = ref(getNaiveOverrideTheme("dark"));
-const maintenanceMode = ref(import.meta.env.MODE !== "development");
+const maintenanceMode = ref(false);
 const maintenanceConfig = {
   timeout: 500,
   chain: ["h", "a", "c", "k", "e", "r", "m", "a", "n"],
