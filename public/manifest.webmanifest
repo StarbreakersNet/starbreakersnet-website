@@ -1,0 +1,11 @@
+{
+    "name": "StarbreakersNet",
+    "short_name": "SBNet",
+    "icons": [
+        { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+        { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+    ],
+    "theme_color": "#9a0310",
+    "background_color": "#9a0310",
+    "display": "standalone"
+}
