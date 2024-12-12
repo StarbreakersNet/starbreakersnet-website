@@ -3,9 +3,14 @@ import TimeClock from "@/components/TimeClock.vue";
 import { h, ref } from "vue";
 import AppVersion from "@/components/AppVersion.vue";
 import { version } from "@/../package.json";
+import router from "@/router/index.js";
 
 const packageVersion = ref(version);
 const options = ref([
+  {
+    label: "Se connecter",
+    key: "login",
+  },
   {
     label: "À propos",
     key: "about",
@@ -21,8 +26,12 @@ const options = ref([
 const showModal = ref(false);
 
 function handleSelect(key) {
-  if (key === "about") {
-    showModal.value = true;
+  switch (key) {
+    case "about":
+      showModal.value = true;
+      break;
+    default:
+      router.push({ name: key });
   }
 }
 </script>

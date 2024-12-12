@@ -28,6 +28,8 @@ Avant de démarrer l'application, vous devez configurer les variables d'environn
 2. Ouvrez le fichier `.env` et configurez les variables selon vos besoins. Voici un exemple des variables que vous pourriez y trouver :
     ```env
     APP_PORT=8081
+    APP_URL=example.com
+    VITE_API_URL=api.example.com
     DIRECTUS_PORT=8055
     DIRECTUS_ADMIN_EMAIL=admin@example.com
     DIRECTUS_ADMIN_PASSWORD=your_admin_password
@@ -35,6 +37,8 @@ Avant de démarrer l'application, vous devez configurer les variables d'environn
     ```
 
     - **APP_PORT** : Le port que l'application doit utiliser.
+    - **APP_URL** : L'url du site pour établire le CORS de Directus
+    - **VITE_API_URL** : L'url que le front va utiliser pour les requêtes à l'api
     - **DIRECTUS_PORT** : Le port que le backoffice va utiliser.
     - **DIRECTUS_ADMIN_EMAIL** : L'identifiant du compte admin du backoffice.
     - **DIRECTUS_ADMIN_PASSWORD** : Le mot de passe du compte admin du backoffice.
