@@ -1,15 +1,15 @@
 <script setup>
 import { RouterView, useRoute } from "vue-router";
 import MainMenu from "@/components/MainMenu.vue";
-import { ref, watch } from "vue";
-import { getNaiveOverrideTheme, getNaiveTheme, preferedOsTheme } from "@/AppUtils.ts";
+import { onBeforeMount, ref, watch } from "vue";
+import { getNaiveOverrideTheme, getNaiveTheme, preferedOsTheme } from "@/composables/appUtils";
 import { useUserStore } from "@/stores/user";
 import MaintenanceView from "@/views/MaintenanceView.vue";
 import { vKonami } from "vue-konami";
 import UserMenu from "@/components/UserMenu.vue";
 
 const route = useRoute();
-const user = useUserStore();
+const userStore = useUserStore();
 
 const isHome = ref(true);
 const showHeader = ref(false);
@@ -41,10 +41,10 @@ function setUiVisibility(isHome) {
 }
 
 watch(
-  () => user.settings.theme,
+  () => userStore.settings.theme,
   value => {
     setAppTheme(value);
-    user.settings.osTheme = preferedOsTheme();
+    userStore.settings.osTheme = preferedOsTheme();
   },
   { immediate: true }
 );
@@ -56,6 +56,11 @@ watch(
     setUiVisibility(isHome.value);
   }
 );
+
+onBeforeMount(async () => {
+  await userStore.refreshSession();
+  // TODO: Ajouter un loader fullscreen pour attendre de savoir si l'utilisateur à un token ou non
+});
 </script>
 
 <template>
@@ -87,7 +92,7 @@ watch(
         </transition>
         <n-flex class="router-view" justify="center">
           <router-view #default="{ Component }">
-            <transition name="scale">
+            <transition name="scale" mode="out-in">
               <component :is="Component" />
             </transition>
           </router-view>
@@ -103,22 +108,22 @@ watch(
 </template>
 
 <style lang="sass" scoped>
-@import @/assets/variables.sass
+@use "@/assets/variables"
 
 .main-container
   min-height: 100vh
   display: flex
   flex-direction: column
   align-items: stretch
-  padding: $sn-main-padding
-  gap: $sn-main-padding
+  padding: variables.$sn-main-padding
+  gap: variables.$sn-main-padding
 
   header
     position: sticky
-    top: $sn-main-padding
-    right: $sn-main-padding
-    bottom: $sn-main-padding
-    left: $sn-main-padding
+    top: variables.$sn-main-padding
+    right: variables.$sn-main-padding
+    bottom: variables.$sn-main-padding
+    left: variables.$sn-main-padding
     z-index: 100
     display: flex
     justify-content: space-between
@@ -136,8 +141,8 @@ watch(
 
   footer
     position: absolute
-    right: $sn-main-padding
-    left: $sn-main-padding
-    bottom: $sn-main-padding
+    right: variables.$sn-main-padding
+    left: variables.$sn-main-padding
+    bottom: variables.$sn-main-padding
     z-index: 10
 </style>

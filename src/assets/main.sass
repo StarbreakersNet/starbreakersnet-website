@@ -1,5 +1,5 @@
-@import variables.sass
-@import animations.sass
+@use "variables"
+@use "animations"
 
 #app
   display: flex
@@ -18,21 +18,21 @@
   overflow: hidden
 
 .apple-blurred
-  border-radius: calc($sn-apple-border-radius * 2)
-  border: $sn-apple-border
+  border-radius: calc(#{variables.$sn-apple-border-radius} * 2)
+  border: variables.$sn-apple-border
   background: rgb(83 83 83 / 0.25)
-  backdrop-filter: blur($sn-apple-blur)
+  backdrop-filter: blur(variables.$sn-apple-blur)
 
 .apple-container
   @extend .apple-blurred
-  border-radius: $sn-apple-border-radius
+  border-radius: variables.$sn-apple-border-radius
   padding: .1em
 
 .apple-menu
   @extend .apple-container
-  padding: $sn-main-padding
+  padding: variables.$sn-main-padding
 
 .card-blurred
-  border: $sn-apple-border
+  border: variables.$sn-apple-border
   background: hsl(0 100% 0% / 0.25)
-  backdrop-filter: blur($sn-apple-blur)
+  backdrop-filter: blur(variables.$sn-apple-blur)

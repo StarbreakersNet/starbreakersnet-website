@@ -1,14 +1,14 @@
-@import config.sass
+@use "variables"
 
 \:root
   @media (prefers-color-scheme: dark)
-    --color-background: #{$vt-c-black}
-    --color-background-soft: #{$vt-c-black-soft}
-    --color-background-mute: #{$vt-c-black-mute}
-    --color-border: #{$vt-c-divider-dark-2}
-    --color-border-hover: #{$vt-c-divider-dark-1}
-    --color-heading: #{$vt-c-text-dark-1}
-    --color-text: #{$vt-c-text-dark-2}
+    --color-background: #{variables.$vt-c-black}
+    --color-background-soft: #{variables.$vt-c-black-soft}
+    --color-background-mute: #{variables.$vt-c-black-mute}
+    --color-border: #{variables.$vt-c-divider-dark-2}
+    --color-border-hover: #{variables.$vt-c-divider-dark-1}
+    --color-heading: #{variables.$vt-c-text-dark-1}
+    --color-text: #{variables.$vt-c-text-dark-2}
 
 *,
 *::before,

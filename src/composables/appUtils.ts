@@ -11,7 +11,7 @@ const themeMappings = {
   light: { naive: naiveLight, naiveOverride: lightTheme },
 };
 
-export function renderFontAwesomeIcon(option: { fas?: string, far?: string, fab?: string }) {
+export function renderFontAwesomeIcon(option: { fas?: string; far?: string; fab?: string }) {
   if (option.fas) {
     return h(NIcon, null, () => h(FontAwesomeIcon, { icon: ["fas", option.fas] }));
   } else if (option.far) {
@@ -44,10 +44,3 @@ export function getNaiveTheme(theme: themeType) {
 export function getNaiveOverrideTheme(theme: themeType) {
   return getTheme(theme, "naive");
 }
-
-export default {
-  renderFontAwesomeIcon,
-  getNaiveTheme,
-  getNaiveOverrideTheme,
-  preferedOsTheme,
-};

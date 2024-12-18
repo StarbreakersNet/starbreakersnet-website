@@ -31,7 +31,7 @@ function onClick(item: MenuItem) {
 </template>
 
 <style lang="sass" scoped>
-@import @/assets/variables.sass
+@use "@/assets/variables"
 
 .component
   padding: 1em
@@ -42,7 +42,7 @@ function onClick(item: MenuItem) {
       height: auto
       width: 15vw
       aspect-ratio: 16 / 9
-      border-radius: $sn-apple-border-radius
+      border-radius: variables.$sn-apple-border-radius
       transition: transform .2s ease-in-out, box-shadow .2s ease-in-out
       padding: .5em 1em
       display: flex

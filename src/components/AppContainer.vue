@@ -35,7 +35,7 @@ const componentStyle = {
 </template>
 
 <style lang="sass" scoped>
-@import @/assets/variables.sass
+@use "@/assets/variables"
 
 .app-container
   position: relative
@@ -43,7 +43,7 @@ const componentStyle = {
   display: flex
   align-items: center
   justify-content: center
-  border-radius: $sn-apple-border-radius
+  border-radius: variables.$sn-apple-border-radius
   overflow: clip
   padding: 3px
 

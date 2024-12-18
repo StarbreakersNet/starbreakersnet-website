@@ -11,7 +11,7 @@ export async function up(knex) {
       name: "StarbreakersNet API",
       color: "#bd0000",
       public_registration: true,
-      public_registration_verify_email: true,
+      public_registration_verify_email: false, // TODO: Nécessite la configuration de Directus avec un serveur mail
     },
     policy: {
       name: "Registered",
@@ -93,11 +93,11 @@ export async function up(knex) {
     log("Settings updated");
   } else {
     await knex("directus_settings").insert({
-      default_language: "fr-FR",
-      project_name: "StarbreakersNet API",
-      project_color: "#bd0000",
-      public_registration: true,
-      public_registration_verify_email: true,
+      default_language: config.settings.language,
+      project_name: config.settings.name,
+      project_color: config.settings.color,
+      public_registration: config.settings.public_registration,
+      public_registration_verify_email: config.settings.public_registration_verify_email,
       public_registration_role: userRole.id,
     });
     log("Settings created");

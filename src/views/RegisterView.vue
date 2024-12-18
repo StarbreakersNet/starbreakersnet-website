@@ -1,129 +1,115 @@
 <script lang="ts" setup>
+import { useUserStore } from "@/stores/user.js";
+import { useReactiveForm, useReactiveRules } from "@/composables/reactiveForm";
+import { FormItemRule } from "naive-ui";
 import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { createDirectus, registerUser, rest } from "@directus/sdk";
 
-const router = useRouter();
+const userStore = useUserStore();
+const formRef = ref(null) as any;
 
-const firstName = ref("");
-const lastName = ref("");
-const email = ref("");
-const password = ref("");
+const registerForm = useReactiveForm(
+  {
+    username: "",
+    email: "",
+    password: "",
+  },
+  formRef
+);
 
-const directus = createDirectus(import.meta.env.VITE_API_URL).with(rest());
+const rules = useReactiveRules({
+  username: [
+    {
+      required: true,
+      trigger: ["input", "blur"],
+      validator(rule: FormItemRule, value: string) {
+        if (!value) {
+          return new Error("Un nom d'utilisateur est requis");
+        } else if (value.length < 3) {
+          return new Error("Doit contenir au moins 3 caractères");
+        } else if (/[^a-zA-Z0-9]/.test(value)) {
+          return new Error("Ne doit pas contenir de caractères spéciaux");
+        }
+        return true;
+      },
+    },
+  ],
+  email: [
+    {
+      required: true,
+      trigger: ["input", "blur"],
+      validator(rule: FormItemRule, value: string) {
+        if (!value) {
+          return new Error("Une adresse email est requis");
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          return new Error("Veuillez entrer une adresse e-mail valide");
+        }
+        return true;
+      },
+    },
+  ],
+  password: [
+    {
+      required: true,
+      trigger: ["input", "blur"],
+      validator(rule: FormItemRule, value: string) {
+        if (!value) {
+          return new Error("Un mot de passe est requis");
+        } else if (value.length < 6) {
+          return new Error("Doit contenir au moins 6 caractères");
+        } else if (!/\d/.test(value)) {
+          return new Error("Doit contenir au moins un chiffre");
+        } else if (!/[A-Z]/.test(value)) {
+          return new Error("Doit contenir au moins une majuscule");
+        }
+        return true;
+      },
+    },
+  ],
+});
 
-const handleSignup = async () => {
-  try {
-    const response = await directus.request(
-      registerUser(email.value, password.value, {
-        first_name: firstName.value,
-        last_name: lastName.value,
-      })
-    );
-    console.log("Signup successful:", response);
-    await router.push({ name: "home" });
-  } catch (error) {
-    console.error("Signup failed:", error);
+async function handleSubmit() {
+  let response = await userStore.register(
+    registerForm.form.email,
+    registerForm.form.password,
+    registerForm.form.username
+  );
+
+  if (response) {
+    await registerForm.reset();
+    // TODO: Toast de confirmation de création du compte sans timer et pour préciser qu'il faut activer le compte avec le lien du mail
   }
-};
+}
 </script>
 
 <template>
   <div class="signup-container">
-    <form @submit.prevent="handleSignup">
-      <div class="form-group">
-        <label for="firstName">First Name:</label>
-        <input id="firstName" v-model="firstName" required type="text" />
-      </div>
-
-      <div class="form-group">
-        <label for="lastName">Last Name:</label>
-        <input id="lastName" v-model="lastName" required type="text" />
-      </div>
-
-      <div class="form-group">
-        <label for="email">Email Address:</label>
-        <input id="email" v-model="email" required type="email" />
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input id="password" v-model="password" required type="password" />
-      </div>
-
-      <button type="submit">Signup</button>
-      <p class="login-link">
-        Already have an account?
-        <RouterLink to="/login">Login</RouterLink>
-      </p>
-    </form>
+    <n-form
+      ref="formRef"
+      :model="registerForm.form"
+      :rules="rules"
+      @submit.prevent="handleSubmit()">
+      <n-form-item label="Nom d'utilisateur" path="username">
+        <n-input v-model:value="registerForm.form.username" placeholder="" />
+      </n-form-item>
+      <n-form-item label="Email" path="email">
+        <n-input v-model:value="registerForm.form.email" placeholder="" />
+      </n-form-item>
+      <n-form-item label="Mot de passe" path="password">
+        <n-input v-model:value="registerForm.form.password" placeholder="" type="password" />
+      </n-form-item>
+      <n-form-item>
+        <n-flex style="width: 100%" vertical>
+          <n-button :disabled="!registerForm.isValid.value" attr-type="submit">S'inscrire</n-button>
+        </n-flex>
+      </n-form-item>
+      <n-text>
+        Vous avez déjà un compte ?
+        <router-link #="{ navigate, href }" custom to="/login">
+          <n-a :href="href" @click="navigate">Se connecter</n-a>
+        </router-link>
+      </n-text>
+    </n-form>
   </div>
 </template>
 
-<style lang="css" scoped>
-.signup-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  font-family: Arial, sans-serif;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-form {
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 300px;
-  width: 100%;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: #4caf50;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-.login-link {
-  margin-top: 15px;
-  text-align: center;
-}
-
-.login-link a {
-  color: #4caf50;
-  text-decoration: none;
-}
-
-.login-link a:hover {
-  text-decoration: underline;
-}
-</style>
+<style lang="css" scoped></style>

@@ -1,32 +1,56 @@
 <script setup>
 import TimeClock from "@/components/TimeClock.vue";
-import { h, ref } from "vue";
+import { computed, h, ref } from "vue";
 import AppVersion from "@/components/AppVersion.vue";
 import { version } from "@/../package.json";
 import router from "@/router/index.js";
+import { useUserStore } from "@/stores/user";
+import LoginView from "@/views/LoginView.vue";
+import { renderFontAwesomeIcon } from "@/composables/appUtils";
 
+const userStore = useUserStore();
 const packageVersion = ref(version);
-const options = ref([
-  {
-    label: "Se connecter",
-    key: "login",
-  },
-  {
+const options = computed(() => {
+  let items = [];
+
+  if (userStore.infos.connected) {
+    items.push({
+      label: "Se déconnecter",
+      key: "logout",
+    });
+  } else {
+    items.push({
+      label: "Se connecter",
+      key: "login",
+    });
+  }
+
+  items.push({
     label: "À propos",
     key: "about",
-  },
-  {
+  });
+
+  items.push({
     key: "version",
     type: "render",
     render: () => {
       return h(AppVersion);
     },
-  },
-]);
+  });
+
+  return items;
+});
 const showModal = ref(false);
+const showLoginModal = ref(false);
 
 function handleSelect(key) {
   switch (key) {
+    case "login":
+      showLoginModal.value = true;
+      break;
+    case "logout":
+      userStore.logout();
+      break;
     case "about":
       showModal.value = true;
       break;
@@ -53,7 +77,13 @@ function handleSelect(key) {
             @select="handleSelect($event)">
             <n-button :bordered="false" round>
               <n-flex align="center">
-                <font-awesome-icon icon="bars" />
+                <transition mode="out-in" name="scale">
+                  <font-awesome-icon
+                    v-if="userStore.infos.connected"
+                    key="icon-user-circle"
+                    icon="user-circle" />
+                  <font-awesome-icon v-else key="icon-bars" icon="bars" />
+                </transition>
               </n-flex>
             </n-button>
           </n-dropdown>
@@ -85,14 +115,24 @@ function handleSelect(key) {
         </n-flex>
       </template>
     </n-modal>
+    <n-modal
+      v-model:show="showLoginModal"
+      :icon="() => renderFontAwesomeIcon({ fas: 'user' })"
+      class="apple-menu"
+      preset="dialog"
+      transform-origin="center">
+      <template #default>
+        <login-view />
+      </template>
+    </n-modal>
   </div>
 </template>
 
 <style lang="sass">
-@import @/assets/main.sass
+@use "@/assets/variables"
 
 .apple-container
   &.n-dropdown-menu:not(.n-dropdown-menu--scrollable)
-    padding: $sn-main-padding
-    border-radius: $sn-apple-border-radius
+    padding: variables.$sn-main-padding
+    border-radius: variables.$sn-apple-border-radius
 </style>

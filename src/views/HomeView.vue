@@ -94,8 +94,9 @@ function calculateDelays(item) {
 </template>
 
 <style lang="sass" scoped>
-@import @/assets/main.sass
-@import @/assets/variables.sass
+@use "@/assets/main"
+@use "@/assets/variables"
+@use "@/assets/animations"
 
 $x-margin: 10vw
 $y-margin: 10vh
@@ -122,7 +123,7 @@ main
       font-weight: bold
       text-transform: uppercase
       margin: unset
-      filter: drop-shadow(0 0 10px $sn-default-dark)
+      filter: drop-shadow(0 0 10px variables.$sn-default-dark)
 
     .n-text
       font-size: 1.5vmin
@@ -160,7 +161,7 @@ main
     position: relative
     overflow: hidden
     border: unset
-    transition: all $default-animation
+    transition: all animations.$default-animation
 
     &:hover
       scale: 1.1
@@ -175,8 +176,8 @@ main
       left: 100%
       width: 100%
       height: 3px
-      background: $sn-primary-red
-      transition: left $default-animation
+      background: variables.$sn-primary-red
+      transition: left animations.$default-animation
       transition-delay: .1s
 
     &:hover::after
@@ -203,8 +204,8 @@ main
       width: 20vw
       height: auto
       object-fit: cover
-      border-radius: $sn-apple-border-radius
-      filter: drop-shadow($sn-text-shadow)
+      border-radius: variables.$sn-apple-border-radius
+      filter: drop-shadow(variables.$sn-text-shadow)
 
   :deep()
     .n-carousel__slide--prev,

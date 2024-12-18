@@ -13,25 +13,29 @@ services:
     environment:
       - NODE_ENV=production
 
-  dev:
-    profiles:
-      - dev
-    depends_on:
-      - directus
-    build:
-      context: .
-      dockerfile: Dockerfile.dev # Utilisez un Dockerfile spécifique au dev si nécessaire
-    develop:
-      watch:
-        - action: sync
-          path: ./
-          target: /app
-          ignore:
-            - node_modules
-    ports:
-      - ${VITE_PORT}:5173
-    environment:
-      - NODE_ENV=development
+# Préférer l'utilisation normal on local. Trop de contraintes d'IDE/Sync d'avoir le serveur vite de dev dans une vm
+# Il sera intéressant de s'en reservir lorsque docker compose watch sera plus répandu.
+#  frontend:
+#    profiles:
+#      - dev
+#    depends_on:
+#      - directus
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.dev # Utilisez un Dockerfile spécifique au dev si nécessaire
+#    develop:
+#      watch:
+#        - action: sync
+#          path: ./
+#          target: /app
+#          ignore:
+#            - ./node_modules
+#        - action: rebuild
+#          path: package.json
+#    ports:
+#      - ${VITE_PORT}:5173
+#    environment:
+#      - NODE_ENV=development
 
   database:
     profiles:

@@ -27,7 +27,7 @@ const formatedValue = computed(() => {
 </template>
 
 <style lang="sass" scoped>
-@import @/assets/variables.sass
+@use "@/assets/variables"
 
 .number-container
   position: relative
@@ -43,7 +43,7 @@ const formatedValue = computed(() => {
     filter: blur(0)
 
   .slide-digit-enter-active, .slide-digit-leave-active
-    transition: all .3s $sn-default-timing
+    transition: all .3s variables.$sn-default-timing
 
   .slide-digit-enter-from
     transform: translateY(100%)
