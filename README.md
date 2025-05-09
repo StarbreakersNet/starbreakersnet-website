@@ -118,4 +118,30 @@ Que vous utilisiez Docker ou npm, vous pouvez créer une version optimisée de v
 
 2. Les fichiers de production seront générés dans le dossier `dist/`.
 
+## Intégrations
 
+### Bonjourr
+
+Bonjourr est une page d'accueil pour votre navigateur Internet inspirée par l'apparence d'iOS.
+Bien qu'elle se veuille minimale, elle vous offre de nombreuses options pour la personnaliser à votre guise. Voici quelques fonctionnalités :
+
+- 🍏 Langage de conception iOS
+- 🏞 Arrière-plans 4K dynamiques qui changent en fonction de l'humeur du jour
+- ⚡️ Rapide et léger !
+- 🔎 Barre de recherche (compatible avec tous les moteurs de recherche)
+- 🕰 Horloge analogique avec plusieurs visages d'horloge
+- 🌤 Météo
+- 🔗 Liens rapides
+- 👋 Vous accueille par votre nom
+- 🌘 Mode sombre
+- 🥖 Emoji comme favicon
+- 🧑‍💻 Style CSS personnalisé
+- 📝 Polices personnalisées
+- 🔒 Privacy focused
+- 🌎 Multilanguage
+
+<h1 align="center">
+  <a href="https://github.com/victrme/Bonjourr">
+    <img src="https://raw.githubusercontent.com/victrme/Bonjourr/master/src/assets/bonjourr.png" width="50%" alt="site web de Bonjourr">
+  </a>
+</h1>
