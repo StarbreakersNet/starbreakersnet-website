@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { authentication, createDirectus, readMe, registerUser, rest } from "@directus/sdk";
 import { useRouter } from "vue-router";
+import { useMessage } from "naive-ui";
 
 export interface UserType {
   appearance: string | null;
@@ -32,8 +33,12 @@ export interface UserType {
   token: string | null;
 }
 
+const CONFIRMATION_TEXT =
+  "Merci de votre inscription ! Consultez vos emails et cliquez sur le lien de confirmation pour vous connecter";
+
 export const useUserStore = defineStore("user", () => {
   const router = useRouter();
+  const message = useMessage();
   const directus = createDirectus(import.meta.env.VITE_API_URL)
     .with(
       authentication("cookie", {
@@ -67,13 +72,14 @@ export const useUserStore = defineStore("user", () => {
         infos.value.me = (await directus.request(readMe())) as UserType;
         infos.value.connected = true;
         localStorage.setItem("user_authenticated", "true");
-        console.log("User logged in"); // TODO: Remplacer par un toast
-        await router.push({ name: "home" });
+        message.success("Authentification réussie. Bienvenue " + infos.value.me.first_name);
+        return true;
       }
     } catch (error) {
-      // TODO: Ajouter une fonction toast/message pour afficher les erreurs globales
       localStorage.removeItem("user_authenticated");
+      message.error("Identifiants incorrects");
       console.error("Authentication failed:", error);
+      return false;
     }
   }
 
@@ -85,8 +91,11 @@ export const useUserStore = defineStore("user", () => {
         await getUserInfos();
       } catch (error) {
         await logout(true);
-        // TODO: Ajouter une fonction toast/message pour afficher les erreurs globales
-        console.error("You have been disconnected:", error);
+        message.error(
+          "Votre session a expiré ou rencontré une erreur." +
+          "Veuillez vous reconnecter pour continuer"
+        );
+        console.error("Your session has expired or encountered an error:", error);
       }
     }
   }
@@ -98,7 +107,8 @@ export const useUserStore = defineStore("user", () => {
     localStorage.removeItem("user_authenticated");
     infos.value.connected = false;
     infos.value.me = null;
-    console.log("User logged out") // TODO: Remplacer par un toast
+    message.info("À bientôt ! Vous êtes maintenant déconnecté");
+    return true;
   }
 
   async function register(email: string, password: string, firstName: string) {
@@ -109,9 +119,12 @@ export const useUserStore = defineStore("user", () => {
         })
       );
 
+      message.info(CONFIRMATION_TEXT, {
+        duration: 5000,
+      });
       return true;
     } catch (error) {
-      // TODO: Ajouter une fonction toast/message pour afficher les erreurs globales
+      message.error("Une erreur est survenue lors de l'inscription");
       console.error("Signup failed:", error);
       return false;
     }

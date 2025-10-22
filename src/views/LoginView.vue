@@ -6,14 +6,24 @@ import { renderFontAwesomeIcon } from "@/composables/appUtils";
 
 const userStore = useUserStore();
 
+const emit = defineEmits(["connected"]);
+
 const email = ref("");
 const password = ref("");
 const showRegisterModal = ref(false);
+
+async function handleSubmit() {
+  let response = await userStore.login(email.value, password.value);
+
+  if (response) {
+    emit("connected");
+  }
+}
 </script>
 
 <template>
   <div class="login-container">
-    <n-form @submit.prevent="userStore.login(email, password)">
+    <n-form @submit.prevent="handleSubmit()">
       <n-form-item label="Email">
         <n-input v-model:value="email" placeholder="" />
       </n-form-item>
@@ -38,7 +48,7 @@ const showRegisterModal = ref(false);
       preset="dialog"
       transform-origin="center">
       <template #default>
-        <register-view />
+        <register-view @registered="showRegisterModal = false" />
       </template>
     </n-modal>
   </div>

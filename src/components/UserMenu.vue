@@ -15,6 +15,10 @@ const options = computed(() => {
 
   if (userStore.infos.connected) {
     items.push({
+      label: "Mon compte",
+      key: "account",
+    })
+    items.push({
       label: "Se déconnecter",
       key: "logout",
     });
@@ -122,7 +126,7 @@ function handleSelect(key) {
       preset="dialog"
       transform-origin="center">
       <template #default>
-        <login-view />
+        <login-view @connected="showLoginModal = false" />
       </template>
     </n-modal>
   </div>

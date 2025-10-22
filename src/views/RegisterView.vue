@@ -1,12 +1,15 @@
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user.js";
 import { useReactiveForm, useReactiveRules } from "@/composables/reactiveForm";
-import { FormItemRule } from "naive-ui";
-import { ref } from "vue";
+import { FormItemRule, useMessage } from "naive-ui";
+import { ref, useTemplateRef } from "vue";
 
 const userStore = useUserStore();
-const formRef = ref(null) as any;
+const message = useMessage();
 
+const emit = defineEmits(["registered"]);
+
+const formRef = useTemplateRef("formRef");
 const registerForm = useReactiveForm(
   {
     username: "",
@@ -15,7 +18,6 @@ const registerForm = useReactiveForm(
   },
   formRef
 );
-
 const rules = useReactiveRules({
   username: [
     {
@@ -76,7 +78,7 @@ async function handleSubmit() {
 
   if (response) {
     await registerForm.reset();
-    // TODO: Toast de confirmation de création du compte sans timer et pour préciser qu'il faut activer le compte avec le lien du mail
+    emit("registered");
   }
 }
 </script>
