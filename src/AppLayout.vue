@@ -1,40 +1,28 @@
 <script setup>
 import { RouterView, useRoute } from "vue-router";
 import MainMenu from "@/components/MainMenu.vue";
-import { onBeforeMount, ref, watch } from "vue";
-import { getNaiveOverrideTheme, getNaiveTheme, preferedOsTheme } from "@/composables/appUtils";
-import { useUserStore } from "@/stores/user";
+import { onMounted, ref, watch } from "vue";
 import MaintenanceView from "@/views/MaintenanceView.vue";
 import UserMenu from "@/components/UserMenu.vue";
+import { useMessage, useNotification } from "naive-ui";
 
 const route = useRoute();
-const userStore = useUserStore();
+
+const props = defineProps({
+  maintenanceMode: {
+    type: Boolean,
+    default: false,
+  },
+});
 
 const isHome = ref(true);
 const showHeader = ref(false);
 const showFooter = ref(false);
-const theme = ref(getNaiveTheme("dark"));
-const themeOverride = ref(getNaiveOverrideTheme("dark"));
-const maintenanceMode = ref(false);
-
-function setAppTheme(newTheme) {
-  theme.value = getNaiveTheme(newTheme);
-  themeOverride.value = getNaiveOverrideTheme(newTheme);
-}
 
 function setUiVisibility(isHome) {
   showHeader.value = !isHome || isHome;
   showFooter.value = isHome;
 }
-
-watch(
-  () => userStore.settings.theme,
-  value => {
-    setAppTheme(value);
-    userStore.settings.osTheme = preferedOsTheme();
-  },
-  { immediate: true }
-);
 
 watch(
   () => route.name,
@@ -44,15 +32,15 @@ watch(
   }
 );
 
-onBeforeMount(async () => {
-  await userStore.refreshSession();
-  // TODO: Ajouter un loader fullscreen pour attendre de savoir si l'utilisateur à un token ou non
+onMounted(async () => {
+  window.$message = useMessage();
+  window.$notification = useNotification();
 });
 </script>
 
 <template>
   <transition mode="out-in" name="scale">
-    <MaintenanceView v-if="maintenanceMode" />
+    <MaintenanceView v-if="props.maintenanceMode" />
     <div v-else class="main-container">
       <transition name="shrink">
         <header v-if="showHeader">
@@ -74,7 +62,7 @@ onBeforeMount(async () => {
       </transition>
       <n-flex class="router-view" justify="center">
         <router-view #default="{ Component }">
-          <transition name="scale" mode="out-in">
+          <transition mode="out-in" name="scale">
             <component :is="Component" />
           </transition>
         </router-view>

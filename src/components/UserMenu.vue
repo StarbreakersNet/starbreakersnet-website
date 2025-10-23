@@ -4,20 +4,22 @@ import { computed, h, ref } from "vue";
 import AppVersion from "@/components/AppVersion.vue";
 import { version } from "@/../package.json";
 import router from "@/router/index.js";
-import { useUserStore } from "@/stores/user";
 import LoginView from "@/views/LoginView.vue";
 import { renderFontAwesomeIcon } from "@/composables/appUtils";
+import { useAuthStore } from "@/stores/auth.ts";
+import { useUserStore } from "@/stores/user.ts";
 
-const userStore = useUserStore();
+const auth = useAuthStore();
+const user = useUserStore();
 const packageVersion = ref(version);
 const options = computed(() => {
   let items = [];
 
-  if (userStore.infos.connected) {
+  if (user.infos.connected) {
     items.push({
       label: "Mon compte",
       key: "account",
-    })
+    });
     items.push({
       label: "Se déconnecter",
       key: "logout",
@@ -53,7 +55,7 @@ function handleSelect(key) {
       showLoginModal.value = true;
       break;
     case "logout":
-      userStore.logout();
+      auth.logout();
       break;
     case "about":
       showModal.value = true;
@@ -83,7 +85,7 @@ function handleSelect(key) {
               <n-flex align="center">
                 <transition mode="out-in" name="scale">
                   <font-awesome-icon
-                    v-if="userStore.infos.connected"
+                    v-if="user.infos.connected"
                     key="icon-user-circle"
                     icon="user-circle" />
                   <font-awesome-icon v-else key="icon-bars" icon="bars" />

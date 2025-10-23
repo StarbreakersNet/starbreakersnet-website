@@ -1,8 +1,12 @@
 <script setup>
-import { ref } from "vue";
-import { getNaiveOverrideTheme, getNaiveTheme } from "@/composables/appUtils";
+import { nextTick, onMounted, ref, watch } from "vue";
+import { getNaiveOverrideTheme, getNaiveTheme, preferedOsTheme } from "@/composables/appUtils";
 import { vKonami } from "vue-konami";
 import AppLayout from "@/AppLayout.vue";
+import { frFR } from "naive-ui";
+import { useUserStore } from "@/stores/user.ts";
+
+const user = useUserStore();
 
 const theme = ref(getNaiveTheme("dark"));
 const themeOverride = ref(getNaiveOverrideTheme("dark"));
@@ -19,16 +23,40 @@ const maintenanceConfig = {
     maintenanceMode.value = !maintenanceMode.value;
   },
 };
+
+function setAppTheme(newTheme) {
+  theme.value = getNaiveTheme(newTheme);
+  themeOverride.value = getNaiveOverrideTheme(newTheme);
+}
+
+watch(
+  () => user.settings.theme,
+  value => {
+    setAppTheme(value);
+    user.settings.osTheme = preferedOsTheme();
+  },
+  { immediate: true }
+);
+
+onMounted(async () => {
+  await nextTick();
+});
 </script>
 
 <template>
   <n-config-provider
     v-konami="maintenanceConfig"
+    :date-locale="frFR"
+    :locale="frFR"
     :theme="theme"
     :theme-overrides="themeOverride"
     inline-theme-disabled>
-    <n-message-provider>
-      <app-layout />
+    <n-message-provider placement="bottom">
+      <n-notification-provider container-class="h-notification" placement="bottom-right">
+        <n-modal-provider>
+          <app-layout :maintenance-mode />
+        </n-modal-provider>
+      </n-notification-provider>
     </n-message-provider>
   </n-config-provider>
 </template>

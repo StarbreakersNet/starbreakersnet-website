@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { useUserStore } from "@/stores/user.js";
 import { useReactiveForm, useReactiveRules } from "@/composables/reactiveForm";
-import { FormItemRule, useMessage } from "naive-ui";
-import { ref, useTemplateRef } from "vue";
+import { FormItemRule } from "naive-ui";
+import { useTemplateRef } from "vue";
+import { useAuthStore } from "@/stores/auth";
 
-const userStore = useUserStore();
-const message = useMessage();
+const auth = useAuthStore();
 
 const emit = defineEmits(["registered"]);
 
@@ -70,7 +69,7 @@ const rules = useReactiveRules({
 });
 
 async function handleSubmit() {
-  let response = await userStore.register(
+  let response = await auth.register(
     registerForm.form.email,
     registerForm.form.password,
     registerForm.form.username

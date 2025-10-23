@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { useUserStore } from "@/stores/user";
 import RegisterView from "@/views/RegisterView.vue";
-import { renderFontAwesomeIcon } from "@/composables/appUtils";
+import { useAuthStore } from "@/stores/auth";
 
-const userStore = useUserStore();
+const auth = useAuthStore();
 
 const emit = defineEmits(["connected"]);
 
@@ -13,7 +12,7 @@ const password = ref("");
 const showRegisterModal = ref(false);
 
 async function handleSubmit() {
-  let response = await userStore.login(email.value, password.value);
+  let response = await auth.login(email.value, password.value);
 
   if (response) {
     emit("connected");

@@ -11,6 +11,10 @@ const themeMappings = {
   light: { naive: naiveLight, naiveOverride: lightTheme },
 };
 
+export function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export function renderFontAwesomeIcon(option: { fas?: string; far?: string; fab?: string }) {
   if (option.fas) {
     return h(NIcon, null, () => h(FontAwesomeIcon, { icon: ["fas", option.fas] }));

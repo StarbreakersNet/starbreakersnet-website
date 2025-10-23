@@ -3,6 +3,8 @@ import HomeView from "@/views/HomeView.vue";
 import ViewerDiscord from "@/components/ViewerDiscord.vue";
 import ViewerYoutube from "@/components/ViewerYoutube.vue";
 import AccountView from "@/views/AccountView.vue";
+import { useAuthStore } from "@/stores/auth.ts";
+import { useUserStore } from "@/stores/user.ts";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,8 +36,18 @@ const router = createRouter({
       path: "/account",
       name: "account",
       component: AccountView,
-    }
+    },
   ],
+});
+
+router.beforeEach(async () => {
+  const user = useUserStore();
+  const auth = useAuthStore();
+
+  if (!user.infos.connected) {
+    await auth.refreshSession();
+    // TODO: Ajouter un loader fullscreen pour attendre de savoir si l'utilisateur à un token ou non
+  }
 });
 
 export default router;
