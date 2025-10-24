@@ -94,7 +94,6 @@ function calculateDelays(item) {
 </template>
 
 <style lang="sass" scoped>
-@use "@/assets/main"
 @use "@/assets/variables"
 @use "@/assets/animations"
 

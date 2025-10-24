@@ -30,40 +30,49 @@ function onClick(item: MenuItem) {
   </n-flex>
 </template>
 
-<style lang="sass" scoped>
-@use "@/assets/variables"
+<style lang="scss" scoped>
+@use "@/assets/variables";
 
-.component
-  padding: 1em
-  margin: unset
+.component {
+  padding: 1em;
+  margin: unset;
 
-  .item
-    button
-      height: auto
-      width: 15vw
-      aspect-ratio: 16 / 9
-      border-radius: variables.$sn-apple-border-radius
-      transition: transform .2s ease-in-out, box-shadow .2s ease-in-out
-      padding: .5em 1em
-      display: flex
-      flex-direction: column
-      align-items: center
-      justify-content: center
-      //background: rgb(255 255 255 / 0.1)
-      box-shadow: 0 4px 6px rgb(0 0 0 / 0.1)
+  .item {
+    button {
+      height: auto;
+      width: 15vw;
+      aspect-ratio: 16 / 9;
+      border-radius: variables.$sn-apple-border-radius;
+      transition:
+        transform 0.2s ease-in-out,
+        box-shadow 0.2s ease-in-out;
+      padding: 0.5em 1em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      //background: rgb(255 255 255 / 0.1);
+      box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+    }
 
-      &:hover
-        transform: scale(1.05)
-        box-shadow: 0 8px 12px rgb(0 0 0 / 0.2)
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 12px rgb(0 0 0 / 0.2);
+    }
 
-      &:active
-        transform: scale(1)
-        box-shadow: 0 4px 6px rgb(0 0 0 / 0.1)
+    &:active {
+      transform: scale(1);
+      box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+    }
 
-      .fa-icon
-        font-size: 3vw
+    .fa-icon {
+      font-size: 3vw;
+    }
 
-      .label
-        font-size: 1vw
-        font-weight: bold
+    .label {
+      font-size: 1vw;
+      font-weight: bold;
+    }
+  }
+}
 </style>
