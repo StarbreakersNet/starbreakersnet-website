@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { MenuItem, menuItems } from "@/models/MenuItem";
+import { type MenuItem, menuItems } from "@/models/MenuItem";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useRouter } from "vue-router";
 

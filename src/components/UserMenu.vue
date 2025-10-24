@@ -5,9 +5,9 @@ import AppVersion from "@/components/AppVersion.vue";
 import { version } from "@/../package.json";
 import router from "@/router/index.js";
 import LoginView from "@/views/LoginView.vue";
-import { renderFontAwesomeIcon } from "@/composables/appUtils";
 import { useAuthStore } from "@/stores/auth.ts";
 import { useUserStore } from "@/stores/user.ts";
+import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
 
 const auth = useAuthStore();
 const user = useUserStore();
@@ -123,7 +123,7 @@ function handleSelect(key) {
     </n-modal>
     <n-modal
       v-model:show="showLoginModal"
-      :icon="() => renderFontAwesomeIcon({ fas: 'user' })"
+      :icon="() => renderNaiveFontAwesomeIcon({ fas: 'user' })"
       class="apple-menu"
       preset="dialog"
       transform-origin="center">

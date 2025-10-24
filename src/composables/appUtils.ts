@@ -15,18 +15,6 @@ export function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function renderFontAwesomeIcon(option: { fas?: string; far?: string; fab?: string }) {
-  if (option.fas) {
-    return h(NIcon, null, () => h(FontAwesomeIcon, { icon: ["fas", option.fas] }));
-  } else if (option.far) {
-    return h(NIcon, null, () => h(FontAwesomeIcon, { icon: ["far", option.far] }));
-  } else if (option.fab) {
-    return h(NIcon, null, () => h(FontAwesomeIcon, { icon: ["fab", option.fab] }));
-  } else {
-    return null;
-  }
-}
-
 export function preferedOsTheme() {
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }

@@ -1,4 +1,4 @@
-import type { MessageOptions, MessageReactive } from "naive-ui";
+import { type MessageOptions, type MessageReactive } from "naive-ui";
 import { computed, type VNodeChild } from "vue";
 
 type MessageContent = string | (() => VNodeChild);

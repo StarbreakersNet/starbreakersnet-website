@@ -1,23 +1,25 @@
 <script lang="ts" setup>
-import { useReactiveForm, useReactiveRules } from "@/composables/reactiveForm";
-import { FormItemRule } from "naive-ui";
-import { useTemplateRef } from "vue";
+import type { FormItemRule } from "naive-ui";
 import { useAuthStore } from "@/stores/auth";
+import { reactive, useTemplateRef } from "vue";
+import type { HFormInst } from "@/types/components/c/hForm.ts";
+import HForm from "@/components/c/hForm.vue";
+import HFormItem from "@/components/c/hFormItem.vue";
+import HInput from "@/components/c/hInput.vue";
+import HFlex from "@/components/c/hFlex.vue";
+import HButton from "@/components/c/hButton.vue";
 
 const auth = useAuthStore();
 
 const emit = defineEmits(["registered"]);
 
-const formRef = useTemplateRef("formRef");
-const registerForm = useReactiveForm(
-  {
-    username: "",
-    email: "",
-    password: "",
-  },
-  formRef
-);
-const rules = useReactiveRules({
+const formRef = useTemplateRef<HFormInst>("formRef");
+const registerForm = reactive({
+  username: "",
+  email: "",
+  password: "",
+});
+const rules = reactive({
   username: [
     {
       required: true,
@@ -70,13 +72,13 @@ const rules = useReactiveRules({
 
 async function handleSubmit() {
   let response = await auth.register(
-    registerForm.form.email,
-    registerForm.form.password,
-    registerForm.form.username
+    registerForm.email,
+    registerForm.password,
+    registerForm.username
   );
 
   if (response) {
-    await registerForm.reset();
+    formRef.value?.reset();
     emit("registered");
   }
 }
@@ -84,32 +86,22 @@ async function handleSubmit() {
 
 <template>
   <div class="signup-container">
-    <n-form
-      ref="formRef"
-      :model="registerForm.form"
-      :rules="rules"
-      @submit.prevent="handleSubmit()">
-      <n-form-item label="Nom d'utilisateur" path="username">
-        <n-input v-model:value="registerForm.form.username" placeholder="" />
-      </n-form-item>
-      <n-form-item label="Email" path="email">
-        <n-input v-model:value="registerForm.form.email" placeholder="" />
-      </n-form-item>
-      <n-form-item label="Mot de passe" path="password">
-        <n-input v-model:value="registerForm.form.password" placeholder="" type="password" />
-      </n-form-item>
-      <n-form-item>
-        <n-flex style="width: 100%" vertical>
-          <n-button :disabled="!registerForm.isValid.value" attr-type="submit">S'inscrire</n-button>
-        </n-flex>
-      </n-form-item>
-      <n-text>
-        Vous avez déjà un compte ?
-        <router-link #="{ navigate, href }" custom to="/login">
-          <n-a :href="href" @click="navigate">Se connecter</n-a>
-        </router-link>
-      </n-text>
-    </n-form>
+    <h-form ref="formRef" :model="registerForm" :rules="rules" @submit.prevent="handleSubmit()">
+      <h-form-item label="Nom d'utilisateur" path="username">
+        <h-input v-model:value="registerForm.username" placeholder="" />
+      </h-form-item>
+      <h-form-item label="Email" path="email">
+        <h-input v-model:value="registerForm.email" placeholder="" />
+      </h-form-item>
+      <h-form-item label="Mot de passe" path="password">
+        <h-input v-model:value="registerForm.password" placeholder="" type="password" />
+      </h-form-item>
+      <h-form-item>
+        <h-flex style="width: 100%" vertical>
+          <h-button :disabled="!formRef?.isValid" attr-type="submit">S'inscrire</h-button>
+        </h-flex>
+      </h-form-item>
+    </h-form>
   </div>
 </template>
 

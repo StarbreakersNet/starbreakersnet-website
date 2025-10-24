@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import RegisterView from "@/views/RegisterView.vue";
 import { useAuthStore } from "@/stores/auth";
+import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
 
 const auth = useAuthStore();
 
@@ -41,7 +42,7 @@ async function handleSubmit() {
     </n-form>
     <n-modal
       v-model:show="showRegisterModal"
-      :icon="() => renderFontAwesomeIcon({ fas: 'user-plus' })"
+      :icon="() => renderNaiveFontAwesomeIcon({ fas: 'user-plus' })"
       :mask-closable="false"
       class="apple-menu"
       preset="dialog"

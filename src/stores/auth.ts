@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { authentication, createDirectus, readMe, registerUser, rest } from "@directus/sdk";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
-import { UserType } from "@/types/User";
+import type { UserType } from "@/types/User";
 
 const CONFIRMATION_TEXT =
   "Merci de votre inscription ! Consultez vos emails et cliquez sur le lien de confirmation pour vous connecter";
@@ -21,13 +21,13 @@ export const useAuthStore = defineStore("auth", () => {
 
   async function getUserInfos() {
     if (user.infos.connected) {
-      const directusUserData = (await directus.request(
+      const directusUserData = await directus.request(
         readMe({
           fields: ["id", "email", "first_name", "last_name"],
         })
-      )) as UserType;
+      );
       console.log("UserData", directusUserData);
-      user.infos.me = directusUserData;
+      user.infos.me = directusUserData as UserType;
     } else {
       console.error("You are not connected");
     }
