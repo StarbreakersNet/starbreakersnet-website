@@ -1,7 +1,6 @@
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { darkTheme, lightTheme, NIcon } from "naive-ui";
-import { h } from "vue";
-import { naiveDark, naiveLight } from "@/assets/themes/naiveTheme";
+import { darkTheme, lightTheme } from "naive-ui";
+import naiveDark from "@/assets/themes/naive.dark.ts";
+import naiveLight from "@/assets/themes/naive.light.ts";
 
 type themeType = "dark" | "light" | "system";
 type themeNaiveType = "naive" | "naiveOverride";
