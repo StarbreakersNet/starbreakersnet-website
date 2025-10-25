@@ -48,4 +48,4 @@ const props = defineProps({
 const slots = useSlots();
 </script>
 
-<style lang="sass" scoped></style>
+<style lang="scss" scoped></style>

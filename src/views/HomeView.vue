@@ -93,163 +93,193 @@ function calculateDelays(item) {
   </main>
 </template>
 
-<style lang="sass" scoped>
-@use "@/assets/variables"
-@use "@/assets/animations"
+<style lang="scss" scoped>
+@use "@/assets/variables";
+@use "@/assets/animations";
 
-$x-margin: 10vw
-$y-margin: 10vh
-$slider-timing-function: cubic-bezier(0.4, 0, 0.2, 1)
+$x-margin: 10vw;
+$y-margin: 10vh;
+$slider-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 
-main
-  flex: 1
-  display: flex
-  justify-content: center
-  align-items: center
-  overflow: hidden
-  z-index: 0
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  z-index: 0;
 
-  .content-container
-    padding-top: $y-margin
-    margin: 0 $x-margin $y-margin $x-margin
+  .content-container {
+    padding-top: $y-margin;
+    margin: 0 $x-margin $y-margin $x-margin;
 
     .n-h1,
-    .n-card
-      max-width: 40vw
+    .n-card {
+      max-width: 40vw;
+    }
 
-    .n-h1
-      font-size: 5vmin
-      font-weight: bold
-      text-transform: uppercase
-      margin: unset
-      filter: drop-shadow(0 0 10px variables.$sn-default-dark)
+    .n-h1 {
+      font-size: 5vmin;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin: unset;
+      filter: drop-shadow(0 0 10px variables.$sn-default-dark);
+    }
 
-    .n-text
-      font-size: 1.5vmin
+    .n-text {
+      font-size: 1.5vmin;
+    }
 
-    .n-card
-      border-radius: .75rem
-      width: unset
+    .n-card {
+      border-radius: .75rem;
+      width: unset;
+    }
 
-    .n-button
-      border-radius: .75rem
-      height: 3rem
-      width: unset
+    .n-button {
+      border-radius: .75rem;
+      height: 3rem;
+      width: unset;
+    }
+  }
 
-  .background-container
-    position: absolute
-    top: 0
-    right: 0
-    bottom: 0
-    left: 0
-    width: 100vw
-    height: 100vh
-    z-index: -1
-    display: flex
-    justify-content: center
-    align-items: center
-    overflow: hidden
+  .background-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 
-    video, img
-      width: 100%
-      height: 120%
-      object-fit: cover
-      z-index: 0
+    video, img {
+      width: 100%;
+      height: 120%;
+      object-fit: cover;
+      z-index: 0;
+    }
+  }
 
-  .btn-action
-    position: relative
-    overflow: hidden
-    border: unset
-    transition: all animations.$default-animation
+  .btn-action {
+    position: relative;
+    overflow: hidden;
+    border: unset;
+    transition: all animations.$default-animation;
 
-    &:hover
-      scale: 1.1
+    &:hover {
+      scale: 1.1;
+    }
 
-    &:active
-      scale: 1.05
+    &:active {
+      scale: 1.05;
+    }
 
-    &::after
-      content: ""
-      position: absolute
-      bottom: 0
-      left: 100%
-      width: 100%
-      height: 3px
-      background: variables.$sn-primary-red
-      transition: left animations.$default-animation
-      transition-delay: .1s
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 100%;
+      width: 100%;
+      height: 3px;
+      background: variables.$sn-primary-red;
+      transition: left animations.$default-animation;
+      transition-delay: .1s;
+    }
 
-    &:hover::after
-      left: 0
+    &:hover::after {
+      left: 0;
+    }
 
-    ::v-deep()
+    ::v-deep() {
       .n-button__border,
-      .n-button__state-border
-        border: unset !important
+      .n-button__state-border {
+        border: unset !important;
+      }
+    }
+  }
 
-  .thumbnail-container
-    &.absolute
-      position: absolute
-      left: calc($x-margin / 2)
-      bottom: calc($y-margin / 2)
-      display: flex
-      justify-content: center
-      align-items: center
+  .thumbnail-container {
+    &.absolute {
+      position: absolute;
+      left: calc($x-margin / 2);
+      bottom: calc($y-margin / 2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-      > img
-        width: 50vw
+      > img {
+        width: 50vw;
+      }
+    }
 
-    > img
-      width: 20vw
-      height: auto
-      object-fit: cover
-      border-radius: variables.$sn-apple-border-radius
-      filter: drop-shadow(variables.$sn-text-shadow)
+    > img {
+      width: 20vw;
+      height: auto;
+      object-fit: cover;
+      border-radius: variables.$sn-apple-border-radius;
+      filter: drop-shadow(variables.$sn-text-shadow);
+    }
+  }
 
-  :deep()
+  :deep() {
     .n-carousel__slide--prev,
     .n-carousel__slide--next,
-    .n-carousel__slide--current
+    .n-carousel__slide--current {
       .title-container,
       .description-container,
       .actions-container,
-      .thumbnail-container
-        transition: all 1s $slider-timing-function
+      .thumbnail-container {
+        transition: all 1s $slider-timing-function;
+      }
+    }
 
-    .n-carousel__slide
+    .n-carousel__slide {
       .title-container,
       .description-container,
       .actions-container,
-      .thumbnail-container
-        transform: translateX(40vw)
-        opacity: 0
-        filter: blur(10px)
+      .thumbnail-container {
+        transform: translateX(40vw);
+        opacity: 0;
+        filter: blur(10px);
+      }
+    }
 
-    .n-carousel__slide--prev
+    .n-carousel__slide--prev {
       .title-container,
       .description-container,
       .actions-container,
-      .thumbnail-container
-        transform: translateX(-40vw)
-        opacity: 0
-        filter: blur(10px)
+      .thumbnail-container {
+        transform: translateX(-40vw);
+        opacity: 0;
+        filter: blur(10px);
+      }
+    }
 
-    .n-carousel__slide--next
+    .n-carousel__slide--next {
       .title-container,
       .description-container,
       .actions-container,
-      .thumbnail-container
-        transform: translateX(40vw)
-        opacity: 0
-        filter: blur(10px)
+      .thumbnail-container {
+        transform: translateX(40vw);
+        opacity: 0;
+        filter: blur(10px);
+      }
+    }
 
-    .n-carousel__slide--current
+    .n-carousel__slide--current {
       .title-container,
       .description-container,
       .actions-container,
-      .thumbnail-container
-        transform: translateX(0vw)
-        opacity: 1
-        filter: blur(0)
-
+      .thumbnail-container {
+        transform: translateX(0vw);
+        opacity: 1;
+        filter: blur(0);
+      }
+    }
+  }
+}
 </style>

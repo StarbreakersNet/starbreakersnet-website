@@ -4,4 +4,4 @@
   <div>_Account_view</div>
 </template>
 
-<style scoped lang="sass"></style>
+<style scoped lang="scss"></style>

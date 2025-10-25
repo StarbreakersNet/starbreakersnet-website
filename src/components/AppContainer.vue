@@ -34,37 +34,41 @@ const componentStyle = {
   </transition-group>
 </template>
 
-<style lang="sass" scoped>
-@use "@/assets/variables"
+<style lang="scss" scoped>
+@use "@/assets/variables";
 
-.app-container
-  position: relative
-  width: 100%
-  display: flex
-  align-items: center
-  justify-content: center
-  border-radius: variables.$sn-apple-border-radius
-  overflow: clip
-  padding: 3px
+.app-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: variables.$sn-apple-border-radius;
+  overflow: clip;
+  padding: 3px;
 
-  .app-wrapper
-    width: 100%
-    height: 100%
-    display: flex
-    align-items: center
-    justify-content: center
+  .app-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-  .icon-wrapper
-    position: absolute
-    top: 0
-    right: 0
-    bottom: 0
-    left: 0
-    display: flex
-    align-items: center
-    justify-content: center
+  .icon-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    .icon
-      font-size: 10vmin
-      color: white
+    .icon {
+      font-size: 10vmin;
+      color: white;
+    }
+  }
+}
 </style>

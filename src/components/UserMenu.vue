@@ -134,11 +134,13 @@ function handleSelect(key) {
   </div>
 </template>
 
-<style lang="sass">
-@use "@/assets/variables"
+<style lang="scss">
+@use "@/assets/variables";
 
-.apple-container
-  &.n-dropdown-menu:not(.n-dropdown-menu--scrollable)
-    padding: variables.$sn-main-padding
-    border-radius: variables.$sn-apple-border-radius
+.apple-container {
+  &.n-dropdown-menu:not(.n-dropdown-menu--scrollable) {
+    padding: variables.$sn-main-padding;
+    border-radius: variables.$sn-apple-border-radius;
+  }
+}
 </style>

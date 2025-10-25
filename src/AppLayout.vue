@@ -76,42 +76,48 @@ onMounted(async () => {
   </transition>
 </template>
 
-<style lang="sass" scoped>
-@use "@/assets/variables"
+<style lang="scss" scoped>
+@use "@/assets/variables";
 
-.main-container
-  min-height: 100vh
-  display: flex
-  flex-direction: column
-  align-items: stretch
-  padding: variables.$sn-main-padding
-  gap: variables.$sn-main-padding
+.main-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: variables.$sn-main-padding;
+  gap: variables.$sn-main-padding;
 
-  header
-    position: sticky
-    top: variables.$sn-main-padding
-    right: variables.$sn-main-padding
-    bottom: variables.$sn-main-padding
-    left: variables.$sn-main-padding
-    z-index: 100
-    display: flex
-    justify-content: space-between
+  header {
+    position: sticky;
+    top: variables.$sn-main-padding;
+    right: variables.$sn-main-padding;
+    bottom: variables.$sn-main-padding;
+    left: variables.$sn-main-padding;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
 
-    &:has(> *:only-child)
-      justify-content: flex-end
+    &:has(> *:only-child) {
+      justify-content: flex-end;
+    }
 
-    > *
-      height: 2.5em
+    > * {
+      height: 2.5em;
+    }
+  }
 
-  .router-view
-    display: flex
-    flex-direction: column
-    flex: 1
+  .router-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
 
-  footer
-    position: absolute
-    right: variables.$sn-main-padding
-    left: variables.$sn-main-padding
-    bottom: variables.$sn-main-padding
-    z-index: 10
+  footer {
+    position: absolute;
+    right: variables.$sn-main-padding;
+    left: variables.$sn-main-padding;
+    bottom: variables.$sn-main-padding;
+    z-index: 10;
+  }
+}
 </style>

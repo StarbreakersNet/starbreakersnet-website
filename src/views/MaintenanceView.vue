@@ -11,8 +11,9 @@ import { particlesOptions } from "@/models/ParticlesConfig.ts";
   </main>
 </template>
 
-<style scoped lang="sass">
-.container
-  height: 100vh
-  font-size: 2em
+<style scoped lang="scss">
+.container {
+  height: 100vh;
+  font-size: 2em;
+}
 </style>

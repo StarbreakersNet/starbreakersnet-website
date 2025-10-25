@@ -17,12 +17,13 @@ const isIframeLoaded = ref(false);
   </app-container>
 </template>
 
-<style lang="sass" scoped>
-@use "@/assets/variables"
+<style lang="scss" scoped>
+@use "@/assets/variables";
 
-iframe
-  width: 100%
-  height: 100%
-  border: none
-  border-radius: variables.$sn-apple-border-radius
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: variables.$sn-apple-border-radius;
+}
 </style>
