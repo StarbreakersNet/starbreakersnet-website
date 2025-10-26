@@ -36,7 +36,7 @@ export default <GlobalThemeOverrides>{
     iconColor: "rgba(255, 255, 255, 0.38)",
     iconColorDisabled: "rgba(255, 255, 255, 0.28)",
     iconColorHover: "rgba(255, 255, 255, 0.475)",
-    iconColorPressed: "rgba(255, 255, 255, 0.30400000000000005)",
+    iconColorPressed: "rgba(255, 255, 255, 0.304)",
     opacity1: "0.9",
     opacity2: "0.82",
     opacity3: "0.52",

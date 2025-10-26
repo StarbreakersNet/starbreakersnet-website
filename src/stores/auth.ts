@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { authentication, createDirectus, readMe, registerUser, rest } from "@directus/sdk";
+import { authentication, createDirectus, readMe, registerUser, rest, updateMe } from "@directus/sdk";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import type { UserType } from "@/types/User";
@@ -22,12 +22,14 @@ export const useAuthStore = defineStore("auth", () => {
   async function getUserInfos() {
     if (user.infos.connected) {
       const directusUserData = await directus.request(
-        readMe({
-          fields: ["id", "email", "first_name", "last_name"],
-        })
+        readMe()
       );
       console.log("UserData", directusUserData);
-      user.infos.me = directusUserData as UserType;
+      user.infos.me = {
+        id: directusUserData.id,
+        username: directusUserData.first_name,
+        email: directusUserData.email,
+      };
     } else {
       console.error("You are not connected");
     }
@@ -40,7 +42,7 @@ export const useAuthStore = defineStore("auth", () => {
         user.infos.connected = true;
         await getUserInfos();
         localStorage.setItem("user_authenticated", "true");
-        message.success("Authentification réussie. Bienvenue " + user.infos.me?.first_name);
+        message.success("Authentification réussie. Bienvenue " + user.infos.me?.username);
         return true;
       }
     } catch (error) {
@@ -65,6 +67,12 @@ export const useAuthStore = defineStore("auth", () => {
         );
         console.error("Your session has expired or encountered an error:", error);
       }
+    }
+  }
+
+  async function refreshData() {
+    if (user.infos.connected) {
+      await getUserInfos();
     }
   }
 
@@ -98,10 +106,53 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  async function update(user: UserType) {
+    try {
+      return await directus.request(updateMe({
+        first_name: user.username,
+        email: user.email,
+        password: user.password,
+      }));
+    } catch (error) {
+      message.error("Une erreur est survenue lors de la mise à jour des informations");
+      console.error("Update failed:", error);
+      return false;
+    }
+  }
+
+  async function updatePassword(oldPassword: string, newPassword: string) {
+    try {
+      // TODO Resume: Le endpoint updateMe ne permet pas de forcer de donner le oldpassword. Il faut en front donc le check avant.
+      const oldPasswordIsValid = await directus.request({
+        method: "POST",
+        path: "/users/me/verify-password",
+        body: {
+          oldPassword,
+        },
+      });
+      if (!oldPasswordIsValid) {
+        message.error("L'ancien mot de passe est incorrect");
+        return false;
+      }
+      // TODO Resume: Implémenter correctement l'update du mot de passe avec directus SDK
+      return await directus.request(updateMe({
+        password: newPassword,
+      }));
+    } catch (error) {
+      message.error("Une erreur est survenu lors du changement de mot de passe");
+      console.error("Password update failed:", error);
+      return false;
+    }
+  }
+
   return {
+    directus,
     login,
     refreshSession,
+    refreshData,
     logout,
     register,
+    update,
+    updatePassword,
   };
 });
