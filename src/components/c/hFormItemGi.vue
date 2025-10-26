@@ -1,41 +1,12 @@
-<template>
-  <n-form-item
-    ref="formItemRef"
-    :content-class="props.contentClass"
-    :content-style="props.contentStyle"
-    :feedback="props.feedback"
-    :feedback-class="props.feedbackClass"
-    :feedback-style="props.feedbackStyle"
-    :first="props.first"
-    :ignore-path-change="props.ignorePathChange"
-    :label="props.label"
-    :label-align="props.labelAlign"
-    :label-placement="props.labelPlacement"
-    :label-props="props.labelProps"
-    :label-style="props.labelStyle"
-    :label-width="props.labelWidth"
-    :path="props.path"
-    :require-mark-placement="props.requireMarkPlacement"
-    :required="props.required"
-    :rule="props.rule"
-    :rule-path="props.rulePath"
-    :show-feedback="props.showFeedback"
-    :show-label="props.showLabel"
-    :show-require-mark="props.showRequireMark"
-    :size="props.size"
-    :validation-status="props.validationStatus"
-    v-bind="$attrs">
-    <slot />
-  </n-form-item>
-</template>
-
 <script lang="ts" setup>
-import type { FormItemInst, FormItemRule } from "naive-ui";
+import type { FormItemInst } from "naive-ui";
+import { type FormItemRule, type GridItemProps } from "naive-ui";
 import { type PropType, ref } from "vue";
 
 const formItemRef = ref<FormItemInst>();
 
 const props = defineProps({
+  // NFormItemProps
   contentClass: {
     type: String,
     default: undefined,
@@ -128,10 +99,61 @@ const props = defineProps({
     type: String as PropType<"error" | "success" | "warning">,
     default: undefined,
   },
+  // NGridItemProps
+  offset: {
+    type: Number as PropType<GridItemProps["offset"]>,
+    default: undefined,
+  },
+  span: {
+    type: [Number, String] as PropType<GridItemProps["span"]>,
+    default: undefined,
+  },
+  suffix: {
+    type: Boolean as PropType<GridItemProps["suffix"]>,
+    default: undefined,
+  },
 });
 
 defineExpose({
   validate: (...args: any[]) => formItemRef.value?.validate(...args),
   restoreValidation: () => formItemRef.value?.restoreValidation(),
 });
+
+defineOptions({
+  __GRID_ITEM__: true,
+});
 </script>
+
+<template>
+  <n-form-item-gi
+    ref="formItemRef"
+    :content-class="props.contentClass"
+    :content-style="props.contentStyle"
+    :feedback="props.feedback"
+    :feedback-class="props.feedbackClass"
+    :feedback-style="props.feedbackStyle"
+    :first="props.first"
+    :ignore-path-change="props.ignorePathChange"
+    :label="props.label"
+    :label-align="props.labelAlign"
+    :label-placement="props.labelPlacement"
+    :label-props="props.labelProps"
+    :label-style="props.labelStyle"
+    :label-width="props.labelWidth"
+    :offset="props.offset"
+    :path="props.path"
+    :require-mark-placement="props.requireMarkPlacement"
+    :required="props.required"
+    :rule="props.rule"
+    :rule-path="props.rulePath"
+    :show-feedback="props.showFeedback"
+    :show-label="props.showLabel"
+    :show-require-mark="props.showRequireMark"
+    :size="props.size"
+    :span="props.span"
+    :suffix="props.suffix"
+    :validation-status="props.validationStatus"
+    v-bind="$attrs">
+    <slot name="default" />
+  </n-form-item-gi>
+</template>
