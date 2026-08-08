@@ -1,0 +1,9 @@
+starbreakers.localhost {
+	# Le front tourne en `npm run dev` directement sur la machine hôte
+	# (voir le commentaire sur le service `frontend` dans docker-compose.yml).
+	reverse_proxy host.docker.internal:5173
+}
+
+api.starbreakers.localhost {
+	reverse_proxy kong:8000
+}
