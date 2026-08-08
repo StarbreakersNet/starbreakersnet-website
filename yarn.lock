@@ -363,13 +363,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@directus/sdk@npm:^18.0.0":
-  version: 18.0.3
-  resolution: "@directus/sdk@npm:18.0.3"
-  checksum: 10c0/42b7dceff7e78a6989d8e000336dba60ce57387e9035463616ec556ca9d9c464963c8922a2fc59130faff6e1f585da2bde2e5612913da1532dc0fecb4f44e778
-  languageName: node
-  linkType: hard
-
 "@emnapi/core@npm:^1.4.3, @emnapi/core@npm:^1.5.0":
   version: 1.6.0
   resolution: "@emnapi/core@npm:1.6.0"
@@ -4900,7 +4893,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "starbreakersnet-website@workspace:."
   dependencies:
-    "@directus/sdk": "npm:^18.0.0"
     "@fortawesome/fontawesome-svg-core": "npm:^6.5.1"
     "@fortawesome/free-brands-svg-icons": "npm:^6.5.1"
     "@fortawesome/free-regular-svg-icons": "npm:^6.5.1"

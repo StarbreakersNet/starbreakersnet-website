@@ -2,8 +2,6 @@ services:
   app:
     profiles:
       - default
-    depends_on:
-      - directus
     restart: unless-stopped
     build:
       context: .
@@ -36,70 +34,3 @@ services:
 #      - ${VITE_PORT}:5173
 #    environment:
 #      - NODE_ENV=development
-
-  database:
-    profiles:
-      - default
-      - dev
-    image: postgis/postgis:13-master
-    restart: unless-stopped
-    ports:
-      - ${DB_PORT}:5432
-    volumes:
-      - ./backend/database:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: "directus"
-      POSTGRES_PASSWORD: "directus"
-      POSTGRES_DB: "directus"
-    healthcheck:
-      test: [ "CMD", "pg_isready", "--host=localhost", "--username=directus" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_interval: 5s
-      start_period: 30s
-
-  directus:
-    profiles:
-      - default
-      - dev
-    image: directus/directus:11.1.1
-    depends_on:
-      database:
-        condition: service_healthy
-    restart: unless-stopped
-    ports:
-      - ${DIRECTUS_PORT}:8055
-    volumes:
-      - ./backend/uploads:/directus/uploads
-      - ./backend/extensions:/directus/extensions
-      - ./backend/migrations:/directus/migrations
-      - ./backend/snapshots:/directus/snapshots
-    environment:
-      SECRET: ${DIRECTUS_KEY}
-
-      DB_CLIENT: "pg"
-      DB_HOST: "database"
-      DB_PORT: "5432"
-      DB_DATABASE: "directus"
-      DB_USER: "directus"
-      DB_PASSWORD: "directus"
-
-      CORS_ENABLED: "true"
-      CORS_ORIGIN: ${APP_URL}
-      CORS_METHODS: "GET,POST,PATCH,DELETE,OPTIONS"
-      CORS_ALLOWED_HEADERS: "Content-Type,Authorization"
-      CORS_EXPOSED_HEADERS: "Content-Range"
-      CORS_CREDENTIALS: "true"
-
-      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
-      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
-      ADMIN_TOKEN: ${DIRECTUS_ADMIN_TOKEN}
-      PROJECT_NAME: "StarbreakersNet"
-
-      FILES_MAX_UPLOAD_SIZE: "1gb"
-    command: >
-      /bin/sh -c "
-      npx directus bootstrap &&
-      npx directus schema apply --yes /directus/snapshots/schema.snapshot.yaml &&
-      npx directus start"
