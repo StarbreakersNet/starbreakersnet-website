@@ -227,6 +227,16 @@ services:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+      - ./caddy/local-ca:/export
+    entrypoint: [ "/bin/sh", "-c" ]
+    command:
+      - |
+        (
+          until [ -f /data/caddy/pki/authorities/local/root.crt ]; do sleep 1; done
+          cp /data/caddy/pki/authorities/local/root.crt /export/root.crt
+          echo "Certificat exporté vers ./caddy/local-ca/root.crt"
+        ) &
+        exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
 
 volumes:
   db-config:

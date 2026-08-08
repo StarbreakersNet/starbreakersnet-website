@@ -50,4 +50,4 @@ backend/database/
 
 # Supabase (données persistées localement, ne pas versionner)
 backend/volumes/db/data/
-local-ca.crt
+caddy/local-ca/
