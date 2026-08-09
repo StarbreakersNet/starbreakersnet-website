@@ -208,6 +208,22 @@ services:
       CORS_ALLOWED_ORIGIN: https://${APP_DOMAIN}
     entrypoint: ["/bin/sh", "/home/kong/kong-entrypoint.sh"]
 
+  migrations:
+    container_name: supabase-migrations
+    image: node:20-alpine
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/supabase:ro,Z
+    working_dir: /supabase
+    entrypoint: [ "sh", "-c" ]
+    command:
+      - |
+        npm install -g supabase --silent &&
+        supabase db push --db-url "postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable" --yes
+
   ###
   ### Reverse proxy local (domaines *.starbreakers.localhost en HTTPS via la CA interne de Caddy)
   ### Même outil que pour Staging/Prod, pour un seul paradigme de config (Caddyfile).

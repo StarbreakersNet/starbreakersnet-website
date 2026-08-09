@@ -24,28 +24,28 @@ export const useAuthStore = defineStore("auth", () => {
     if (!authUser) {
       user.infos.connected = false;
       user.infos.me = null;
-      return;
+    } else {
+      user.infos.connected = true;
+      message.success("Vous êtes connecté");
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", authUser.id)
+        .single();
+
+      if (!error) {
+        user.infos.me = {
+          id: authUser.id,
+          username: profile.username,
+          email: authUser.email ?? null,
+          firstName: profile.first_name,
+          lastName: profile.last_name,
+        };
+      } else {
+        message.error("Impossible de récupérer les informations du compte");
+      }
     }
-
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", authUser.id)
-      .single();
-
-    if (error) {
-      message.error("Impossible de récupérer les informations du compte");
-      return;
-    }
-
-    user.infos.connected = true;
-    user.infos.me = {
-      id: authUser.id,
-      username: profile.username,
-      email: authUser.email ?? null,
-      firstName: profile.first_name,
-      lastName: profile.last_name,
-    };
   }
 
   async function login(email: string, password: string) {
@@ -160,18 +160,18 @@ export const useAuthStore = defineStore("auth", () => {
     return true;
   }
 
-  supabase.auth.onAuthStateChange((event) => {
-    if (event === "SIGNED_OUT") {
-      user.infos.connected = false;
-      user.infos.me = null;
-    } else if (
-      event === "SIGNED_IN" ||
-      event === "TOKEN_REFRESHED" ||
-      event === "INITIAL_SESSION"
-    ) {
-      getUserInfos();
-    }
-  });
+  // supabase.auth.onAuthStateChange((event) => {
+  //   if (event === "SIGNED_OUT") {
+  //     user.infos.connected = false;
+  //     user.infos.me = null;
+  //   } else if (
+  //     event === "SIGNED_IN" ||
+  //     event === "TOKEN_REFRESHED" ||
+  //     event === "INITIAL_SESSION"
+  //   ) {
+  //     getUserInfos();
+  //   }
+  // });
 
   return {
     login,
