@@ -23,10 +23,14 @@ export const menuItems: MenuItem[] = [
     textColor: "rgb(255, 255, 255)",
   },
   {
-    externalLink: "https://gitlab.com/starbreakersdevteam",
-    label: "GitLab",
-    icon: ["fab", "gitlab"],
-    color: "rgb(226, 67, 41)",
+    // D-006 (04/11/2026) : l'organisation GitLab n'existe plus ; le bouton
+    // mène à l'organisation GitHub, avec son logo (marque FontAwesome free,
+    // enregistrée en bloc par library.add(fab) dans main.js) et son noir de
+    // marque #181717.
+    externalLink: "https://github.com/StarbreakersNet",
+    label: "GitHub",
+    icon: ["fab", "github"],
+    color: "rgb(24, 23, 23)",
     textColor: "rgb(255, 255, 255)",
   },
   {

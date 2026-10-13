@@ -31,3 +31,43 @@ coverage
 
 .env
 backend/database/
+
+# Copie de référence vendue du projet amont Bonjourr (fournie le 14/10, hors
+# sources du fork : propre dépôt, propre outillage Deno, hors ESLint du fork).
+# Ancré à la racine : sans le « / », ce motif a AVALÉ src/bonjourr/ pendant
+# trois sessions (motifs git insensibles à la casse sur ce poste, prouvé le
+# 28/10 par un build sur arbre propre de la base : Could not load src/bonjourr/i18n).
+/Bonjourr/
+
+# Sorties de mesure du parcours headless (dumps DOM Edge + stderr, voir HANDOFF)
+edge-*.html
+edge-*.err
+
+# Captures des vérifications e2e regardées avant de cocher une case (astuce A007)
+captures/
+
+# ---- Documents de travail du fork (jamais destinés au dépôt d'origine ; à
+# retirer de ce fichier si la proposition de commit est retenue en l'état) ----
+# banc d'essai du fork (specs vitest + scripts e2e, hors dépôt d'origine)
+tests
+# plan de travail, relais de session, journal des choix, demandes de la personne
+PLAN.md
+HANDOFF.md
+journal-de-bord.md
+DEMANDES.md
+# lanceur du kit (port, ports à libérer)
+launch.json
+# mémoire partagée des runs (#1404) : copie du kit
+/.astuces/
+# parcours et captures du harnais de revue
+.harnais/
+# consignes de run du kit et captures d'écran de la personne (référence visuelle)
+readme.txt
+affichage_bonjourr.png
+bouton_bonjourr.png
+# fiches d'étude du code (outillage d'exploration)
+specs/
+# proposition de contribution destinée au dépôt d'origine (preuve sur disque)
+PROPOSITION-COMMIT.md
+proposition-commit.patch
+messages

@@ -4,6 +4,15 @@ import { h, ref } from "vue";
 import AppVersion from "@/components/AppVersion.vue";
 import { version } from "@/../package.json";
 
+// L'heure en haut à droite est retirée sur la page Bonjourr (demande du
+// 26/10) : elle doublonne l'horloge du fork. Ailleurs, elle reste affichée.
+defineProps({
+  showClock: {
+    type: Boolean,
+    default: true,
+  },
+});
+
 const packageVersion = ref(version);
 const options = ref([
   {
@@ -31,7 +40,7 @@ function handleSelect(key) {
   <div>
     <n-flex key="menu" :size="0" align="center" class="apple-container">
       <transition-group name="insert">
-        <n-tag key="icon" :bordered="false" :color="{ color: 'transparent' }" round>
+        <n-tag v-if="showClock" key="icon" :bordered="false" :color="{ color: 'transparent' }" round>
           <n-flex align="center">
             <time-clock key="time" />
           </n-flex>
@@ -68,7 +77,7 @@ function handleSelect(key) {
           <n-text>
             Si vous êtes intéressé pour participer au développement, n'hésitez pas à contacter
             <n-text strong type="info">TheRedfoox</n-text>
-            sur Discord ou le GitLab.
+            sur Discord ou GitHub.
           </n-text>
           <n-text code>
             <p>Version {{ packageVersion }} © 2024</p>

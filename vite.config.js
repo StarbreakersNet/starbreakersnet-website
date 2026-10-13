@@ -13,10 +13,20 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    watch: {
+      // tests/ n'est pas importé par l'application : le surveiller fait planter
+      // le serveur de dev en EBUSY sur Windows dès qu'un outil y écrit (piège
+      // relevé trois sessions de suite).
+      ignored: ["**/tests/**"],
+    },
   },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
+  },
+  test: {
+    environment: "happy-dom",
+    include: ["tests/**/*.spec.{js,ts}"],
   },
 });
