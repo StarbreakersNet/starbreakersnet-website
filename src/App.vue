@@ -82,7 +82,7 @@ watch(
                 </n-flex>
               </n-button>
             </transition-group>
-            <user-menu />
+            <user-menu :show-clock="route.name !== 'bonjourr'" />
           </header>
         </transition>
         <n-flex class="router-view" justify="center">

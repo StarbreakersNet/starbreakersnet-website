@@ -1,24 +1,14 @@
 <script lang="ts" setup>
-import { ref } from "vue";
-import MimicBackend from "@/stores/MimicBackend";
+// L'application Bonjourr du site est le fork natif Vue/TypeScript du projet
+// Bonjourr (demande du 26/10) : elle occupe l'encadré coloré du site, comme la
+// vidéo YouTube et le widget Discord. L'iframe de l'application en ligne
+// (online.bonjourr.fr) a vécu ; le fork est livré avec le site, hors ligne.
 import AppContainer from "@/components/AppContainer.vue";
-
-const url: string = MimicBackend.getViewerBonjourrUrl();
-const isIframeLoaded = ref(false);
+import BonjourrView from "@/views/BonjourrView.vue";
 </script>
 
 <template>
-  <app-container :loaded="isIframeLoaded" app="bonjourr">
-    <iframe :src="url" allowtransparency="true" @load="isIframeLoaded = true" />
+  <app-container loaded app="bonjourr">
+    <BonjourrView />
   </app-container>
 </template>
-
-<style lang="sass" scoped>
-@import @/assets/variables.sass
-
-iframe
-  width: 100%
-  height: 100%
-  border: none
-  border-radius: $sn-apple-border-radius
-</style>
