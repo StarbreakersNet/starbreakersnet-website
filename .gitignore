@@ -31,3 +31,8 @@ coverage
 
 .env
 backend/database/
+
+# Copie de référence vendue du projet amont Bonjourr (fournie le 14/10, hors
+# sources du fork : propre dépôt, propre outillage Deno, hors ESLint du fork)
+Bonjourr/
+

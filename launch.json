@@ -1,0 +1,8 @@
+{
+  "type": "url",
+  "label": "Ouvrir STARBREAKERSNET-WEBSITE",
+  "target": "http://localhost:5173",
+  "start": [
+    { "command": "npm run dev", "cwd": "." }
+  ]
+}

@@ -17,6 +17,11 @@ const router = createRouter({
       component: ViewerDiscord
     },
     {
+      path: '/bonjourr',
+      name: 'bonjourr',
+      component: () => import('@/views/BonjourrView.vue')
+    },
+    {
       path: '/youtube',
       name: 'youtube',
       component: ViewerYoutube
