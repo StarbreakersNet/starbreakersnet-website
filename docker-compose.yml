@@ -92,3 +92,24 @@ services:
       npx directus bootstrap &&
       npx directus schema apply --yes /directus/snapshots/schema.snapshot.yaml &&
       npx directus start"
+
+  # Case 22 : le Bonjourr amont (référence Deno, lisible seule) en service
+  # propre, profil « bonjourr ». Build depuis Bonjourr/docker/Dockerfile avec
+  # Bonjourr/ comme contexte (COPY _locales docker src tasks deno.json deno.lock) ;
+  # port 8000 comme Bonjourr/docker/compose.yaml l.6-7. Le montage du source
+  # (src + _locales) est reconstruit au démarrage (`deno task build` puis
+  # `deno task serve`, tasks/serve.ts l.8 sert release/online) : les fichiers
+  # montés sont donc réellement ceux qui repartent en ligne, pas un décor.
+  bonjourr:
+    profiles:
+      - bonjourr
+    build:
+      context: ./Bonjourr
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ./Bonjourr/src:/app/src
+      - ./Bonjourr/_locales:/app/_locales
+    command: [ "/bin/sh", "-c", "deno task build && deno task serve" ]
+    ports:
+      - 8000:8000
+    restart: unless-stopped

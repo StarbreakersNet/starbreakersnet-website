@@ -23,17 +23,14 @@ const router = createRouter({
       component: ViewerDiscord
     },
     {
+      path: '/bonjourr',
+      name: 'bonjourr',
+      component: () => import('@/views/BonjourrView.vue')
+    },
+    {
       path: '/youtube',
       name: 'youtube',
       component: ViewerYoutube
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
     }
   ]
 })
