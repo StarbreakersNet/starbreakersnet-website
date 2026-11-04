@@ -60,7 +60,7 @@ function calculateDelays(item) {
           <n-flex
             :style="{transitionDelay: carouselItemsStyle[itemIndex].delay[3]}"
             class="actions-container">
-            <template v-for="action in item.actions">
+            <template v-for="action in item.actions" :key="action.label">
               <n-button
                 :href="action.externalLink"
                 :tag="action.externalLink ? 'a' : 'button'"

@@ -5,22 +5,34 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-function onClick(item: MenuItem) {
+// Les items sont de vrais <a href> (parcours humain, y compris sans JS) ;
+// la navigation interne reste une navigation SPA sans rechargement.
+function hrefFor(item: MenuItem): string | undefined {
   if (item.routeName) {
+    return router.resolve({ name: item.routeName }).href;
+  }
+  return item.externalLink;
+}
+
+function onClick(item: MenuItem, event: MouseEvent) {
+  if (item.routeName) {
+    event.preventDefault();
     router.push({ name: item.routeName });
-  } else if (item.externalLink) {
-    window.open(item.externalLink, "_blank");
   }
 }
 </script>
 
 <template>
   <n-flex :size="30" align="center" class="component apple-blurred" justify="center">
-    <div v-for="item in menuItems" class="item">
+    <div v-for="item in menuItems" :key="item.label" class="item">
       <n-button
         :color="item.color"
+        :href="hrefFor(item)"
+        :rel="item.externalLink ? 'noopener' : undefined"
+        :tag="hrefFor(item) ? 'a' : 'button'"
+        :target="item.externalLink ? '_blank' : undefined"
         :text-color="item.textColor ?? (item.color ? 'white' : '')"
-        @click="onClick(item)">
+        @click="onClick(item, $event)">
         <n-flex :size="10" align="center" justify="center" vertical>
           <FontAwesomeIcon v-if="item.icon" :icon="item.icon" class="fa-icon" />
           <span v-if="item.label" class="label">{{ item.label }}</span>
