@@ -1,81 +1,39 @@
 <script lang="ts" setup>
-import type { FormItemRule } from "naive-ui";
 import { useAuthStore } from "@/stores/auth";
-import { reactive, useTemplateRef } from "vue";
+import { reactive, ref, useTemplateRef } from "vue";
 import type { HFormInst } from "@/types/components/c/hForm.ts";
 import HForm from "@/components/c/hForm.vue";
 import HFormItem from "@/components/c/hFormItem.vue";
 import HInput from "@/components/c/hInput.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HButton from "@/components/c/hButton.vue";
+import { emailRule, passwordRule, usernameRule } from "@/lib/validation";
 
 const auth = useAuthStore();
 
 const emit = defineEmits(["registered"]);
 
 const formRef = useTemplateRef<HFormInst>("formRef");
+const loading = ref(false);
 const registerForm = reactive({
   username: "",
   email: "",
   password: "",
 });
-const rules = reactive({
-  username: [
-    {
-      required: true,
-      trigger: ["input", "blur"],
-      validator(rule: FormItemRule, value: string) {
-        if (!value) {
-          return new Error("Un nom d'utilisateur est requis");
-        } else if (value.length < 3) {
-          return new Error("Doit contenir au moins 3 caractères");
-        } else if (/[^a-zA-Z0-9]/.test(value)) {
-          return new Error("Ne doit pas contenir de caractères spéciaux");
-        }
-        return true;
-      },
-    },
-  ],
-  email: [
-    {
-      required: true,
-      trigger: ["input", "blur"],
-      validator(rule: FormItemRule, value: string) {
-        if (!value) {
-          return new Error("Une adresse email est requis");
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          return new Error("Veuillez entrer une adresse e-mail valide");
-        }
-        return true;
-      },
-    },
-  ],
-  password: [
-    {
-      required: true,
-      trigger: ["input", "blur"],
-      validator(rule: FormItemRule, value: string) {
-        if (!value) {
-          return new Error("Un mot de passe est requis");
-        } else if (value.length < 6) {
-          return new Error("Doit contenir au moins 6 caractères");
-        } else if (!/\d/.test(value)) {
-          return new Error("Doit contenir au moins un chiffre");
-        } else if (!/[A-Z]/.test(value)) {
-          return new Error("Doit contenir au moins une majuscule");
-        }
-        return true;
-      },
-    },
-  ],
-});
+const rules = {
+  username: usernameRule,
+  email: emailRule,
+  password: passwordRule,
+};
 
 async function handleSubmit() {
-  let response = await auth.register(
+  loading.value = true;
+  const response = await auth.register(
     registerForm.email,
     registerForm.password,
     registerForm.username
   );
+  loading.value = false;
 
   if (response) {
     formRef.value?.reset();
@@ -94,11 +52,16 @@ async function handleSubmit() {
         <h-input v-model:value="registerForm.email" placeholder="" />
       </h-form-item>
       <h-form-item label="Mot de passe" path="password">
-        <h-input v-model:value="registerForm.password" placeholder="" type="password" />
+        <h-input
+          v-model:value="registerForm.password"
+          show-password-on="click"
+          type="password" />
       </h-form-item>
       <h-form-item>
         <h-flex style="width: 100%" vertical>
-          <h-button :disabled="!formRef?.isValid" attr-type="submit">S'inscrire</h-button>
+          <h-button :disabled="!formRef?.isValid" :loading="loading" attr-type="submit">
+            S'inscrire
+          </h-button>
         </h-flex>
       </h-form-item>
     </h-form>

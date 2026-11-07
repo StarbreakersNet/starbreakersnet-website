@@ -2,12 +2,14 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
+import { getAuthErrorMessage } from "@/lib/authErrors";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import type { UserType } from "@/types/User";
 
 const CONFIRMATION_TEXT =
   "Merci de votre inscription ! Consultez vos emails et cliquez sur le lien de confirmation pour vous connecter";
+const CONFIRMATION_DURATION = 10000;
 
 export const useAuthStore = defineStore("auth", () => {
   const user = useUserStore();
@@ -114,7 +116,7 @@ export const useAuthStore = defineStore("auth", () => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      message.error("Email ou mot de passe incorrect");
+      message.error(getAuthErrorMessage(error, "Email ou mot de passe incorrect"));
       return false;
     }
 
@@ -139,7 +141,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function register(email: string, password: string, username: string) {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -148,11 +150,20 @@ export const useAuthStore = defineStore("auth", () => {
     });
 
     if (error) {
-      message.error("Impossible de créer le compte");
+      message.error(getAuthErrorMessage(error, "Impossible de créer le compte"));
       return false;
     }
 
-    message.success(CONFIRMATION_TEXT);
+    // Confirmation d'email désactivée (autoconfirm en local) : GoTrue renvoie directement une session.
+    // Sinon, pas de session : l'utilisateur doit cliquer sur le lien reçu par email. GoTrue répond
+    // de la même façon si l'email est déjà inscrit, pour ne pas révéler quels comptes existent.
+    if (data.session) {
+      await loadUser(data.session.user);
+      message.success("Bienvenue ! Votre compte est créé et vous êtes connecté");
+    } else {
+      message.success(CONFIRMATION_TEXT, { duration: CONFIRMATION_DURATION });
+    }
+
     return true;
   }
 
