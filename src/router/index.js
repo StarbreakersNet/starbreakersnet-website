@@ -4,6 +4,7 @@ import ViewerDiscord from "@/components/ViewerDiscord.vue";
 import ViewerYoutube from "@/components/ViewerYoutube.vue";
 import AccountView from "@/views/AccountView.vue";
 import { useAuthStore } from "@/stores/auth.ts";
+import { useUserStore } from "@/stores/user.ts";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,13 +36,20 @@ const router = createRouter({
       path: "/account",
       name: "account",
       component: AccountView,
+      meta: { requiresAuth: true },
     },
   ],
 });
 
-// On attend de connaître la session initiale avant toute navigation (loader affiché par AppLayout)
-router.beforeEach(async () => {
+router.beforeEach(async to => {
+  // On attend de connaître la session initiale avant toute navigation (loader affiché par AppLayout)
   await useAuthStore().whenReady();
+
+  // Route protégée sans session : retour à l'accueil avec la modale de connexion ouverte,
+  // puis retour sur la route demandée une fois connecté (voir UserMenu.vue)
+  if (to.meta.requiresAuth && !useUserStore().infos.connected) {
+    return { name: "home", query: { login: "1", redirect: to.fullPath } };
+  }
 });
 
 export default router;

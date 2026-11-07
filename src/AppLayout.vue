@@ -1,14 +1,17 @@
 <script setup>
-import { RouterView, useRoute } from "vue-router";
+import { RouterView, useRoute, useRouter } from "vue-router";
 import MainMenu from "@/components/MainMenu.vue";
 import { onMounted, ref, watch } from "vue";
 import MaintenanceView from "@/views/MaintenanceView.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useMessage, useNotification } from "naive-ui";
 import { useAuthStore } from "@/stores/auth.ts";
+import { useUserStore } from "@/stores/user.ts";
 
 const route = useRoute();
+const router = useRouter();
 const auth = useAuthStore();
+const user = useUserStore();
 
 const props = defineProps({
   maintenanceMode: {
@@ -31,6 +34,16 @@ watch(
   () => {
     isHome.value = route.name === "home";
     setUiVisibility(isHome.value);
+  }
+);
+
+// Déconnexion (bouton, session expirée ou autre onglet) depuis une route protégée : retour à l'accueil
+watch(
+  () => user.infos.connected,
+  connected => {
+    if (!connected && route.meta.requiresAuth) {
+      router.push({ name: "home" });
+    }
   }
 );
 

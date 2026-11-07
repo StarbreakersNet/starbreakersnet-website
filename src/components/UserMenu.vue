@@ -1,19 +1,22 @@
 <script setup>
 import TimeClock from "@/components/TimeClock.vue";
 import { computed, h, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import AppVersion from "@/components/AppVersion.vue";
 import { version } from "@/../package.json";
-import router from "@/router/index.js";
 import LoginView from "@/views/LoginView.vue";
+import HModal from "@/components/c/hModal.vue";
 import { useAuthStore } from "@/stores/auth.ts";
 import { useUserStore } from "@/stores/user.ts";
 import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
 
 const auth = useAuthStore();
 const user = useUserStore();
+const route = useRoute();
+const router = useRouter();
 const packageVersion = ref(version);
 const options = computed(() => {
-  let items = [];
+  const items = [];
 
   if (user.infos.connected) {
     items.push({
@@ -47,12 +50,46 @@ const options = computed(() => {
   return items;
 });
 const showModal = ref(false);
-const showLoginModal = ref(false);
+
+// La modale de connexion est pilotée par l'URL (?login=1&redirect=/account) :
+// le guard du router peut l'ouvrir, et le bouton « précédent » la referme.
+const showLoginModal = computed(() => route.query.login === "1");
+
+function getRedirect() {
+  const redirect = route.query.redirect;
+
+  // Uniquement un chemin interne, pour éviter une redirection vers un autre site
+  if (typeof redirect === "string" && redirect.startsWith("/") && !redirect.startsWith("//")) {
+    return redirect;
+  }
+  return null;
+}
+
+function openLoginModal() {
+  router.push({ query: { ...route.query, login: "1" } });
+}
+
+function closeLoginModal() {
+  const query = { ...route.query };
+  delete query.login;
+  delete query.redirect;
+  router.replace({ query });
+}
+
+function handleConnected() {
+  const redirect = getRedirect();
+
+  if (redirect) {
+    router.replace(redirect);
+  } else {
+    closeLoginModal();
+  }
+}
 
 function handleSelect(key) {
   switch (key) {
     case "login":
-      showLoginModal.value = true;
+      openLoginModal();
       break;
     case "logout":
       auth.logout();
@@ -121,16 +158,17 @@ function handleSelect(key) {
         </n-flex>
       </template>
     </n-modal>
-    <n-modal
-      v-model:show="showLoginModal"
+    <h-modal
       :icon="() => renderNaiveFontAwesomeIcon({ fas: 'user' })"
+      :show="showLoginModal"
       class="apple-menu"
       preset="dialog"
-      transform-origin="center">
+      transform-origin="center"
+      @update:show="!$event && closeLoginModal()">
       <template #default>
-        <login-view @connected="showLoginModal = false" />
+        <login-view @connected="handleConnected()" />
       </template>
-    </n-modal>
+    </h-modal>
   </div>
 </template>
 
