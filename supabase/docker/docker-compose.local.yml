@@ -1,12 +1,14 @@
 # Starbreakers.net : services réservés au développement local (jamais déployés).
 # À activer après docker-compose.starbreakers.yml : `sh run.sh config add starbreakers local`.
 # Les ports publiés ici sont tous liés à 127.0.0.1 : rien n'est joignable depuis le réseau local.
+# Ports déjà pris sur le poste (autre conteneur web, autre Postgres) : les changer dans .env avec
+# LOCAL_HTTP_PORT, LOCAL_HTTPS_PORT et LOCAL_DB_PORT (voir le README).
 
 services:
   # Postgres accessible depuis la machine (IntelliJ, psql, CLI Supabase)
   db:
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:${LOCAL_DB_PORT:-5432}:5432"
 
   # Capteur de mails : avec SMTP_HOST=mailpit / SMTP_PORT=1025 dans .env, GoTrue y envoie tous ses
   # mails, lisibles sur https://mail.starbreakers.localhost. Rien ne sort de la machine.
@@ -25,8 +27,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
-      - "127.0.0.1:80:80"
-      - "127.0.0.1:443:443"
+      - "127.0.0.1:${LOCAL_HTTP_PORT:-80}:80"
+      - "127.0.0.1:${LOCAL_HTTPS_PORT:-443}:443"
     volumes:
       - ../../caddy/Caddyfile:/etc/caddy/Caddyfile:ro,z
       - caddy-data:/data

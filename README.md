@@ -103,6 +103,27 @@ Aucun service tiers : tout tourne sur nos serveurs.
 
 Les seuls ports publiés en local (80/443 pour Caddy, 5432 pour Postgres) sont liés à `127.0.0.1`. Si votre navigateur résout `*.localhost` en IPv6 et que la connexion échoue, ajoutez les mêmes ports sur `[::1]` dans `docker-compose.local.yml`.
 
+### Ports déjà utilisés sur le poste
+
+Si `docker compose up` répond `address already in use` (autre conteneur web, autre Postgres…) :
+
+1. Choisir d'autres ports dans `supabase/docker/.env` :
+    ```
+    LOCAL_HTTP_PORT=8080
+    LOCAL_HTTPS_PORT=8443
+    LOCAL_DB_PORT=54322
+    ```
+2. Ajouter le port HTTPS à toutes les URL locales :
+    - dans `supabase/docker/.env` :
+        - `SUPABASE_PUBLIC_URL=https://api.starbreakers.localhost:8443`
+        - `API_EXTERNAL_URL=https://api.starbreakers.localhost:8443/auth/v1`
+        - `SITE_URL=https://starbreakers.localhost:8443`
+        - `ADDITIONAL_REDIRECT_URLS=https://starbreakers.localhost:8443/**`
+    - dans le `.env` du front : `VITE_SUPABASE_URL=https://api.starbreakers.localhost:8443`
+3. Relancer `docker compose up -d` et `yarn dev`, puis ouvrir directement les adresses en HTTPS avec le port : https://starbreakers.localhost:8443, https://api.starbreakers.localhost:8443, https://mail.starbreakers.localhost:8443. La redirection automatique depuis `http://…:8080` renvoie vers le port 443 et ne fonctionne donc pas.
+
+Pour savoir qui occupe un port : `docker ps --format '{{.Names}}\t{{.Ports}}' | grep ':443->'`, ou `lsof -nP -iTCP:443 -sTCP:LISTEN`.
+
 Avec `ENABLE_EMAIL_AUTOCONFIRM=true`, il n'y a pas de lien à cliquer à l'inscription, et GoTrue n'impose pas non plus la double confirmation lors d'un changement d'email. Pour tester le parcours réel, passer à `false` et relancer `docker compose up -d`.
 
 ### Certificat HTTPS local
