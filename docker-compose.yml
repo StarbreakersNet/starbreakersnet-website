@@ -1,3 +1,8 @@
+###
+### Aucun `ports:` dans ce fichier : un port publié l'est sur toutes les interfaces de l'hôte,
+### et les règles iptables de Docker passent avant ufw. Le trafic entre par le reverse proxy
+### (Caddy en local via docker-compose.dev.yaml, Ingressi en staging/prod).
+###
 services:
   app:
     profiles:
@@ -6,8 +11,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    ports:
-      - ${APP_PORT}:80
     environment:
       - NODE_ENV=production
 
@@ -17,7 +20,6 @@ services:
   ### studio + meta (dashboard admin). Pas de realtime/storage/functions/analytics.
   ###
   db:
-    container_name: supabase-db
     image: supabase/postgres:17.6.1.136
     restart: unless-stopped
     volumes:
@@ -50,7 +52,6 @@ services:
       ]
 
   auth:
-    container_name: supabase-auth
     image: supabase/gotrue:v2.189.0
     restart: unless-stopped
     depends_on:
@@ -103,7 +104,6 @@ services:
       GOTRUE_SMS_AUTOCONFIRM: "false"
 
   rest:
-    container_name: supabase-rest
     image: postgrest/postgrest:v14.12
     restart: unless-stopped
     depends_on:
@@ -129,7 +129,6 @@ services:
     command: ["postgrest"]
 
   meta:
-    container_name: supabase-meta
     image: supabase/postgres-meta:v0.96.6
     restart: unless-stopped
     depends_on:
@@ -145,7 +144,6 @@ services:
       CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
 
   studio:
-    container_name: supabase-studio
     image: supabase/studio:2026.08.03-sha-022b374
     restart: unless-stopped
     depends_on:
@@ -180,15 +178,11 @@ services:
       AUTH_JWT_SECRET: ${JWT_SECRET}
 
   kong:
-    container_name: supabase-kong
     image: kong/kong:3.9.3
     restart: unless-stopped
     depends_on:
       studio:
         condition: service_healthy
-    ports:
-      - ${KONG_HTTP_PORT}:8000/tcp
-      - ${KONG_HTTPS_PORT}:8443/tcp
     volumes:
       - ./backend/kong/kong.yml:/home/kong/temp.yml:ro,Z
       - ./backend/kong/kong-entrypoint.sh:/home/kong/kong-entrypoint.sh:ro,Z
@@ -212,9 +206,10 @@ services:
       CORS_ALLOWED_ORIGIN: https://${APP_DOMAIN}
     entrypoint: ["/bin/sh", "/home/kong/kong-entrypoint.sh"]
 
+  # One-shot : vérifie les secrets (backend/check-secrets.sh) puis applique backend/migrations.
+  # Monté sur /supabase : la CLI cherche un dossier "supabase" contenant config.toml.
   migrations:
-    container_name: supabase-migrations
-    image: node:20-alpine
+    image: node:22-alpine
     restart: "no"
     depends_on:
       db:
@@ -222,43 +217,18 @@ services:
     volumes:
       - ./backend:/supabase:ro,Z
     working_dir: /supabase
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ANON_KEY: ${ANON_KEY}
+      DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+      PG_META_CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
     entrypoint: [ "sh", "-c" ]
     command:
       - |
-        npm install -g supabase --silent &&
-        supabase db push --db-url "postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable" --yes
-
-  ###
-  ### Reverse proxy local (domaines *.starbreakers.localhost en HTTPS via la CA interne de Caddy)
-  ### Même outil que pour Staging/Prod, pour un seul paradigme de config (Caddyfile).
-  ###
-  caddy:
-    profiles:
-      - dev
-    container_name: caddy
-    image: caddy:2-alpine
-    restart: unless-stopped
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-      - ./caddy/local-ca:/export
-    entrypoint: [ "/bin/sh", "-c" ]
-    command:
-      - |
-        (
-          until [ -f /data/caddy/pki/authorities/local/root.crt ]; do sleep 1; done
-          cp /data/caddy/pki/authorities/local/root.crt /export/root.crt
-          echo "Certificat exporté vers ./caddy/local-ca/root.crt"
-        ) &
-        exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+        sh /supabase/check-secrets.sh &&
+        npm install -g supabase@3.0.0 --silent &&
+        supabase db push --remote="postgresql://postgres:$${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable" --yes
 
 volumes:
   db-config:
-  caddy_data:
-  caddy_config:

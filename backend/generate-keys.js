@@ -1,17 +1,23 @@
 #!/usr/bin/env node
-// Génère ANON_KEY et SERVICE_ROLE_KEY (JWT HS256 legacy) à partir de JWT_SECRET.
-// Usage : node generate-keys.js VOTRE_JWT_SECRET
+// Génère les secrets de la stack Supabase, au format du .env (à copier-coller).
+//
+// Usage :
+//   node backend/generate-keys.js               -> génère tous les secrets
+//   node backend/generate-keys.js <JWT_SECRET>  -> régénère ANON_KEY et SERVICE_ROLE_KEY
+//                                                  à partir d'un JWT_SECRET existant
+//
+// Un jeu de secrets différent par environnement (local, staging, prod).
+// Attention : POSTGRES_PASSWORD n'est appliqué qu'à l'initialisation de la base. Le changer
+// ensuite dans le .env ne modifie pas les mots de passe déjà enregistrés dans Postgres.
 
 import crypto from "node:crypto";
 
-const secret = process.argv[2];
-if (!secret) {
-  console.error("Usage: node generate-keys.js <JWT_SECRET>");
-  process.exit(1);
-}
+// Hexadécimal : utilisable tel quel dans une URL de connexion Postgres et dans kong.yml
+const randomHex = bytes => crypto.randomBytes(bytes).toString("hex");
 
 const base64url = obj => Buffer.from(JSON.stringify(obj)).toString("base64url");
 
+// Clés API legacy : JWT HS256 signés avec JWT_SECRET
 function signJWT(role, secret) {
   const header = { alg: "HS256", typ: "JWT" };
   const now = Math.floor(Date.now() / 1000);
@@ -26,5 +32,27 @@ function signJWT(role, secret) {
   return `${data}.${signature}`;
 }
 
-console.log("ANON_KEY=" + signJWT("anon", secret));
-console.log("SERVICE_ROLE_KEY=" + signJWT("service_role", secret));
+const providedSecret = process.argv[2];
+
+if (providedSecret && providedSecret.length < 32) {
+  console.error("JWT_SECRET doit contenir au moins 32 caractères.");
+  process.exit(1);
+}
+
+const jwtSecret = providedSecret ?? randomHex(32);
+const lines = [];
+
+if (!providedSecret) {
+  lines.push(`POSTGRES_PASSWORD=${randomHex(24)}`, `JWT_SECRET=${jwtSecret}`);
+}
+
+lines.push(
+  `ANON_KEY=${signJWT("anon", jwtSecret)}`,
+  `SERVICE_ROLE_KEY=${signJWT("service_role", jwtSecret)}`
+);
+
+if (!providedSecret) {
+  lines.push(`DASHBOARD_PASSWORD=${randomHex(24)}`, `PG_META_CRYPTO_KEY=${randomHex(32)}`);
+}
+
+console.log(lines.join("\n"));

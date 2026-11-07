@@ -1,6 +1,5 @@
 starbreakers.localhost {
-	# Le front tourne en `npm run dev` directement sur la machine hôte
-	# (voir le commentaire sur le service `frontend` dans docker-compose.yml).
+	# Le front tourne avec `yarn dev` (Vite, port 5173) directement sur la machine hôte
 	reverse_proxy host.docker.internal:5173
 }
 
