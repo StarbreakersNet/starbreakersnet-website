@@ -222,7 +222,7 @@ const props = defineProps({
 
 const slots = useSlots();
 
-const refSkeleton = ref(null);
+const refSkeleton = ref<HTMLElement | null>(null);
 const defaultSlotWidth = ref(DEFAULT_WIDTH);
 const shouldShowSkeleton = ref(false);
 let showTimeoutId: number | null = null;

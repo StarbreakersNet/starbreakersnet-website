@@ -22,8 +22,8 @@
         <template v-if="slots.suffix" #suffix>
             <slot name="suffix" />
         </template>
-        <template v-if="slots.clear" #clear>
-            <slot name="clear" />
+        <template v-if="slots['clear-icon']" #clear-icon>
+            <slot name="clear-icon" />
         </template>
         <template v-if="slots.count" #count>
             <slot name="count" />
@@ -41,11 +41,11 @@ const slots = useSlots();
 
 const props = defineProps({
     value: {
-        type: [String, Number] as PropType<string | number | null | undefined>,
+        type: [String, Array] as PropType<InputProps["value"]>,
         default: undefined,
     },
     defaultValue: {
-        type: [String, Number] as PropType<string | number | null | undefined>,
+        type: [String, Array] as PropType<InputProps["defaultValue"]>,
         default: undefined,
     },
     placeholder: {

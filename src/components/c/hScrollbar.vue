@@ -21,11 +21,11 @@
 </template>
 
 <script lang="ts" setup>
-import { NScrollbar } from "naive-ui";
+import { NScrollbar, type ScrollbarInst, type ScrollbarProps } from "naive-ui";
 import { computed, type PropType, ref, useSlots } from "vue";
 
 const slots = useSlots();
-const scrollbar = ref(null);
+const scrollbar = ref<ScrollbarInst | null>(null);
 
 const props = defineProps({
     trigger: {
@@ -69,20 +69,28 @@ const props = defineProps({
         default: "bottom",
     },
     theme: {
-        type: Object,
+        type: Object as PropType<InstanceType<typeof NScrollbar>["$props"]["theme"]>,
         default: undefined,
     },
     themeOverrides: {
-        type: Object,
+        type: Object as PropType<ScrollbarProps["themeOverrides"]>,
         default: undefined,
     },
 });
 
 defineEmits(["scroll"]);
 
+// Délégation à NScrollbar en conservant les surcharges de scrollTo / scrollBy
+const scrollTo = ((...args: unknown[]) =>
+    scrollbar.value &&
+    Reflect.apply(scrollbar.value.scrollTo, scrollbar.value, args)) as ScrollbarInst["scrollTo"];
+const scrollBy = ((...args: unknown[]) =>
+    scrollbar.value &&
+    Reflect.apply(scrollbar.value.scrollBy, scrollbar.value, args)) as ScrollbarInst["scrollBy"];
+
 defineExpose({
-    scrollTo: (...args: any[]) => scrollbar.value?.scrollTo(...args),
-    scrollBy: (...args: any[]) => scrollbar.value?.scrollBy(...args),
+    scrollTo,
+    scrollBy,
 });
 
 const computedContainerClass = computed(() => {

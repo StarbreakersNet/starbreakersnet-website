@@ -8,6 +8,13 @@ declare global {
   }
 }
 
+// Variables de thème propres au projet, lues via useThemeVars() (ex. hButton, prop `accent`)
+declare module "naive-ui" {
+  interface CustomThemeCommonVars {
+    accentColor?: string;
+  }
+}
+
 interface ImportMetaEnv {
   readonly VITE_API_URL: string;
   readonly VITE_API_ANON_KEY: string;
