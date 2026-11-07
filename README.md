@@ -1,183 +1,178 @@
 # starbreakersnet-website
 
-Ce projet est un site web développé avec **Vue 3** et **Vite**, et inclut un **backoffice** propulsé par **Supabase** self-hosted (Postgres, authentification, API REST auto-générée et dashboard admin Studio). Le front-end permet d'afficher des données dynamiques et de gérer l'authentification des utilisateurs. Vous pouvez configurer un environnement de développement de deux manières : en utilisant **Docker Compose** ou directement avec **npm**.
+Site des Starbreakers : front **Vue 3 + Vite** (TypeScript, Pinia, vue-router, Naive UI, Tailwind) et backend **Supabase self-hosted** (Postgres, authentification GoTrue, API REST PostgREST, passerelle Kong, dashboard Studio).
+
+Aucun service tiers : pas de Supabase Cloud, tout tourne dans `docker-compose.yml`.
+
+## Sommaire
+
+- [Prérequis](#prérequis)
+- [Démarrage en local](#démarrage-en-local)
+- [Variables d'environnement](#variables-denvironnement)
+- [Base de données et migrations](#base-de-données-et-migrations)
+- [Build de production](#build-de-production)
+- [Déploiement (staging / prod)](#déploiement-staging--prod)
 
 ## Prérequis
 
-Avant de commencer, assurez-vous d'avoir les outils suivants installés sur votre machine :
+- [Docker](https://docs.docker.com/get-started/) avec Docker Compose v2
+- [Node.js](https://nodejs.org/) 22 avec Corepack (fourni avec Node). Le projet utilise **Yarn 4**, installé par Corepack d'après le champ `packageManager` de `package.json`. Les dépendances sont installées dans `node_modules` (`.yarnrc.yml`).
 
-### Pour l'installation via Docker Compose
+## Démarrage en local
 
-- [Docker](https://www.docker.com/get-started) version 20.10 ou supérieure
-- [Docker Compose](https://docs.docker.com/compose/) version 1.29 ou supérieure
+En local, la stack Supabase, Caddy et Mailpit tournent dans Docker, et le front tourne directement sur la machine avec Vite.
 
-### Pour l'installation avec npm
+1. Cloner le dépôt et installer les dépendances :
+    ```bash
+    git clone https://github.com/StarbreakersNet/starbreakersnet-website.git
+    cd starbreakersnet-website
+    corepack enable
+    yarn install
+    ```
 
-- [Node.js](https://nodejs.org/) version 20 ou supérieure
-- [npm](https://www.npmjs.com/) (généralement installé avec Node.js)
-
-### Pour les migrations de base de données
-
-- [Supabase CLI](https://supabase.com/docs/guides/cli) — les migrations de schéma (`supabase/migrations`) sont appliquées avec `supabase db push`, pas de script maison.
-
-## Configuration du fichier `.env`
-
-Avant de démarrer l'application, vous devez configurer les variables d'environnement. Un fichier d'exemple `.env.example` est fourni pour vous guider.
-
-1. Dupliquez le fichier `.env.example` et renommez-le en `.env` :
+2. Créer le `.env` et générer les secrets :
     ```bash
     cp .env.example .env
+    node backend/generate-keys.js
     ```
+    Reporter dans le `.env` les lignes affichées (`POSTGRES_PASSWORD`, `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, `DASHBOARD_PASSWORD`, `PG_META_CRYPTO_KEY`) et choisir un `DASHBOARD_USERNAME`. Le service `migrations` refuse de démarrer tant qu'un secret vaut `change_me_…` ou est vide.
 
-2. Ouvrez le fichier `.env` et configurez les variables selon vos besoins :
+    > `POSTGRES_PASSWORD` n'est appliqué qu'à la création de la base. Pour en changer ensuite en local, supprimer `backend/volumes/db/data` (les données locales sont perdues).
 
-    - **APP_PORT** : Le port que l'application doit utiliser (build de production).
-    - **VITE_PORT** : Le port du serveur de développement Vite.
-    - **VITE_API_URL** / **VITE_SUPABASE_URL** : L'URL que le front va utiliser pour les requêtes à l'API Supabase (Kong).
-    - **VITE_SUPABASE_ANON_KEY** : La clé publique `anon` de Supabase (voir `ANON_KEY` ci-dessous).
-    - **POSTGRES_PASSWORD**, **JWT_SECRET**, **ANON_KEY**, **SERVICE_ROLE_KEY**, **DASHBOARD_USERNAME**, **DASHBOARD_PASSWORD**, **PG_META_CRYPTO_KEY** : secrets de la stack Supabase. **Générez des valeurs propres à chaque environnement, ne gardez jamais les exemples.**
-    - **API_EXTERNAL_URL** / **SUPABASE_PUBLIC_URL** : l'URL publique de l'API (Kong).
-    - **GOTRUE_SITE_URL** / **GOTRUE_URI_ALLOW_LIST** : l'URL du front, utilisée pour construire les liens de confirmation d'email.
-    - **ENABLE_EMAIL_AUTOCONFIRM** : `true` en local (pas de SMTP disponible), `false` en Staging/Prod (SMTP branché sur le serveur mail OVH, voir les variables `GOTRUE_SMTP_*`).
-    - **CORS_ALLOWED_ORIGIN** : l'origine autorisée par Kong pour les appels du front.
-
-    Pour générer `JWT_SECRET`, `ANON_KEY` et `SERVICE_ROLE_KEY` propres à votre environnement, utilisez le générateur officiel : https://supabase.com/docs/guides/self-hosting/docker#securing-your-services (section _Generate API Keys_), ou la commande `openssl rand -base64 40` pour un secret aléatoire suivi de la génération des JWT `anon`/`service_role` signés avec ce secret.
-
-Assurez-vous que les valeurs dans le fichier `.env` sont correctes avant de continuer.
-
-## Installation et Configuration
-
-### Option 1 : Utilisation de Docker Compose
-
-Cette méthode permet de configurer et de lancer l'environnement de développement à l'aide de **Docker Compose**, ce qui rend le projet indépendant de l'environnement de votre machine.
-
-1. Clonez le dépôt sur votre machine locale :
+3. Démarrer la stack (ou la run configuration IntelliJ **dev**) :
     ```bash
-    git clone https://gitlab.com/starbreakersdevteam/starbreakersnet-website.git
-    cd ton-projet
+    docker compose --profile dev -f docker-compose.yml -f docker-compose.dev.yaml up -d
     ```
+    Cela démarre Postgres (`db`), GoTrue (`auth`), PostgREST (`rest`), Kong (`kong`), Studio (`studio` + `meta`), Caddy, Mailpit, puis applique les migrations (service one-shot `migrations`).
 
-2. Démarrez la stack Supabase et le reverse proxy Caddy :
+4. Démarrer le front :
     ```bash
-    docker compose --profile dev up --build
-    ```
-   Cela démarre Postgres, l'authentification (`auth`), l'API REST (`rest`), la passerelle (`kong`), le dashboard admin (`studio` + `meta`) et Caddy.
-
-3. Démarrez le serveur de développement du front directement sur votre machine (voir Option 2 ci-dessous) — le front n'est pas conteneurisé en local pour éviter les contraintes d'IDE/sync.
-
-4. Faites confiance au certificat HTTPS local généré par Caddy (une seule fois, voir section suivante), puis accédez à :
-    ```
-    https://starbreakers.localhost         (front)
-    https://api.starbreakers.localhost     (API)
-    https://studio.starbreakers.localhost  (dashboard admin, identifiants DASHBOARD_USERNAME/DASHBOARD_PASSWORD)
+    yarn dev
     ```
 
-5. Pour arrêter les conteneurs :
+5. Faire confiance au certificat HTTPS local (une seule fois, voir [plus bas](#certificat-https-local)), puis ouvrir :
+
+    | URL | Rôle |
+    |---|---|
+    | https://starbreakers.localhost | Front (Vite) |
+    | https://api.starbreakers.localhost | API (Kong) : `/auth/v1`, `/rest/v1` |
+    | https://api.starbreakers.localhost/ | Studio, identifiants `DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD` |
+    | https://mail.starbreakers.localhost | Mailpit : tous les mails envoyés par GoTrue (rien ne sort de la machine) |
+
+6. Arrêter la stack :
     ```bash
-    docker compose down
+    docker compose --profile dev -f docker-compose.yml -f docker-compose.dev.yaml down
     ```
 
-### Option 2 : Utilisation de npm
+Les ports de Caddy (80/443) et de Postgres (5432) sont liés à `127.0.0.1` dans `docker-compose.dev.yaml` : rien n'est joignable depuis le réseau local. Si votre navigateur résout `*.localhost` en IPv6 (`::1`) et que la connexion échoue, ajoutez les mêmes ports sur `[::1]` dans `docker-compose.dev.yaml`.
 
-Si vous préférez ne pas utiliser Docker, vous pouvez également configurer l'environnement de développement en utilisant directement **npm**.
+### Certificat HTTPS local
 
-1. Clonez le dépôt sur votre machine locale :
+Caddy signe les certificats de `*.starbreakers.localhost` avec sa CA interne. Au démarrage, il exporte le certificat racine dans `caddy/local-ca/root.crt` (non versionné). Il reste valable tant que le volume `caddy_data` existe.
+
+- **macOS** :
     ```bash
-    git clone https://gitlab.com/starbreakersdevteam/starbreakersnet-website.git
-    cd ton-projet
+    sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain caddy/local-ca/root.crt
     ```
-
-2. Installez les dépendances du projet :
-    ```bash
-    npm install
-    ```
-
-3. Démarrez le serveur de développement :
-    ```bash
-    npm run dev
-    ```
-
-4. Accédez à l'application dans votre navigateur à l'URL suivante :
-    ```
-    http://localhost:5174 (ou celui défini dans le .env)
-    ```
-   Ou, si la stack Supabase/Caddy tourne (Option 1), via `https://starbreakers.localhost`.
-
-5. Pour arrêter le serveur de développement, utilisez `Ctrl + C` dans le terminal.
-
-## Faire confiance au certificat HTTPS local (Caddy)
-
-Caddy détecte que les domaines `*.starbreakers.localhost` ne sont pas publics et génère/signe automatiquement des certificats via sa **CA interne** (pas besoin de mkcert). Cette CA est générée à l'intérieur du conteneur, donc invisible du magasin de certificats de la machine hôte tant qu'elle n'a pas été extraite et ajoutée manuellement — **une seule fois**, tant que le volume `caddy_data` persiste (ne pas le supprimer sous peine de devoir refaire cette opération).
-
-1. Démarrez la stack (`docker compose --profile dev up -d`), puis extrayez le certificat de la CA interne (identique sur les trois OS) :
-    ```bash
-    docker compose exec caddy cat /data/caddy/pki/authorities/local/root.crt > local-ca.crt
-    ```
-
-2. Ajoutez ce certificat au magasin de confiance de votre système :
-
-    **macOS** :
-    ```bash
-    sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain local-ca.crt
-    ```
-
-    **Windows** (PowerShell en admin) :
+- **Windows** (PowerShell en admin) :
     ```powershell
-    certutil -addstore -f "ROOT" local-ca.crt
+    certutil -addstore -f "ROOT" caddy\local-ca\root.crt
     ```
-
-    **Linux** (Debian/Ubuntu) :
+- **Linux** (Debian/Ubuntu) :
     ```bash
-    sudo cp local-ca.crt /usr/local/share/ca-certificates/local-ca.crt
+    sudo cp caddy/local-ca/root.crt /usr/local/share/ca-certificates/starbreakers-local-ca.crt
     sudo update-ca-certificates
     ```
-
-    **Linux** (Fedora/RHEL) :
+- **Linux** (Fedora/RHEL) :
     ```bash
-    sudo cp local-ca.crt /etc/pki/ca-trust/source/anchors/
+    sudo cp caddy/local-ca/root.crt /etc/pki/ca-trust/source/anchors/starbreakers-local-ca.crt
     sudo update-ca-trust
     ```
+- **Firefox** utilise son propre magasin : importer le certificat (`about:preferences#privacy` → Certificats → Importer), ou activer `security.enterprise_roots.enabled` dans `about:config`.
 
-3. **Cas particulier Firefox** (tous OS) : Firefox utilise son propre magasin de certificats (NSS), indépendant du système — l'étape précédente ne suffit pas pour lui. Deux options :
-    - Importer le certificat manuellement : `about:preferences#privacy` → Certificates → View Certificates → Import → sélectionner `local-ca.crt`.
-    - Ou activer `security.enterprise_roots.enabled` dans `about:config` pour que Firefox utilise le magasin de confiance du système.
+### Mails en local
 
-> `.localhost` résout automatiquement vers `127.0.0.1` sur la plupart des OS/navigateurs modernes (RFC 6761). Si ce n'est pas le cas dans votre environnement, ajoutez les domaines à votre fichier `hosts`.
+`ENABLE_EMAIL_AUTOCONFIRM=true` (valeur par défaut du `.env.example`) évite de confirmer l'adresse à l'inscription. Les autres mails (mot de passe oublié, changement d'adresse) arrivent dans Mailpit.
 
-## Base de données — migrations
+Pour tester le parcours réel, passer `ENABLE_EMAIL_AUTOCONFIRM=false` et redémarrer `auth`. Avec l'autoconfirm, GoTrue n'impose pas non plus la double confirmation (ancienne et nouvelle adresse) lors d'un changement d'email.
 
-Les migrations de schéma sont gérées avec la CLI Supabase, pas de script maison. La stack étant self-hosted (pas un projet supabase.com), on cible directement l'URL de connexion Postgres de l'environnement visé plutôt que `supabase link` :
+## Variables d'environnement
+
+Toutes les variables sont dans `.env` (modèle : `.env.example`). Les constantes internes (hôtes, ports, schémas, durée des JWT, règles de mot de passe…) sont écrites dans `docker-compose.yml`.
+
+| Variable | Rôle |
+|---|---|
+| `APP_DOMAIN`, `API_DOMAIN` | Domaines du front et de l'API. Toutes les URL de la stack en dérivent (site URL de GoTrue, CORS de Kong, URL publique de Studio…). |
+| `POSTGRES_PASSWORD`, `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, `DASHBOARD_PASSWORD`, `PG_META_CRYPTO_KEY` | Secrets, générés par `node backend/generate-keys.js`, différents pour chaque environnement. `SERVICE_ROLE_KEY` peut rester vide. Avec un `JWT_SECRET` en argument, le script ne régénère que les clés API. |
+| `DASHBOARD_USERNAME` | Identifiant du basic-auth de Studio. |
+| `VITE_API_URL`, `VITE_API_ANON_KEY` | Seules variables lues par le front, déclarées après les secrets parce que les `${…}` sont résolues dans l'ordre du fichier. En production, elles sont intégrées au bundle au moment du build. |
+| `ENABLE_EMAIL_AUTOCONFIRM` | `true` en local, `false` en staging/prod. |
+| `GOTRUE_SMTP_*` | SMTP OVH (`ssl0.ovh.net`, port 465 SSL ou 587 STARTTLS, expéditeur `noreply@starbreakers.net`). En local, `docker-compose.dev.yaml` redirige tout vers Mailpit. |
+
+## Base de données et migrations
+
+Le schéma est géré par des migrations SQL dans `backend/migrations/`, appliquées par la [CLI Supabase](https://supabase.com/docs/guides/cli) (`supabase db push`). Le service one-shot `migrations` le fait automatiquement à chaque `docker compose up`, après avoir vérifié les secrets (`backend/check-secrets.sh`).
+
+- **Une migration poussée sur GitHub est figée** : toute modification de schéma passe par une nouvelle migration.
+- Créer une migration : ajouter un fichier `backend/migrations/<horodatage UTC AAAAMMJJHHMMSS>_<nom>.sql`, par exemple `20261107200033_user_settings.sql`. C'est ce que fait `supabase migration new`, mais la CLI attend un dossier nommé `supabase` et ne trouve pas `backend`.
+- Appliquer les nouvelles migrations en local :
+    ```bash
+    docker compose -f docker-compose.yml -f docker-compose.dev.yaml run --rm migrations
+    ```
+- `backend/config.toml` est le gabarit de `supabase init`. Seule sa présence compte (sans lui, la CLI répond « up to date » sans rien appliquer), son contenu ne s'applique pas à la stack Docker. Ne pas le supprimer.
+- Nouvelles tables du schéma `public` : activer la RLS, écrire les policies et donner des `grant` explicites à `authenticated` (voir `20261107200033_user_settings.sql`). Ne pas compter sur l'exposition automatique, que Supabase abandonne.
+
+**Studio sert à administrer les données, jamais le schéma.** En staging et en prod, une table, colonne, policy ou fonction créée dans Studio n'existe pas dans le dépôt : l'environnement diverge. Toute modification de structure passe par une migration.
+
+## Build de production
 
 ```bash
-supabase db push --db-url postgresql://postgres:<POSTGRES_PASSWORD>@<host>:<POSTGRES_PORT>/postgres
+yarn build          # type-check + build Vite dans dist/
+yarn preview        # sert dist/ en local
 ```
 
-Pour créer une nouvelle migration :
+L'image Docker du front (`Dockerfile.prod`, service `app`, profil `default`) installe les dépendances avec `yarn install --immutable`, construit le front avec `VITE_API_URL` et `VITE_API_ANON_KEY` passées en build args (le `.env` n'entre pas dans l'image), puis le sert avec nginx (`nginx.conf`, fallback SPA vers `index.html`).
+
+`docker-compose.yml` ne publie aucun port : en local, `app` n'est pas joignable. Pour tester l'image seule :
 
 ```bash
-supabase migration new nom_de_la_migration
+docker compose --profile default build app
+docker run --rm -p 127.0.0.1:8080:80 starbreakersnet-website-app
 ```
 
-À appliquer avec `supabase db push` contre chaque environnement (dev, staging, prod) — pas d'application automatique au démarrage des conteneurs.
+## Déploiement (staging / prod)
 
-## Compilation pour la Production
+Deux projets Dokploy sur le même serveur : `starbreakersnet-website-beta` (staging) et `starbreakersnet-website-live` (prod). Le reverse proxy HTTPS est **Ingressi** (basé sur Caddy), en dehors de ce dépôt.
 
-Que vous utilisiez Docker ou npm, vous pouvez créer une version optimisée de votre application pour la production en suivant ces étapes :
+### Configuration
 
-### Avec Docker Compose
+- **Profil** : le service `app` est sous le profil `default`. Il doit être activé sur Dokploy (`COMPOSE_PROFILES=default` dans l'environnement, ou `--profile default` dans la commande), sinon le front ne démarre pas.
+- **Isolated Deployments** activé sur les deux projets : chaque environnement a son propre réseau.
+- **`.env`** rempli à la main dans Dokploy, avec des secrets générés pour cet environnement (`node backend/generate-keys.js`), `ENABLE_EMAIL_AUTOCONFIRM=false` et les identifiants SMTP OVH.
+- **Aucun port publié** : `kong` et `app` ne sont joignables que par Ingressi. *(Rattachement au réseau d'Ingressi et persistance de la base : configuration en cours de validation, voir la note ci-dessous.)*
 
-1. Construisez l'image pour la production :
+> **À finaliser avant le premier déploiement.** Dokploy refait un `git clone` à chaque déploiement, ce qui vide le dossier du code. La base est actuellement montée dans `./backend/volumes/db/data`, à l'intérieur de ce dossier : elle doit être déplacée (volume nommé) avant toute mise en ligne.
+
+### Studio
+
+Studio est servi par Kong sur `https://<API_DOMAIN>/` (toute route autre que `/auth/v1/*`, `/rest/v1/*` et `/pg/*`), derrière le basic-auth `DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD`. C'est la configuration officielle de Supabase self-hosted.
+
+- Joignable uniquement en HTTPS via Ingressi, jamais par un port publié.
+- `DASHBOARD_PASSWORD` aléatoire et long (généré par le script).
+- Données uniquement, jamais le schéma (voir plus haut).
+
+### Vérifications après le premier déploiement d'un environnement
+
+- [ ] Sur le serveur, aucun conteneur de la stack ne publie de port :
     ```bash
-    docker compose --profile default up --build
+    docker ps --format '{{.Names}}\t{{.Ports}}' | grep 0.0.0.0
     ```
-
-2. Votre application sera accessible via Docker à l'URL configurée dans votre fichier `.env`.
-
-### Avec npm
-
-1. Compilez et minifiez le code pour la production :
+- [ ] Depuis une machine extérieure, les ports internes ne répondent pas (« timed out ») :
     ```bash
-    npm run build
+    for port in 5432 8000 8443 3000; do nc -vz -w 3 starbreakers.net $port; done
     ```
-
-2. Les fichiers de production seront générés dans le dossier `dist/`.
+- [ ] `https://<API_DOMAIN>/` demande une authentification (Studio).
+- [ ] `https://<API_DOMAIN>/rest/v1/` avec l'en-tête `apikey: <ANON_KEY>` répond normalement.
+- [ ] `https://<API_DOMAIN>/auth/v1/health` avec la même clé répond `200`.
+- [ ] Logs du service `migrations` : secrets acceptés et migrations appliquées.
+- [ ] Inscription → mail de confirmation reçu → connexion → `/account` → mot de passe oublié.
