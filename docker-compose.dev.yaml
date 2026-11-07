@@ -1,4 +1,24 @@
+###
+### Surcharges réservées au développement local (jamais déployées)
+###
 services:
   db:
     ports:
       - "127.0.0.1:5432:5432"
+
+  # GoTrue envoie ses mails (confirmation, mot de passe oublié, changement d'email) à Mailpit
+  auth:
+    environment:
+      GOTRUE_SMTP_HOST: mailpit
+      GOTRUE_SMTP_PORT: 1025
+      GOTRUE_SMTP_USER: ""
+      GOTRUE_SMTP_PASS: ""
+      GOTRUE_SMTP_ADMIN_EMAIL: noreply@starbreakers.localhost
+
+  # Capteur de mails : rien ne sort de la machine, les mails sont lisibles sur
+  # https://mail.starbreakers.localhost (via Caddy)
+  mailpit:
+    profiles:
+      - dev
+    image: axllent/mailpit:v1.33.0
+    restart: unless-stopped

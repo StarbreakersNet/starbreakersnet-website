@@ -7,3 +7,8 @@ starbreakers.localhost {
 api.starbreakers.localhost {
 	reverse_proxy kong:8000
 }
+
+# Interface web de Mailpit (capteur de mails local, voir docker-compose.dev.yaml)
+mail.starbreakers.localhost {
+	reverse_proxy mailpit:8025
+}

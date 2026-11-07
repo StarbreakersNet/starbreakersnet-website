@@ -1,6 +1,11 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
+import {
+  type AuthChangeEvent,
+  isAuthRetryableFetchError,
+  type Session,
+  type User,
+} from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 import { getAuthErrorMessage } from "@/lib/authErrors";
 import { useMessage } from "@/composables/useMessage";
@@ -12,6 +17,9 @@ type ProfileUpdate = Pick<UserType, "username" | "firstName" | "lastName">;
 const CONFIRMATION_TEXT =
   "Merci de votre inscription ! Consultez vos emails et cliquez sur le lien de confirmation pour vous connecter";
 const CONFIRMATION_DURATION = 10000;
+// Message identique que le compte existe ou non, pour ne pas révéler quels emails sont inscrits
+const PASSWORD_RESET_TEXT =
+  "Si un compte existe avec cette adresse, un email contenant un lien de réinitialisation vient d'être envoyé";
 
 export const useAuthStore = defineStore("auth", () => {
   const user = useUserStore();
@@ -28,10 +36,14 @@ export const useAuthStore = defineStore("auth", () => {
     return readyPromise;
   }
 
+  // Vrai quand l'utilisateur arrive par le lien de réinitialisation du mot de passe
+  const passwordRecovery = ref(false);
+
   let pendingLoad: { id: string; promise: Promise<void> } | null = null;
 
   function clearUser() {
     pendingLoad = null;
+    passwordRecovery.value = false;
     user.infos.connected = false;
     user.infos.me = null;
   }
@@ -114,6 +126,12 @@ export const useAuthStore = defineStore("auth", () => {
       case "TOKEN_REFRESHED":
         if (session) {
           await loadUser(session.user, isEmailStale(session.user));
+        }
+        break;
+      case "PASSWORD_RECOVERY":
+        passwordRecovery.value = true;
+        if (session) {
+          await loadUser(session.user);
         }
         break;
       case "USER_UPDATED":
@@ -253,8 +271,42 @@ export const useAuthStore = defineStore("auth", () => {
     return true;
   }
 
+  async function requestPasswordReset(email: string) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    // Seules les erreurs qui ne dépendent pas de l'existence du compte sont affichées
+    // (réseau, limite de requêtes par IP). Les autres (limite d'envoi par utilisateur,
+    // échec SMTP…) révéleraient que l'adresse est inscrite.
+    if (error && (isAuthRetryableFetchError(error) || error.code === "over_request_rate_limit")) {
+      message.error(getAuthErrorMessage(error, "Impossible d'envoyer l'email"));
+      return false;
+    }
+
+    if (error) {
+      console.warn("resetPasswordForEmail", error);
+    }
+
+    message.info(PASSWORD_RESET_TEXT, { duration: CONFIRMATION_DURATION });
+    return true;
+  }
+
+  async function resetPassword(newPassword: string) {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      message.error(getAuthErrorMessage(error, "Impossible de modifier le mot de passe"));
+      return false;
+    }
+
+    passwordRecovery.value = false;
+    return true;
+  }
+
   return {
     isReady,
+    passwordRecovery,
     whenReady,
     login,
     logout,
@@ -262,5 +314,7 @@ export const useAuthStore = defineStore("auth", () => {
     updateProfile,
     updateEmail,
     updatePassword,
+    requestPasswordReset,
+    resetPassword,
   };
 });

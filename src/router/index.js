@@ -38,6 +38,12 @@ const router = createRouter({
       component: AccountView,
       meta: { requiresAuth: true },
     },
+    {
+      // Cible du lien envoyé par resetPasswordForEmail (voir stores/auth.ts)
+      path: "/reset-password",
+      name: "reset-password",
+      component: () => import("@/views/ResetPasswordView.vue"),
+    },
   ],
 });
 

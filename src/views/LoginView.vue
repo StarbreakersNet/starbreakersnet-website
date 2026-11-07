@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import RegisterView from "@/views/RegisterView.vue";
+import ForgotPasswordView from "@/views/ForgotPasswordView.vue";
 import HModal from "@/components/c/hModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
@@ -15,6 +16,7 @@ const email = ref("");
 const password = ref("");
 const loading = ref(false);
 const showRegisterModal = ref(false);
+const showForgotPasswordModal = ref(false);
 
 async function handleSubmit() {
   loading.value = true;
@@ -50,10 +52,15 @@ function handleRegistered() {
           <n-button :loading="loading" attr-type="submit">Se connecter</n-button>
         </n-flex>
       </n-form-item>
-      <n-text>
-        Vous n'avez pas de compte ?
-        <n-a @click="showRegisterModal = true">S'inscrire</n-a>
-      </n-text>
+      <n-flex vertical>
+        <n-text>
+          <n-a @click="showForgotPasswordModal = true">Mot de passe oublié ?</n-a>
+        </n-text>
+        <n-text>
+          Vous n'avez pas de compte ?
+          <n-a @click="showRegisterModal = true">S'inscrire</n-a>
+        </n-text>
+      </n-flex>
     </n-form>
     <h-modal
       v-model:show="showRegisterModal"
@@ -64,6 +71,17 @@ function handleRegistered() {
       transform-origin="center">
       <template #default>
         <register-view @registered="handleRegistered()" />
+      </template>
+    </h-modal>
+    <h-modal
+      v-model:show="showForgotPasswordModal"
+      :icon="() => renderNaiveFontAwesomeIcon({ fas: 'key' })"
+      class="apple-menu"
+      preset="dialog"
+      title="Mot de passe oublié"
+      transform-origin="center">
+      <template #default>
+        <forgot-password-view :email="email" @sent="showForgotPasswordModal = false" />
       </template>
     </h-modal>
   </div>
