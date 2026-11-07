@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
-import { createClient } from "@supabase/supabase-js";
+import { ref } from "vue";
+import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabaseClient";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import type { UserType } from "@/types/User";
@@ -7,82 +9,133 @@ import type { UserType } from "@/types/User";
 const CONFIRMATION_TEXT =
   "Merci de votre inscription ! Consultez vos emails et cliquez sur le lien de confirmation pour vous connecter";
 
-const supabase = createClient(
-  import.meta.env.VITE_API_URL,
-  import.meta.env.VITE_API_ANON_KEY
-);
-
 export const useAuthStore = defineStore("auth", () => {
   const user = useUserStore();
   const message = useMessage();
 
-  async function getUserInfos() {
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
+  // Passe à true quand on sait s'il y a une session (et que le profil est chargé s'il y en a une)
+  const isReady = ref(false);
+  let resolveReady: () => void = () => {};
+  const readyPromise = new Promise<void>(resolve => {
+    resolveReady = resolve;
+  });
 
-    if (!authUser) {
-      user.infos.connected = false;
-      user.infos.me = null;
-    } else {
-      user.infos.connected = true;
-      message.success("Vous êtes connecté");
+  function whenReady() {
+    return readyPromise;
+  }
 
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", authUser.id)
-        .single();
+  let pendingLoad: { id: string; promise: Promise<void> } | null = null;
 
-      if (!error) {
-        user.infos.me = {
-          id: authUser.id,
-          username: profile.username,
-          email: authUser.email ?? null,
-          firstName: profile.first_name,
-          lastName: profile.last_name,
-        };
-      } else {
-        message.error("Impossible de récupérer les informations du compte");
+  function clearUser() {
+    pendingLoad = null;
+    user.infos.connected = false;
+    user.infos.me = null;
+  }
+
+  async function fetchUser(authUser: User) {
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", authUser.id)
+      .single();
+
+    user.infos.connected = true;
+
+    if (error) {
+      message.error("Impossible de récupérer les informations du compte");
+      return;
+    }
+
+    user.infos.me = {
+      id: authUser.id,
+      username: profile.username,
+      email: authUser.email ?? null,
+      firstName: profile.first_name,
+      lastName: profile.last_name,
+    };
+  }
+
+  // Charge le profil une seule fois par utilisateur, même si plusieurs événements arrivent en même temps
+  function loadUser(authUser: User, force = false): Promise<void> {
+    if (!force) {
+      if (pendingLoad?.id === authUser.id) {
+        return pendingLoad.promise;
       }
+      if (user.infos.me?.id === authUser.id) {
+        return Promise.resolve();
+      }
+    }
+
+    const promise = fetchUser(authUser).finally(() => {
+      if (pendingLoad?.promise === promise) {
+        pendingLoad = null;
+      }
+    });
+    pendingLoad = { id: authUser.id, promise };
+
+    return promise;
+  }
+
+  async function handleAuthChange(event: AuthChangeEvent, session: Session | null) {
+    switch (event) {
+      case "INITIAL_SESSION":
+        if (session) {
+          await loadUser(session.user);
+        } else {
+          clearUser();
+        }
+        isReady.value = true;
+        resolveReady();
+        break;
+      case "SIGNED_IN":
+      case "TOKEN_REFRESHED":
+        if (session) {
+          await loadUser(session.user);
+        }
+        break;
+      case "USER_UPDATED":
+        if (session) {
+          await loadUser(session.user, true);
+        }
+        break;
+      case "SIGNED_OUT":
+        clearUser();
+        break;
     }
   }
 
+  // Seule source de vérité pour l'état de connexion. Le callback ne doit pas appeler Supabase
+  // directement (risque d'interblocage, cf. doc de onAuthStateChange) : on diffère le traitement.
+  supabase.auth.onAuthStateChange((event, session) => {
+    setTimeout(() => handleAuthChange(event, session), 0);
+  });
+
   async function login(email: string, password: string) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       message.error("Email ou mot de passe incorrect");
       return false;
     }
 
-    await getUserInfos();
+    await loadUser(data.user);
+    message.success("Vous êtes connecté");
     return true;
   }
 
-  async function refreshSession() {
-    const { data } = await supabase.auth.getSession();
-
-    if (data.session) {
-      await getUserInfos();
-    }
-  }
-
   async function refreshData() {
-    if (user.infos.connected) {
-      await getUserInfos();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session) {
+      await loadUser(session.user, true);
     }
   }
 
-  async function logout(inError = false) {
+  async function logout() {
     await supabase.auth.signOut();
-
-    user.infos.connected = false;
-    user.infos.me = null;
-
-    if (inError) {
-      message.error("Votre session a expiré, veuillez vous reconnecter");
-    }
+    clearUser();
   }
 
   async function register(email: string, password: string, username: string) {
@@ -160,22 +213,10 @@ export const useAuthStore = defineStore("auth", () => {
     return true;
   }
 
-  // supabase.auth.onAuthStateChange((event) => {
-  //   if (event === "SIGNED_OUT") {
-  //     user.infos.connected = false;
-  //     user.infos.me = null;
-  //   } else if (
-  //     event === "SIGNED_IN" ||
-  //     event === "TOKEN_REFRESHED" ||
-  //     event === "INITIAL_SESSION"
-  //   ) {
-  //     getUserInfos();
-  //   }
-  // });
-
   return {
+    isReady,
+    whenReady,
     login,
-    refreshSession,
     refreshData,
     logout,
     register,

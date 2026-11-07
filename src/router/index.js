@@ -4,7 +4,6 @@ import ViewerDiscord from "@/components/ViewerDiscord.vue";
 import ViewerYoutube from "@/components/ViewerYoutube.vue";
 import AccountView from "@/views/AccountView.vue";
 import { useAuthStore } from "@/stores/auth.ts";
-import { useUserStore } from "@/stores/user.ts";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,14 +39,9 @@ const router = createRouter({
   ],
 });
 
+// On attend de connaître la session initiale avant toute navigation (loader affiché par AppLayout)
 router.beforeEach(async () => {
-  const user = useUserStore();
-  const auth = useAuthStore();
-
-  if (!user.infos.connected) {
-    await auth.refreshSession();
-    // TODO: Ajouter un loader fullscreen pour attendre de savoir si l'utilisateur à un token ou non
-  }
+  await useAuthStore().whenReady();
 });
 
 export default router;

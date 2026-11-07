@@ -5,8 +5,10 @@ import { onMounted, ref, watch } from "vue";
 import MaintenanceView from "@/views/MaintenanceView.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useMessage, useNotification } from "naive-ui";
+import { useAuthStore } from "@/stores/auth.ts";
 
 const route = useRoute();
+const auth = useAuthStore();
 
 const props = defineProps({
   maintenanceMode: {
@@ -20,7 +22,7 @@ const showHeader = ref(false);
 const showFooter = ref(false);
 
 function setUiVisibility(isHome) {
-  showHeader.value = !isHome || isHome;
+  showHeader.value = true;
   showFooter.value = isHome;
 }
 
@@ -39,6 +41,11 @@ onMounted(async () => {
 </script>
 
 <template>
+  <transition>
+    <div v-if="!auth.isReady" class="app-loader">
+      <n-spin size="large" />
+    </div>
+  </transition>
   <transition mode="out-in" name="scale">
     <MaintenanceView v-if="props.maintenanceMode" />
     <div v-else class="main-container">
@@ -78,6 +85,15 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 @use "@/assets/variables";
+
+.app-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .main-container {
   min-height: 100vh;
