@@ -46,13 +46,10 @@ __screenshots__/
 
 # Custom
 .env
-# Sauvegardes créées par les scripts officiels (generate-keys.sh, add-new-auth-keys.sh…)
+# Sauvegardes du .env créées par les scripts officiels (generate-keys.sh --update-env…)
 .env.*
 !.env.example
-*.old
 
 # Stack Supabase : supabase/docker/.gitignore (officiel) gère ses propres fichiers locaux
 # CA locale de Caddy, exportée au démarrage
 caddy/local-ca/
-# Ancienne base locale (avant supabase/docker) : ne jamais versionner, peut être supprimée
-backend/
