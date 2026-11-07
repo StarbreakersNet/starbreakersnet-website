@@ -7,6 +7,8 @@ import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import type { UserType } from "@/types/User";
 
+type ProfileUpdate = Pick<UserType, "username" | "firstName" | "lastName">;
+
 const CONFIRMATION_TEXT =
   "Merci de votre inscription ! Consultez vos emails et cliquez sur le lien de confirmation pour vous connecter";
 const CONFIRMATION_DURATION = 10000;
@@ -48,10 +50,18 @@ export const useAuthStore = defineStore("auth", () => {
       return;
     }
 
-    user.infos.me = {
+    user.infos.me = toUser(authUser, profile);
+  }
+
+  function toUser(
+    authUser: User,
+    profile: { username: string; first_name: string | null; last_name: string | null }
+  ): UserType {
+    return {
       id: authUser.id,
       username: profile.username,
       email: authUser.email ?? null,
+      pendingEmail: authUser.new_email ?? null,
       firstName: profile.first_name,
       lastName: profile.last_name,
     };
@@ -78,6 +88,17 @@ export const useAuthStore = defineStore("auth", () => {
     return promise;
   }
 
+  // Email modifié ailleurs (lien de confirmation ouvert dans un autre onglet) : profil à recharger
+  function isEmailStale(authUser: User) {
+    const me = user.infos.me;
+
+    return (
+      !!me &&
+      me.id === authUser.id &&
+      (me.email !== (authUser.email ?? null) || me.pendingEmail !== (authUser.new_email ?? null))
+    );
+  }
+
   async function handleAuthChange(event: AuthChangeEvent, session: Session | null) {
     switch (event) {
       case "INITIAL_SESSION":
@@ -92,7 +113,7 @@ export const useAuthStore = defineStore("auth", () => {
       case "SIGNED_IN":
       case "TOKEN_REFRESHED":
         if (session) {
-          await loadUser(session.user);
+          await loadUser(session.user, isEmailStale(session.user));
         }
         break;
       case "USER_UPDATED":
@@ -123,16 +144,6 @@ export const useAuthStore = defineStore("auth", () => {
     await loadUser(data.user);
     message.success("Vous êtes connecté");
     return true;
-  }
-
-  async function refreshData() {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (session) {
-      await loadUser(session.user, true);
-    }
   }
 
   async function logout() {
@@ -167,60 +178,78 @@ export const useAuthStore = defineStore("auth", () => {
     return true;
   }
 
-  async function update(updatedUser: UserType) {
-    if (!user.infos.me) {
+  async function updateProfile(profile: ProfileUpdate) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
       return false;
     }
 
-    if (updatedUser.email && updatedUser.email !== user.infos.me.email) {
-      const { error } = await supabase.auth.updateUser({ email: updatedUser.email });
-
-      if (error) {
-        message.error("Impossible de mettre à jour l'email");
-        return false;
-      }
-    }
-
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("profiles")
       .update({
-        username: updatedUser.username,
-        first_name: updatedUser.firstName,
-        last_name: updatedUser.lastName,
+        username: profile.username,
+        first_name: profile.firstName || null,
+        last_name: profile.lastName || null,
       })
-      .eq("id", user.infos.me.id);
+      .eq("id", session.user.id)
+      .select()
+      .single();
 
     if (error) {
-      message.error("Impossible de mettre à jour le compte");
+      message.error("Impossible de mettre à jour le profil");
+      return false;
+    }
+
+    user.infos.me = toUser(session.user, data);
+    return true;
+  }
+
+  // Double confirmation active (GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED par défaut) : le changement
+  // n'est effectif qu'une fois les liens envoyés à l'ancienne et à la nouvelle adresse validés.
+  async function updateEmail(email: string) {
+    const { error } = await supabase.auth.updateUser(
+      { email },
+      { emailRedirectTo: `${window.location.origin}/account` }
+    );
+
+    if (error) {
+      message.error(getAuthErrorMessage(error, "Impossible de modifier l'adresse email"));
       return false;
     }
 
     return true;
   }
 
-  async function updatePassword(oldPassword: string, newPassword: string) {
+  async function updatePassword(currentPassword: string, newPassword: string) {
     if (!user.infos.me?.email) {
       return false;
     }
 
+    // Vérifie le mot de passe actuel en se reconnectant avec
     const { error: verifyError } = await supabase.auth.signInWithPassword({
       email: user.infos.me.email,
-      password: oldPassword,
+      password: currentPassword,
     });
 
     if (verifyError) {
-      message.error("Ancien mot de passe incorrect");
+      const text =
+        verifyError.code === "invalid_credentials"
+          ? "Mot de passe actuel incorrect"
+          : getAuthErrorMessage(verifyError, "Impossible de vérifier le mot de passe actuel");
+      message.error(text);
       return false;
     }
 
     const { error } = await supabase.auth.updateUser({ password: newPassword });
 
     if (error) {
-      message.error("Impossible de mettre à jour le mot de passe");
+      message.error(getAuthErrorMessage(error, "Impossible de modifier le mot de passe"));
       return false;
     }
 
-    message.success("Mot de passe mis à jour");
     return true;
   }
 
@@ -228,10 +257,10 @@ export const useAuthStore = defineStore("auth", () => {
     isReady,
     whenReady,
     login,
-    refreshData,
     logout,
     register,
-    update,
+    updateProfile,
+    updateEmail,
     updatePassword,
   };
 });
