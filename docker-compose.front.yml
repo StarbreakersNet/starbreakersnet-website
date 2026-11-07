@@ -1,0 +1,25 @@
+# Front (Vue + nginx) : staging/prod uniquement, application Dokploy distincte de Supabase
+# (voir le README). En local, le front tourne avec `yarn dev`.
+#
+# Rejoint le réseau Docker dédié à l'environnement, partagé uniquement avec la passerelle Supabase
+# et Ingressi. Upstream Ingressi : http://<STACK_NAME>-front:80 (par ex. http://sbn-beta-front:80)
+
+services:
+  front:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      # Valeurs publiques, intégrées au bundle par Vite au moment du build
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
+    restart: unless-stopped
+    networks:
+      edge:
+        aliases:
+          - ${STACK_NAME:?STACK_NAME doit être défini (sbn-beta ou sbn-live)}-front
+
+networks:
+  edge:
+    name: ${STACK_NAME}-edge
+    external: true

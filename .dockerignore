@@ -7,9 +7,9 @@ dist
 .env
 .env.*
 
-# Données locales de la stack (base Postgres, CA de Caddy)
-backend/volumes/db/data
-caddy/local-ca
+# Stack Supabase (avec son .env) et proxy local : inutiles pour l'image du front
+supabase
+caddy
 
 .git
 .idea

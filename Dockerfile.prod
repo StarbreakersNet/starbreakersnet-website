@@ -6,9 +6,9 @@ COPY package.json yarn.lock .yarnrc.yml ./
 RUN yarn install --immutable
 COPY . .
 # Variables publiques du front, intégrées au bundle par Vite au moment du build.
-# Passées par docker-compose.yml (build.args) : le .env n'entre pas dans l'image (.dockerignore).
-ARG VITE_API_URL
-ARG VITE_API_ANON_KEY
+# Passées par docker-compose.front.yml (build.args) : le .env n'entre pas dans l'image (.dockerignore).
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_PUBLISHABLE_KEY
 RUN yarn build
 
 # Stage 2 : Serve with Nginx
