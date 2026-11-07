@@ -29,7 +29,8 @@ services:
     volumes:
       - ./backend/volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
       - ./backend/volumes/db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:Z
-      - ./backend/volumes/db/data:/var/lib/postgresql/data:Z
+      # Volume nommé et non dossier du dépôt : Dokploy vide le dossier du code à chaque déploiement
+      - db-data:/var/lib/postgresql/data
       - db-config:/etc/postgresql-custom
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres", "-h", "localhost"]
@@ -187,6 +188,9 @@ services:
     depends_on:
       studio:
         condition: service_healthy
+      # Secrets vérifiés et migrations appliquées avant d'exposer l'API : sinon `up` échoue
+      migrations:
+        condition: service_completed_successfully
     volumes:
       - ./backend/kong/kong.yml:/home/kong/temp.yml:ro,Z
       - ./backend/kong/kong-entrypoint.sh:/home/kong/kong-entrypoint.sh:ro,Z
@@ -235,4 +239,5 @@ services:
         supabase db push --remote="postgresql://postgres:$${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable" --yes
 
 volumes:
+  db-data:
   db-config:

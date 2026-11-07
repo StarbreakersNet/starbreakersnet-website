@@ -37,13 +37,13 @@ En local, la stack Supabase, Caddy et Mailpit tournent dans Docker, et le front 
     ```
     Reporter dans le `.env` les lignes affichées (`POSTGRES_PASSWORD`, `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, `DASHBOARD_PASSWORD`, `PG_META_CRYPTO_KEY`) et choisir un `DASHBOARD_USERNAME`. Le service `migrations` refuse de démarrer tant qu'un secret vaut `change_me_…` ou est vide.
 
-    > `POSTGRES_PASSWORD` n'est appliqué qu'à la création de la base. Pour en changer ensuite en local, supprimer `backend/volumes/db/data` (les données locales sont perdues).
+    > `POSTGRES_PASSWORD` n'est appliqué qu'à la création de la base (volume Docker `db-data`). Pour en changer ensuite en local, supprimer le volume : `docker volume rm starbreakersnet-website_db-data` (les données locales sont perdues).
 
 3. Démarrer la stack (ou la run configuration IntelliJ **dev**) :
     ```bash
     docker compose --profile dev -f docker-compose.yml -f docker-compose.dev.yaml up -d
     ```
-    Cela démarre Postgres (`db`), GoTrue (`auth`), PostgREST (`rest`), Kong (`kong`), Studio (`studio` + `meta`), Caddy, Mailpit, puis applique les migrations (service one-shot `migrations`).
+    Cela démarre Postgres (`db`), GoTrue (`auth`), PostgREST (`rest`), Studio (`studio` + `meta`), Caddy et Mailpit, applique les migrations (service one-shot `migrations`), puis démarre Kong. Kong attend la réussite de `migrations` : si un secret est invalide ou qu'une migration échoue, l'API ne démarre pas et `up` renvoie une erreur.
 
 4. Démarrer le front :
     ```bash
@@ -111,7 +111,9 @@ Toutes les variables sont dans `.env` (modèle : `.env.example`). Les constantes
 
 ## Base de données et migrations
 
-Le schéma est géré par des migrations SQL dans `backend/migrations/`, appliquées par la [CLI Supabase](https://supabase.com/docs/guides/cli) (`supabase db push`). Le service one-shot `migrations` le fait automatiquement à chaque `docker compose up`, après avoir vérifié les secrets (`backend/check-secrets.sh`).
+Le schéma est géré par des migrations SQL dans `backend/migrations/`, appliquées par la [CLI Supabase](https://supabase.com/docs/guides/cli) (`supabase db push`). Le service one-shot `migrations` le fait automatiquement à chaque `docker compose up`, après avoir vérifié les secrets (`backend/check-secrets.sh`). Kong ne démarre qu'une fois ce service terminé avec succès.
+
+Les données Postgres sont dans le volume Docker nommé `db-data`, pas dans le dépôt.
 
 - **Une migration poussée sur GitHub est figée** : toute modification de schéma passe par une nouvelle migration.
 - Créer une migration : ajouter un fichier `backend/migrations/<horodatage UTC AAAAMMJJHHMMSS>_<nom>.sql`, par exemple `20261107200033_user_settings.sql`. C'est ce que fait `supabase migration new`, mais la CLI attend un dossier nommé `supabase` et ne trouve pas `backend`.
@@ -149,9 +151,9 @@ Deux projets Dokploy sur le même serveur : `starbreakersnet-website-beta` (stag
 - **Profil** : le service `app` est sous le profil `default`. Il doit être activé sur Dokploy (`COMPOSE_PROFILES=default` dans l'environnement, ou `--profile default` dans la commande), sinon le front ne démarre pas.
 - **Isolated Deployments** activé sur les deux projets : chaque environnement a son propre réseau.
 - **`.env`** rempli à la main dans Dokploy, avec des secrets générés pour cet environnement (`node backend/generate-keys.js`), `ENABLE_EMAIL_AUTOCONFIRM=false` et les identifiants SMTP OVH.
-- **Aucun port publié** : `kong` et `app` ne sont joignables que par Ingressi. *(Rattachement au réseau d'Ingressi et persistance de la base : configuration en cours de validation, voir la note ci-dessous.)*
-
-> **À finaliser avant le premier déploiement.** Dokploy refait un `git clone` à chaque déploiement, ce qui vide le dossier du code. La base est actuellement montée dans `./backend/volumes/db/data`, à l'intérieur de ce dossier : elle doit être déplacée (volume nommé) avant toute mise en ligne.
+- **Aucun port publié** : `kong` et `app` ne sont joignables que par Ingressi. *(Rattachement au réseau d'Ingressi : configuration en cours de validation.)*
+- **Données** : la base est dans le volume nommé `db-data`. Dokploy refait un `git clone` à chaque déploiement, ce qui vide le dossier du code : rien de persistant ne doit y être stocké. Ce volume peut être sauvegardé avec les Volume Backups de Dokploy.
+- **Échec du déploiement** si un secret vaut encore `change_me_…` ou si une migration échoue : Kong ne démarre pas et `docker compose up` renvoie une erreur.
 
 ### Studio
 
