@@ -1,3 +1,16 @@
-node_modules/*
-dist/*
+# Dépendances et builds locaux (réinstallés / reconstruits dans l'image)
+node_modules
+dist
+.yarn
+
+# Secrets : les variables utiles au build passent par les build args (voir Dockerfile.prod)
+.env
+.env.*
+
+# Données locales de la stack (base Postgres, CA de Caddy)
+backend/volumes/db/data
+caddy/local-ca
+
+.git
+.idea
 .DS_Store

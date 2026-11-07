@@ -11,6 +11,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
+      # Seules variables du .env utiles au build du front (valeurs publiques, incluses dans le bundle)
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_API_ANON_KEY: ${VITE_API_ANON_KEY}
     environment:
       - NODE_ENV=production
 

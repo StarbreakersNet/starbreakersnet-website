@@ -1,10 +1,15 @@
 # Stage 1 : Build app
-FROM node:20-alpine AS build-stage
+FROM node:22-alpine AS build-stage
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+RUN corepack enable
+COPY package.json yarn.lock .yarnrc.yml ./
+RUN yarn install --immutable
 COPY . .
-RUN npm run build
+# Variables publiques du front, intégrées au bundle par Vite au moment du build.
+# Passées par docker-compose.yml (build.args) : le .env n'entre pas dans l'image (.dockerignore).
+ARG VITE_API_URL
+ARG VITE_API_ANON_KEY
+RUN yarn build
 
 # Stage 2 : Serve with Nginx
 FROM nginx:alpine AS production-stage
