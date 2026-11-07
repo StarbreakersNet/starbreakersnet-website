@@ -1,13 +1,17 @@
+# Reverse proxy local (supabase/docker/docker-compose.local.yml)
+
+# Front : `yarn dev` (Vite, port 5173) directement sur la machine hôte
 starbreakers.localhost {
-	# Le front tourne avec `yarn dev` (Vite, port 5173) directement sur la machine hôte
 	reverse_proxy host.docker.internal:5173
 }
 
+# Supabase : passerelle officielle (Envoy) - /auth/v1, /rest/v1, /realtime/v1, /storage/v1,
+# et Studio sur / (basic-auth DASHBOARD_USERNAME / DASHBOARD_PASSWORD)
 api.starbreakers.localhost {
-	reverse_proxy kong:8000
+	reverse_proxy api-gw:8000
 }
 
-# Interface web de Mailpit (capteur de mails local, voir docker-compose.dev.yaml)
+# Mailpit : mails envoyés par GoTrue en local
 mail.starbreakers.localhost {
 	reverse_proxy mailpit:8025
 }

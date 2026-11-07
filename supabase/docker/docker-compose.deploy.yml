@@ -1,0 +1,18 @@
+# Starbreakers.net : staging/prod uniquement (commande Dokploy, voir le README).
+#
+# Rattache la passerelle (api-gw) au réseau Docker dédié à l'environnement, qui ne contient
+# qu'elle, le front et Ingressi. Aucun autre conteneur du serveur ne peut joindre l'API sans
+# passer par Ingressi. Le réseau est créé une fois sur le serveur : docker network create <STACK_NAME>-edge
+# Upstream Ingressi : http://<STACK_NAME>-api:8000 (par ex. http://sbn-beta-api:8000)
+
+services:
+  api-gw:
+    networks:
+      edge:
+        aliases:
+          - ${STACK_NAME:?STACK_NAME doit être défini (sbn-beta ou sbn-live)}-api
+
+networks:
+  edge:
+    name: ${STACK_NAME}-edge
+    external: true
