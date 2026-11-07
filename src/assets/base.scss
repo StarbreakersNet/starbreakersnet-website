@@ -1,7 +1,9 @@
 @use "variables";
 
 :root {
-  @media (prefers-color-scheme: dark) {
+  // Thème choisi par l'utilisateur (App.vue), plus la préférence du système
+  &[data-theme="dark"] {
+    color-scheme: dark;
     --color-background: #{variables.$vt-c-black};
     --color-background-soft: #{variables.$vt-c-black-soft};
     --color-background-mute: #{variables.$vt-c-black-mute};

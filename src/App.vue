@@ -1,6 +1,6 @@
 <script setup>
 import { nextTick, onMounted, ref, watch } from "vue";
-import { getNaiveOverrideTheme, getNaiveTheme, preferedOsTheme } from "@/composables/appUtils";
+import { getNaiveOverrideTheme, getNaiveTheme } from "@/composables/appUtils";
 import { vKonami } from "vue-konami";
 import AppLayout from "@/AppLayout.vue";
 import { frFR } from "naive-ui";
@@ -33,7 +33,8 @@ watch(
   () => user.settings.theme,
   value => {
     setAppTheme(value);
-    user.settings.osTheme = preferedOsTheme();
+    // Utilisé par base.scss pour les couleurs hors composants Naive UI (fond de page…)
+    document.documentElement.dataset.theme = value;
   },
   { immediate: true }
 );

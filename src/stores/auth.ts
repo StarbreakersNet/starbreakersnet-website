@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { getAuthErrorMessage } from "@/lib/authErrors";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
+import { useSettingsStore } from "@/stores/settings";
 import type { UserType } from "@/types/User";
 
 type ProfileUpdate = Pick<UserType, "username" | "firstName" | "lastName">;
@@ -23,6 +24,7 @@ const PASSWORD_RESET_TEXT =
 
 export const useAuthStore = defineStore("auth", () => {
   const user = useUserStore();
+  const settings = useSettingsStore();
   const message = useMessage();
 
   // Passe à true quand on sait s'il y a une session (et que le profil est chargé s'il y en a une)
@@ -49,11 +51,10 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function fetchUser(authUser: User) {
-    const { data: profile, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", authUser.id)
-      .single();
+    const [{ data: profile, error }] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", authUser.id).single(),
+      settings.load(authUser.id),
+    ]);
 
     user.infos.connected = true;
 
@@ -174,7 +175,8 @@ export const useAuthStore = defineStore("auth", () => {
       email,
       password,
       options: {
-        data: { username },
+        // Repris par les triggers d'inscription (profil et paramètres)
+        data: { username, theme: user.settings.theme },
       },
     });
 

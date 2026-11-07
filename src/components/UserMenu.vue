@@ -8,10 +8,12 @@ import LoginView from "@/views/LoginView.vue";
 import HModal from "@/components/c/hModal.vue";
 import { useAuthStore } from "@/stores/auth.ts";
 import { useUserStore } from "@/stores/user.ts";
+import { useSettingsStore } from "@/stores/settings.ts";
 import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
 
 const auth = useAuthStore();
 const user = useUserStore();
+const settings = useSettingsStore();
 const route = useRoute();
 const router = useRouter();
 const packageVersion = ref(version);
@@ -33,6 +35,11 @@ const options = computed(() => {
       key: "login",
     });
   }
+
+  items.push({
+    label: user.settings.theme === "dark" ? "Thème clair" : "Thème sombre",
+    key: "theme",
+  });
 
   items.push({
     label: "À propos",
@@ -93,6 +100,9 @@ function handleSelect(key) {
       break;
     case "logout":
       auth.logout();
+      break;
+    case "theme":
+      settings.toggleTheme();
       break;
     case "about":
       showModal.value = true;

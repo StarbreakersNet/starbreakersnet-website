@@ -230,7 +230,7 @@ let hideTimeoutId: number | null = null;
 let skeletonShowTime: number | null = null;
 
 const computedWidth = computed(() => props.width ?? defaultSlotWidth.value);
-const isDarkTheme = computed(() => user.preference.theme === "dark");
+const isDarkTheme = computed(() => user.settings.theme === "dark");
 
 watch(
     () => props.show,

@@ -8,3 +8,9 @@ export interface UserType {
   lastName?: string | null;
   password?: string | null;
 }
+
+export type ThemeType = "dark" | "light";
+
+export interface UserSettingsType {
+  theme: ThemeType;
+}
