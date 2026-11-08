@@ -12,7 +12,9 @@
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "lint:eslint": "eslint . --fix --cache",
     "lint": "run-s lint:*",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "env:local": "node scripts/setup-env.mjs local",
+    "env:deploy": "node scripts/setup-env.mjs deploy"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",

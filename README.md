@@ -27,6 +27,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
 | `supabase/docker/docker-compose.deploy.yml` | Staging/prod uniquement : passerelle publiée sur l'IP du bridge Docker, pour Ingressi |
 | `supabase/docker/check-secrets.sh` | Garde-fou : refuse de démarrer avec des secrets d'exemple |
 | `docker-compose.front.yml`, `Dockerfile.prod`, `nginx.conf` | Image du front (staging/prod) |
+| `scripts/setup-env.mjs` | Génération des `.env` (`yarn env:local`, `yarn env:deploy`) |
 | `caddy/Caddyfile` | Proxy HTTPS local |
 
 **Règle : on ne modifie pas les fichiers officiels de `supabase/docker/`.** Tout ce qui est propre au projet passe par le `.env` et par les trois fichiers d'override ci-dessus, pour que [`update.sh`](#mettre-à-jour-supabase) puisse mettre la stack à jour. Seule exception : les quatre lignes de `docker-compose.yml` activées par `utils/add-new-auth-keys.sh`, comme le fait l'installation officielle.
@@ -55,16 +56,17 @@ Aucun service tiers : tout tourne sur nos serveurs.
     yarn install
     ```
 
-2. Configurer la stack Supabase, avec les scripts officiels :
+2. Générer les deux `.env` (stack Supabase et front) :
     ```bash
-    cd supabase/docker
-    cp .env.example .env
-    sh utils/generate-keys.sh --update-env
-    sh utils/add-new-auth-keys.sh --update-env
-    rm -f docker-compose.yml.old    # copie de sauvegarde laissée par le script, inutile ici
-    sh run.sh config add starbreakers local
+    yarn env:local
     ```
-    Puis, dans `supabase/docker/.env`, mettre les valeurs locales :
+    Le script (`scripts/setup-env.mjs`, sans dépendance) :
+    - crée `supabase/docker/.env` depuis `.env.example` et génère tous les secrets avec les scripts officiels (`utils/generate-keys.sh`, puis `utils/add-new-auth-keys.sh`) ;
+    - y écrit les valeurs locales ci-dessous, et active nos overrides (`sh run.sh config add starbreakers local`, qui renseigne `COMPOSE_FILE`) ;
+    - crée `.env` (front) avec l'URL de l'API et la clé `SUPABASE_PUBLISHABLE_KEY` ;
+    - affiche les adresses et les identifiants de Studio.
+
+    Il peut être relancé sans risque : les secrets existants sont conservés, seules les valeurs locales sont réécrites. Pour repartir de zéro : `docker compose down -v` (depuis `supabase/docker`), supprimer `supabase/docker/.env`, puis relancer.
 
     | Variable | Valeur locale |
     |---|---|
@@ -81,13 +83,13 @@ Aucun service tiers : tout tourne sur nos serveurs.
 
 3. Démarrer la stack (depuis `supabase/docker`, ou avec la run configuration IntelliJ **dev**) :
     ```bash
+    cd supabase/docker
     docker compose up -d
     ```
     `COMPOSE_FILE` (dans `.env`) ajoute nos overrides. Les migrations s'appliquent avant le démarrage de la passerelle.
 
-4. Configurer et lancer le front (à la racine du dépôt) :
+4. Lancer le front (à la racine du dépôt) :
     ```bash
-    cp .env.example .env    # VITE_SUPABASE_PUBLISHABLE_KEY = SUPABASE_PUBLISHABLE_KEY de supabase/docker/.env
     yarn dev
     ```
 
@@ -108,20 +110,13 @@ Les seuls ports publiés en local (80/443 pour Caddy, 5432 pour Postgres) sont l
 
 Si `docker compose up` répond `address already in use` (autre conteneur web, autre Postgres…) :
 
-1. Choisir d'autres ports dans `supabase/docker/.env` :
+1. Relancer le script avec d'autres ports. Il les enregistre dans `supabase/docker/.env` (`LOCAL_*`) et ajoute le port HTTPS à toutes les URL locales, front compris :
+    ```bash
+    yarn env:local --https-port 8443 --http-port 8080 --db-port 54322
     ```
-    LOCAL_HTTP_PORT=8080
-    LOCAL_HTTPS_PORT=8443
-    LOCAL_DB_PORT=54322
-    ```
-2. Ajouter le port HTTPS à toutes les URL locales :
-    - dans `supabase/docker/.env` :
-        - `SUPABASE_PUBLIC_URL=https://api.starbreakers.localhost:8443`
-        - `API_EXTERNAL_URL=https://api.starbreakers.localhost:8443/auth/v1`
-        - `SITE_URL=https://starbreakers.localhost:8443`
-        - `ADDITIONAL_REDIRECT_URLS=https://starbreakers.localhost:8443/**`
-    - dans le `.env` du front : `VITE_SUPABASE_URL=https://api.starbreakers.localhost:8443`
-3. Relancer `docker compose up -d` et `yarn dev`, puis ouvrir directement les adresses en HTTPS avec le port : https://starbreakers.localhost:8443, https://api.starbreakers.localhost:8443, https://mail.starbreakers.localhost:8443. La redirection automatique depuis `http://…:8080` renvoie vers le port 443 et ne fonctionne donc pas.
+    Les ports restent mémorisés aux lancements suivants. Pour revenir aux ports par défaut : `yarn env:local --https-port 443 --http-port 80 --db-port 5432`.
+2. Recréer les services concernés (depuis `supabase/docker`) : `docker compose up -d`.
+3. Relancer `yarn dev`, puis ouvrir directement les adresses en HTTPS avec le port : https://starbreakers.localhost:8443, https://api.starbreakers.localhost:8443, https://mail.starbreakers.localhost:8443. La redirection automatique depuis `http://…:8080` renvoie vers le port 443 et ne fonctionne donc pas.
 
 Pour savoir qui occupe un port : `docker ps --format '{{.Names}}\t{{.Ports}}' | grep ':443->'`, ou `lsof -nP -iTCP:443 -sTCP:LISTEN`.
 
@@ -193,6 +188,21 @@ Comme les autres sites du serveur, la passerelle Supabase et le front publient c
 
 > Ces ports sont joignables depuis **tous les conteneurs du serveur** (instances AMP comprises), sans passer par Ingressi. Ils y trouvent les mêmes protections que depuis Internet : clés et RLS pour l'API, basic-auth pour Studio (voir [Studio](#studio)). La base, elle, n'est jamais publiée.
 
+### Générer les `.env` d'un environnement
+
+Depuis la racine du dépôt, une fois par environnement (ici beta, avec les ports du tableau) :
+```bash
+yarn env:deploy beta --api-domain api.beta.starbreakers.net --site-domain beta.starbreakers.net --api-port 9180 --front-port 9181
+```
+Le script génère de nouveaux secrets avec les scripts officiels, dans un dossier temporaire (le `.env` local n'est pas touché), et écrit deux fichiers non versionnés :
+
+| Fichier | Contenu | À copier dans |
+|---|---|---|
+| `supabase/docker/.env.beta` | Secrets, URL publiques, `API_GW_HTTP_PORT`, `ENABLE_EMAIL_AUTOCONFIRM=false`, SMTP OVH (`ssl0.ovh.net:465`, expéditeur `noreply@starbreakers.net`), `DASHBOARD_USERNAME=admin` | Application « Supabase », Environment |
+| `.env.beta` | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `FRONT_HTTP_PORT` | Application « Front », Environment |
+
+Ensuite : compléter `SMTP_USER` et `SMTP_PASS` dans Dokploy, ranger le mot de passe de Studio affiché dans le gestionnaire de mots de passe, puis **supprimer les deux fichiers du poste**. Le script refuse d'écraser un fichier existant ; `--force` génère de nouveaux secrets, à ne faire que sur un environnement neuf (la base est initialisée avec les secrets du premier démarrage).
+
 ### Application « Supabase » (type Compose)
 
 - **Compose Path** : `supabase/docker/docker-compose.yml`
@@ -201,12 +211,7 @@ Comme les autres sites du serveur, la passerelle Supabase et le front publient c
     compose -p <appName> -f supabase/docker/docker-compose.yml -f supabase/docker/docker-compose.starbreakers.yml -f supabase/docker/docker-compose.deploy.yml up -d --remove-orphans
     ```
     Pas de `--force-recreate` : avec, une migration en échec couperait l'API au lieu de la laisser tourner sur l'ancien schéma.
-- **Environment** : un `.env` complet, généré pour cet environnement avec les scripts officiels (`generate-keys.sh`, puis `add-new-auth-keys.sh`, dans une copie de `supabase/docker`), avec :
-    - `API_GW_HTTP_PORT=9180` (port de l'environnement, voir le tableau) ;
-    - `SUPABASE_PUBLIC_URL=https://<domaine de l'API>` et `API_EXTERNAL_URL=https://<domaine de l'API>/auth/v1` ;
-    - `SITE_URL=https://<domaine du site>` et `ADDITIONAL_REDIRECT_URLS=https://<domaine du site>/**` ;
-    - `ENABLE_EMAIL_AUTOCONFIRM=false` ;
-    - SMTP OVH : `SMTP_HOST=ssl0.ovh.net`, `SMTP_PORT=465` (SSL) ou `587` (STARTTLS), identifiants de la boîte, `SMTP_ADMIN_EMAIL=noreply@starbreakers.net`, `SMTP_SENDER_NAME=Starbreakers.net`.
+- **Environment** : le contenu de `supabase/docker/.env.<env>`, généré par `yarn env:deploy` (voir [Générer les `.env` d'un environnement](#générer-les-env-dun-environnement)), complété de `SMTP_USER` et `SMTP_PASS` (boîte OVH).
 - **Watch Paths** : `supabase/**`
 - **Isolated Deployments** : activé
 - **Volume Backups** : `db-data` (et `storage-data` pour les fichiers)
@@ -218,7 +223,7 @@ Le dossier du code étant re-cloné à chaque déploiement, les conteneurs déj�
 ### Application « Front » (type Compose)
 
 - **Compose Path** : `docker-compose.front.yml` (commande par défaut)
-- **Environment** : `FRONT_HTTP_PORT` (port de l'environnement), `VITE_SUPABASE_URL` (le domaine de l'API), `VITE_SUPABASE_PUBLISHABLE_KEY` (celle de l'application Supabase du même environnement)
+- **Environment** : le contenu de `.env.<env>`, généré en même temps (`FRONT_HTTP_PORT`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` de la stack du même environnement)
 - **Watch Paths** : `src/**`, `public/**`, `index.html`, `package.json`, `yarn.lock`, `.yarnrc.yml`, `vite.config.ts`, `tsconfig*.json`, `env.d.ts`, `Dockerfile.prod`, `nginx.conf`, `docker-compose.front.yml`
 
 ### Ingressi
