@@ -192,7 +192,7 @@ Comme les autres sites du serveur, la passerelle Supabase et le front publient c
 
 Depuis la racine du dépôt, une fois par environnement (ici beta, avec les ports du tableau) :
 ```bash
-yarn env:deploy beta --api-domain beta.api.starbreakers.net --site-domain beta.starbreakers.net --api-port 9056 --front-port 9081
+yarn env:deploy beta --api-domain api.beta.starbreakers.net --site-domain beta.starbreakers.net --api-port 9056 --front-port 9081
 ```
 Le script génère de nouveaux secrets avec les scripts officiels, dans un dossier temporaire (le `.env` local n'est pas touché), et écrit deux fichiers non versionnés :
 
