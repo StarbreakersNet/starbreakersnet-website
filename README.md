@@ -190,7 +190,7 @@ Comme les autres sites du serveur, la passerelle Supabase et le front publient c
 | Passerelle Supabase (`API_GW_HTTP_PORT`) | 9180 | 9080 |
 | Front (`FRONT_HTTP_PORT`) | 9181 | 9081 |
 
-> Ces ports sont joignables depuis **tous les conteneurs du serveur** (instances AMP comprises), sans passer par Ingressi ni par son portail. Pour Studio, le basic-auth de la passerelle est donc indispensable. La base, elle, n'est jamais publiée.
+> Ces ports sont joignables depuis **tous les conteneurs du serveur** (instances AMP comprises), sans passer par Ingressi. Ils y trouvent les mêmes protections que depuis Internet : clés et RLS pour l'API, basic-auth pour Studio (voir [Studio](#studio)). La base, elle, n'est jamais publiée.
 
 ### Application « Supabase » (type Compose)
 
@@ -227,7 +227,23 @@ Le dossier du code étant re-cloné à chaque déploiement, les conteneurs déj�
 | Domaine du site | `http://host.docker.internal:<FRONT_HTTP_PORT>` |
 | Domaine de l'API | `http://host.docker.internal:<API_GW_HTTP_PORT>` |
 
-Studio est servi sur `https://<domaine de l'API>/`, derrière le basic-auth `DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD` de la passerelle officielle. Protection recommandée en plus : le portail **Forward Auth** d'Ingressi sur le domaine de l'API, avec en **Excluded Paths** les routes publiques de l'API : `/auth/v1/*, /rest/v1/*, /realtime/v1/*, /storage/v1/*` (le `*` final est obligatoire). Le temps réel passe par des WebSockets (`/realtime/v1/websocket`), qu'Ingressi (Caddy) relaie nativement.
+Pas de portail ni de chemin exclu à régler. Le temps réel passe par des WebSockets (`/realtime/v1/websocket`), qu'Ingressi (Caddy) relaie nativement.
+
+### Studio
+
+Studio est servi sur `https://<domaine de l'API>/`, derrière le basic-auth `DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD` de la passerelle officielle : c'est la configuration prévue par Supabase. La passerelle vérifie le mot de passe avant Studio, quelle que soit l'origine de la requête (Ingressi ou autre conteneur du serveur).
+
+Sa solidité repose sur le secret, comme pour les clés de l'API (`SERVICE_ROLE_KEY`, `SUPABASE_SECRET_KEY`), dont la fuite serait au moins aussi grave :
+
+- `DASHBOARD_PASSWORD` est généré par `generate-keys.sh` (128 bits aléatoires) : impossible à deviner, aucune limite d'essais n'est nécessaire. Ne jamais le remplacer par un mot de passe choisi.
+- Un mot de passe par environnement (local, beta, live), rangé dans un gestionnaire de mots de passe, jamais réutilisé ni partagé.
+- Le régénérer au moindre doute (partage, départ d'une personne qui le connaissait), puis redéployer.
+- `DASHBOARD_USERNAME` : préférer une autre valeur que `supabase`, celle par défaut.
+- Dokploy contient tous les secrets en clair : la double authentification y est indispensable.
+- Option, si l'IP d'administration est fixe : restreindre dans Ingressi l'accès au domaine de l'API à cette IP, sauf pour les routes publiques de l'API.
+- Garder la stack à jour (`update.sh`) : la passerelle (Envoy) est la seule barrière devant Studio.
+
+Studio n'a pas de connexion à lui : le navigateur garde les identifiants jusqu'à sa fermeture.
 
 ### Vérifications après le premier déploiement d'un environnement
 
@@ -239,7 +255,8 @@ Studio est servi sur `https://<domaine de l'API>/`, derrière le basic-auth `DAS
     ```bash
     for port in 9080 9081 9180 9181 5432 6543 8000 3000; do nc -vz -w 3 starbreakers.net $port; done
     ```
-- [ ] `https://<domaine de l'API>/` demande une authentification (Studio).
+- [ ] `https://<domaine de l'API>/` demande une authentification (Studio), et `DASHBOARD_PASSWORD` est bien celui généré pour cet environnement.
+- [ ] La double authentification est active sur Dokploy.
 - [ ] `https://<domaine de l'API>/auth/v1/health` avec l'en-tête `apikey: <SUPABASE_PUBLISHABLE_KEY>` répond `200`.
 - [ ] Logs du service `migrations` : secrets acceptés, migrations appliquées.
 - [ ] Inscription → mail de confirmation reçu → connexion → `/account` → mot de passe oublié.
