@@ -179,12 +179,12 @@ docker run --rm -p 127.0.0.1:8080:80 starbreakersnet-front
 
 Chaque environnement (beta depuis `develop`, live depuis `master`) a **deux applications Dokploy** dans le projet StarbreakersNet : **Supabase**, déployée rarement, et **Front**, déployée à chaque évolution du site. Le reverse proxy HTTPS est **Ingressi**, en dehors de ce dépôt.
 
-Comme les autres sites du serveur, la passerelle Supabase et le front publient chacun un port **uniquement sur l'IP du bridge Docker de l'hôte** (`172.17.0.1`). Ingressi les joint via `http://host.docker.internal:<port>`, et Internet ne les voit pas. Chaque port doit être propre à l'environnement et libre sur le serveur (AMP en utilise aussi). Exemple :
+Comme les autres sites du serveur, la passerelle Supabase et le front publient chacun un port **uniquement sur l'IP du bridge Docker de l'hôte** (`172.17.0.1`). Ingressi les joint via `http://host.docker.internal:<port>`, et Internet ne les voit pas. Chaque port doit être propre à l'environnement et libre sur le serveur (AMP en utilise aussi) :
 
 | | beta | live |
 |---|---|---|
-| Passerelle Supabase (`API_GW_HTTP_PORT`) | 9180 | 9080 |
-| Front (`FRONT_HTTP_PORT`) | 9181 | 9081 |
+| Passerelle Supabase (`API_GW_HTTP_PORT`) | 9056 | 9055 |
+| Front (`FRONT_HTTP_PORT`) | 9081 | 9080 |
 
 > Ces ports sont joignables depuis **tous les conteneurs du serveur** (instances AMP comprises), sans passer par Ingressi. Ils y trouvent les mêmes protections que depuis Internet : clés et RLS pour l'API, basic-auth pour Studio (voir [Studio](#studio)). La base, elle, n'est jamais publiée.
 
@@ -192,7 +192,7 @@ Comme les autres sites du serveur, la passerelle Supabase et le front publient c
 
 Depuis la racine du dépôt, une fois par environnement (ici beta, avec les ports du tableau) :
 ```bash
-yarn env:deploy beta --api-domain api.beta.starbreakers.net --site-domain beta.starbreakers.net --api-port 9180 --front-port 9181
+yarn env:deploy beta --api-domain beta.api.starbreakers.net --site-domain beta.starbreakers.net --api-port 9056 --front-port 9081
 ```
 Le script génère de nouveaux secrets avec les scripts officiels, dans un dossier temporaire (le `.env` local n'est pas touché), et écrit deux fichiers non versionnés :
 
@@ -259,7 +259,7 @@ Studio n'a pas de connexion à lui : le navigateur garde les identifiants jusqu'
     ```
 - [ ] Depuis une machine extérieure, ces ports et les ports internes ne répondent pas (« timed out ») :
     ```bash
-    for port in 9080 9081 9180 9181 5432 6543 8000 3000; do nc -vz -w 3 starbreakers.net $port; done
+    for port in 9055 9056 9080 9081 5432 6543 8000 8055 3000; do nc -vz -w 3 starbreakers.net $port; done
     ```
 - [ ] `https://<domaine de l'API>/` demande une authentification (Studio), et `DASHBOARD_PASSWORD` est bien celui généré pour cet environnement.
 - [ ] La double authentification est active sur Dokploy.
