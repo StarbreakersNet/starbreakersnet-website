@@ -47,6 +47,18 @@ watch(
   }
 );
 
+// Lien de réinitialisation du mot de passe : GoTrue peut renvoyer sur l'accueil (SITE_URL) au lieu de
+// /reset-password, par exemple si la demande venait d'une adresse non autorisée. On affiche le
+// formulaire quelle que soit la page d'arrivée.
+watch(
+  () => auth.passwordRecovery,
+  recovery => {
+    if (recovery && route.name !== "reset-password") {
+      router.replace({ name: "reset-password" });
+    }
+  }
+);
+
 onMounted(async () => {
   window.$message = useMessage();
   window.$notification = useNotification();
