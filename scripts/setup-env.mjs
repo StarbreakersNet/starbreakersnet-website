@@ -7,8 +7,9 @@
 //       Relançable : les secrets existants sont conservés, seules les valeurs locales sont réécrites.
 //
 //   yarn env:deploy <beta|live|…> --api-domain <domaine> --site-domain <domaine> --api-port <port> --front-port <port>
-//       supabase/docker/.env.<nom> et .env.<nom> (front), à copier dans les applications Dokploy
-//       de l'environnement, puis à supprimer du poste. Nouveaux secrets à chaque génération.
+//       .env.<nom>.environment (variables de l'environnement Dokploy), supabase/docker/.env.<nom> et
+//       .env.<nom> (applications Supabase et Front, qui y font référence), à copier dans Dokploy puis
+//       à supprimer du poste. Nouveaux secrets à chaque génération.
 //
 // Aucune dépendance : Node 22, sh, openssl (requis par les scripts officiels).
 
@@ -194,15 +195,21 @@ function setupDeploy(name, options) {
   const frontPort = portOption(options["front-port"], "front-port");
   if (apiPort === frontPort) fail("--api-port et --front-port doivent être différents.");
 
+  // Trois fichiers, pour les environnements Dokploy : les valeurs communes aux deux applications
+  // sont des variables de l'environnement, que les applications référencent (${{environment.NOM}}).
+  const sharedOut = join(ROOT, `.env.${name}.environment`);
   const supabaseOut = join(SUPABASE_DIR, `.env.${name}`);
   const frontOut = join(ROOT, `.env.${name}`);
-  for (const path of [supabaseOut, frontOut]) {
+  for (const path of [sharedOut, supabaseOut, frontOut]) {
     if (existsSync(path) && !options.force) {
       fail(
         `${relative(ROOT, path)} existe déjà. Supprimez-le, ou relancez avec --force pour générer de nouveaux secrets.`
       );
     }
   }
+
+  const ref = variable => `\${{environment.${variable}}}`;
+  let publishableKey;
 
   // Génération dans un dossier temporaire : supabase/docker/.env (local) n'est pas touché
   const workDir = mkdtempSync(join(tmpdir(), "starbreakers-env-"));
@@ -211,15 +218,18 @@ function setupDeploy(name, options) {
     copyFileSync(join(SUPABASE_DIR, "docker-compose.yml"), join(workDir, "docker-compose.yml"));
     generateSecrets(workDir);
 
-    const apiUrl = `https://${options["api-domain"]}`;
-    const siteUrl = `https://${options["site-domain"]}`;
+    publishableKey = getVar(
+      readFileSync(join(workDir, ".env"), "utf8"),
+      "SUPABASE_PUBLISHABLE_KEY"
+    );
     updateFile(join(workDir, ".env"), {
-      SUPABASE_PUBLIC_URL: apiUrl,
-      API_EXTERNAL_URL: `${apiUrl}/auth/v1`,
-      SITE_URL: siteUrl,
-      ADDITIONAL_REDIRECT_URLS: `${siteUrl}/**`,
+      SUPABASE_PUBLIC_URL: `https://${ref("API_DOMAIN")}`,
+      API_EXTERNAL_URL: `https://${ref("API_DOMAIN")}/auth/v1`,
+      SITE_URL: `https://${ref("SITE_DOMAIN")}`,
+      ADDITIONAL_REDIRECT_URLS: `https://${ref("SITE_DOMAIN")}/**`,
+      SUPABASE_PUBLISHABLE_KEY: ref("SUPABASE_PUBLISHABLE_KEY"),
+      API_GW_HTTP_PORT: ref("API_GW_HTTP_PORT"),
       ENABLE_EMAIL_AUTOCONFIRM: "false",
-      API_GW_HTTP_PORT: apiPort,
       DASHBOARD_USERNAME: "admin",
       SMTP_HOST: "ssl0.ovh.net",
       SMTP_PORT: "465",
@@ -233,23 +243,36 @@ function setupDeploy(name, options) {
     rmSync(workDir, { recursive: true, force: true });
   }
 
+  writeFileSync(
+    sharedOut,
+    `# Variables de l'environnement Dokploy « ${name} » (Environment Variables de l'environnement)
+API_DOMAIN=${options["api-domain"]}
+SITE_DOMAIN=${options["site-domain"]}
+SUPABASE_PUBLISHABLE_KEY=${publishableKey}
+API_GW_HTTP_PORT=${apiPort}
+FRONT_HTTP_PORT=${frontPort}
+`
+  );
+  writeFileSync(
+    frontOut,
+    `# Application Dokploy « Front » de l'environnement « ${name} » (valeurs dans les variables de l'environnement)
+VITE_SUPABASE_URL=https://${ref("API_DOMAIN")}
+VITE_SUPABASE_PUBLISHABLE_KEY=${ref("SUPABASE_PUBLISHABLE_KEY")}
+FRONT_HTTP_PORT=${ref("FRONT_HTTP_PORT")}
+`
+  );
+
   const content = readFileSync(supabaseOut, "utf8");
-  rmSync(frontOut, { force: true });
-  frontEnv(frontOut, {
-    VITE_SUPABASE_URL: `https://${options["api-domain"]}`,
-    VITE_SUPABASE_PUBLISHABLE_KEY: getVar(content, "SUPABASE_PUBLISHABLE_KEY"),
-    FRONT_HTTP_PORT: frontPort,
-  });
-
   console.log(`
-Créés (non versionnés) :
-  ${relative(ROOT, supabaseOut)}  → Environment de l'application Dokploy « Supabase » (${name})
-  ${relative(ROOT, frontOut)}  → Environment de l'application Dokploy « Front » (${name})
+Créés (non versionnés), à coller dans Dokploy :
+  ${relative(ROOT, sharedOut)}  → variables de l'environnement « ${name} »
+  ${relative(ROOT, supabaseOut)}  → Environment de l'application « Supabase »
+  ${relative(ROOT, frontOut)}  → Environment de l'application « Front »
 
-À compléter dans Dokploy : SMTP_USER et SMTP_PASS (boîte mail OVH).
+À compléter dans l'application Supabase : SMTP_USER et SMTP_PASS (boîte mail OVH).
 Studio : admin / ${getVar(content, "DASHBOARD_PASSWORD")}  (à ranger dans le gestionnaire de mots de passe)
 
-Une fois copiés dans Dokploy, supprimez ces deux fichiers du poste.`);
+Une fois copiés dans Dokploy, supprimez ces trois fichiers du poste.`);
 }
 
 // --- Point d'entrée
