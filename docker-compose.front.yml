@@ -1,0 +1,19 @@
+# Front (Vue + nginx) : staging/prod uniquement, application Dokploy distincte de Supabase
+# (voir le README). En local, le front tourne avec `yarn dev`.
+#
+# Publié uniquement sur l'IP du bridge Docker de l'hôte (172.17.0.1 par défaut) : joignable par
+# Ingressi via http://host.docker.internal:<FRONT_HTTP_PORT>, mais pas depuis Internet.
+# Ne jamais retirer l'IP : sans elle, le port serait publié sur toutes les interfaces.
+
+services:
+  front:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      # Valeurs publiques, intégrées au bundle par Vite au moment du build
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
+    restart: unless-stopped
+    ports:
+      - "${DOCKER_BRIDGE_IP:-172.17.0.1}:${FRONT_HTTP_PORT:?FRONT_HTTP_PORT doit être défini (port propre à l'environnement)}:80"

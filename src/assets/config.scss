@@ -1,0 +1,15 @@
+@use "variables";
+
+:root {
+  --color-background: #{variables.$vt-c-white};
+  --color-background-soft: #{variables.$vt-c-white-soft};
+  --color-background-mute: #{variables.$vt-c-white-mute};
+
+  --color-border: #{variables.$vt-c-divider-light-2};
+  --color-border-hover: #{variables.$vt-c-divider-light-1};
+
+  --color-heading: #{variables.$vt-c-text-light-1};
+  --color-text: #{variables.$vt-c-text-light-1};
+
+  --section-gap: 160px;
+}

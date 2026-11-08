@@ -1,0 +1,11 @@
+# Starbreakers.net : staging/prod uniquement (commande Dokploy, voir le README).
+#
+# Publie la passerelle (api-gw) uniquement sur l'IP du bridge Docker de l'hôte (172.17.0.1 par
+# défaut) : joignable par Ingressi via http://host.docker.internal:<API_GW_HTTP_PORT>, mais pas
+# depuis Internet. Même schéma que les autres sites du serveur.
+# Ne jamais retirer l'IP : sans elle, le port serait publié sur toutes les interfaces.
+
+services:
+  api-gw:
+    ports:
+      - "${DOCKER_BRIDGE_IP:-172.17.0.1}:${API_GW_HTTP_PORT:?API_GW_HTTP_PORT doit être défini (port propre à l'environnement)}:8000"

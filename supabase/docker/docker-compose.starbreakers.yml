@@ -1,0 +1,109 @@
+# Starbreakers.net : ajustements communs à tous les environnements (local, staging, prod).
+#
+# Les fichiers officiels de Supabase (docker-compose.yml, volumes/, utils/…) ne sont pas modifiés,
+# pour que `sh update.sh` puisse les mettre à jour. Tout ce qui est propre au projet est ici.
+# Activé par COMPOSE_FILE dans .env (`sh run.sh config add starbreakers`) ou par `-f` sur Dokploy.
+
+services:
+  # --- Aucun port publié : un port publié l'est sur toutes les interfaces de l'hôte, et les règles
+  # iptables de Docker passent avant ufw. Le trafic entre par le reverse proxy (Caddy en local,
+  # Ingressi en staging/prod), comme dans les overrides de proxy officiels (docker-compose.caddy.yml).
+  api-gw:
+    container_name: !reset null
+    ports: !reset []
+    # Secrets vérifiés et migrations appliquées avant d'exposer l'API et Studio : sinon `up` échoue
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+
+  # --- Pas de container_name fixe : beta et live tournent sur le même serveur (et Dokploy les
+  # déconseille). Docker nomme les conteneurs d'après le projet.
+  studio:
+    container_name: !reset null
+    # Snippets SQL de Studio dans un volume : Dokploy vide le dossier du code à chaque déploiement
+    volumes:
+      - studio-snippets:/app/snippets
+  auth:
+    container_name: !reset null
+    environment:
+      # Règles de mot de passe, à garder alignées avec src/lib/validation.ts
+      GOTRUE_PASSWORD_MIN_LENGTH: 8
+      GOTRUE_PASSWORD_REQUIRED_CHARACTERS: "abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789"
+  rest:
+    container_name: !reset null
+  realtime:
+    container_name: !reset null
+    # La passerelle joint Realtime par ce nom (le tenant « realtime-dev » en est déduit) : alias
+    # réseau, limité au réseau de la stack, à la place du container_name officiel du même nom.
+    networks:
+      default:
+        aliases:
+          - realtime-dev.supabase-realtime
+  storage:
+    container_name: !reset null
+    volumes:
+      - storage-data:/var/lib/storage
+  imgproxy:
+    container_name: !reset null
+    volumes:
+      - storage-data:/var/lib/storage
+  meta:
+    container_name: !reset null
+  db:
+    container_name: !reset null
+    # Données dans un volume nommé et non dans le dossier du dépôt (vidé par Dokploy à chaque
+    # déploiement). Compatible avec les Volume Backups de Dokploy.
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  # --- Services officiels non utilisés pour l'instant (réactivables en retirant ces lignes)
+  functions:
+    container_name: !reset null
+    profiles: [ disabled ]
+  supavisor:
+    container_name: !reset null
+    ports: !reset []
+    profiles: [ disabled ]
+
+  # --- Migrations du projet (../migrations), appliquées par la CLI Supabase après vérification
+  # des secrets. One-shot : l'API ne démarre que s'il se termine avec succès.
+  migrations:
+    image: node:22-alpine
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ../config.toml:/project/supabase/config.toml:ro,z
+      - ../migrations:/project/supabase/migrations:ro,z
+      - ./check-secrets.sh:/check-secrets.sh:ro,z
+      - ./.env.example:/env.example:ro,z
+    working_dir: /project
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY}
+      SUPABASE_SECRET_KEY: ${SUPABASE_SECRET_KEY}
+      DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      REALTIME_DB_ENC_KEY: ${REALTIME_DB_ENC_KEY}
+      VAULT_ENC_KEY: ${VAULT_ENC_KEY}
+      PG_META_CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
+      S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID}
+      S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET}
+      JWT_KEYS: ${JWT_KEYS}
+      JWT_JWKS: ${JWT_JWKS}
+    entrypoint: [ "sh", "-c" ]
+    command:
+      - |
+        sh /check-secrets.sh /env.example &&
+        npm install -g supabase@3.0.0 --silent &&
+        supabase db push --yes --remote="postgresql://postgres:$${POSTGRES_PASSWORD}@db:5432/$${POSTGRES_DB}?sslmode=disable"
+
+volumes:
+  db-data:
+  storage-data:
+  studio-snippets:

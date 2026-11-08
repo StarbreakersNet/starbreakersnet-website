@@ -1,0 +1,164 @@
+<script setup>
+import { RouterView, useRoute, useRouter } from "vue-router";
+import MainMenu from "@/components/MainMenu.vue";
+import { onMounted, ref, watch } from "vue";
+import MaintenanceView from "@/views/MaintenanceView.vue";
+import UserMenu from "@/components/UserMenu.vue";
+import { useMessage, useNotification } from "naive-ui";
+import { useAuthStore } from "@/stores/auth.ts";
+import { useUserStore } from "@/stores/user.ts";
+
+const route = useRoute();
+const router = useRouter();
+const auth = useAuthStore();
+const user = useUserStore();
+
+const props = defineProps({
+  maintenanceMode: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const isHome = ref(true);
+const showHeader = ref(false);
+const showFooter = ref(false);
+
+function setUiVisibility(isHome) {
+  showHeader.value = true;
+  showFooter.value = isHome;
+}
+
+watch(
+  () => route.name,
+  () => {
+    isHome.value = route.name === "home";
+    setUiVisibility(isHome.value);
+  }
+);
+
+// Déconnexion (bouton, session expirée ou autre onglet) depuis une route protégée : retour à l'accueil
+watch(
+  () => user.infos.connected,
+  connected => {
+    if (!connected && route.meta.requiresAuth) {
+      router.push({ name: "home" });
+    }
+  }
+);
+
+// Lien de réinitialisation du mot de passe : GoTrue peut renvoyer sur l'accueil (SITE_URL) au lieu de
+// /reset-password, par exemple si la demande venait d'une adresse non autorisée. On affiche le
+// formulaire quelle que soit la page d'arrivée.
+watch(
+  () => auth.passwordRecovery,
+  recovery => {
+    if (recovery && route.name !== "reset-password") {
+      router.replace({ name: "reset-password" });
+    }
+  }
+);
+
+onMounted(async () => {
+  window.$message = useMessage();
+  window.$notification = useNotification();
+});
+</script>
+
+<template>
+  <transition>
+    <div v-if="!auth.isReady" class="app-loader">
+      <n-spin size="large" />
+    </div>
+  </transition>
+  <transition mode="out-in" name="scale">
+    <MaintenanceView v-if="props.maintenanceMode" />
+    <div v-else class="main-container">
+      <transition name="shrink">
+        <header v-if="showHeader">
+          <transition-group name="fade-y">
+            <n-button
+              v-if="!isHome"
+              key="home"
+              :bordered="false"
+              class="apple-blurred"
+              @click="$router.push({ name: 'home' })">
+              <n-flex align="center">
+                <font-awesome-icon icon="arrow-left" />
+                Accueil
+              </n-flex>
+            </n-button>
+          </transition-group>
+          <user-menu />
+        </header>
+      </transition>
+      <n-flex class="router-view" justify="center">
+        <router-view #default="{ Component }">
+          <transition mode="out-in" name="scale">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+      </n-flex>
+      <transition name="fade-y">
+        <footer v-if="showFooter">
+          <main-menu />
+        </footer>
+      </transition>
+    </div>
+  </transition>
+</template>
+
+<style lang="scss" scoped>
+@use "@/assets/variables";
+
+.app-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: variables.$sn-main-padding;
+  gap: variables.$sn-main-padding;
+
+  header {
+    position: sticky;
+    top: variables.$sn-main-padding;
+    right: variables.$sn-main-padding;
+    bottom: variables.$sn-main-padding;
+    left: variables.$sn-main-padding;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+
+    &:has(> *:only-child) {
+      justify-content: flex-end;
+    }
+
+    > * {
+      height: 2.5em;
+    }
+  }
+
+  .router-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  footer {
+    position: absolute;
+    right: variables.$sn-main-padding;
+    left: variables.$sn-main-padding;
+    bottom: variables.$sn-main-padding;
+    z-index: 10;
+  }
+}
+</style>

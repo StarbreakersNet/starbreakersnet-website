@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="dev" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+    <deployment type="docker-compose.yml">
+      <settings>
+        <option name="envFilePath" value="" />
+        <option name="removeOrphansOnComposeDown" value="false" />
+        <option name="secondarySourceFiles">
+          <list>
+            <option value="supabase/docker/docker-compose.starbreakers.yml" />
+            <option value="supabase/docker/docker-compose.local.yml" />
+          </list>
+        </option>
+        <option name="sourceFilePath" value="supabase/docker/docker-compose.yml" />
+        <option name="upDetach" value="false" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>

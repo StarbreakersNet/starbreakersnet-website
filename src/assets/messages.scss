@@ -1,0 +1,47 @@
+.n-message-wrapper {
+    > .n-message {
+        --background-color: var(--n-text-color);
+        --text-color: var(--n-text-color);
+
+        display: flex;
+        justify-content: space-between;
+        max-width: 80vw;
+
+        &.n-message--info-type,
+        &.n-message--success-type,
+        &.n-message--warning-type,
+        &.n-message--error-type {
+            --text-color: white;
+        }
+
+        &.n-message--info-type {
+            background: var(--n-icon-color-info);
+            --text-color: white;
+        }
+        &.n-message--success-type {
+            background: var(--n-icon-color-success);
+            --text-color: white;
+        }
+        &.n-message--warning-type {
+            background: var(--n-icon-color-warning);
+            --text-color: white;
+        }
+        &.n-message--error-type {
+            background: var(--n-icon-color-error);
+            --text-color: white;
+        }
+
+        > .n-message__icon {
+            > * {
+                color: var(--text-color);
+            }
+        }
+        > .n-message__close {
+            color: var(--text-color);
+        }
+        > .n-message__content {
+            flex: 1;
+            color: var(--text-color);
+        }
+    }
+}
