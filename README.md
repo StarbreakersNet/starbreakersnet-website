@@ -177,7 +177,22 @@ docker run --rm -p 127.0.0.1:8080:80 starbreakersnet-front
 
 ## Déploiement (staging / prod)
 
-Chaque environnement (beta depuis `develop`, live depuis `master`) a **deux applications Dokploy** : **Supabase**, déployée rarement, et **Front**, déployée à chaque évolution du site. Le reverse proxy HTTPS est **Ingressi**, en dehors de ce dépôt.
+### Branches et mises en production
+
+Une seule branche de référence, `master` :
+
+```
+feature/xxx ──PR──▶ master ──push──▶ beta (staging), en continu
+                       └──tag vX.Y.Z──▶ live (production), une fois la beta validée
+```
+
+- **`master` doit toujours être livrable** : on n'y fusionne (par PR) que des fonctionnalités terminées. La beta reflète `master` en permanence.
+- **Mise en production** : un tag `vX.Y.Z` sur un commit déjà validé en beta. Les migrations SQL passent donc toujours par la beta avant la prod.
+- **Correctif urgent** quand `master` contient un travail pas prêt : branche depuis le tag en prod (`git checkout -b hotfix/xyz vX.Y.Z`), correctif, nouveau tag `vX.Y.(Z+1)`, puis PR de la branche vers `master`.
+
+### Environnements Dokploy
+
+Le projet Dokploy « StarbreakersNet Website » a un environnement Dokploy par environnement du site : `staging` (beta) et `production` (live). Chacun a **deux applications** : **Supabase**, déployée rarement, et **Front**, déployée à chaque évolution du site. Le reverse proxy HTTPS est **Ingressi**, en dehors de ce dépôt.
 
 Comme les autres sites du serveur, la passerelle Supabase et le front publient chacun un port **uniquement sur l'IP du bridge Docker de l'hôte** (`172.17.0.1`). Ingressi les joint via `http://host.docker.internal:<port>`, et Internet ne les voit pas. Chaque port doit être propre à l'environnement et libre sur le serveur (AMP en utilise aussi) :
 
@@ -192,22 +207,24 @@ Comme les autres sites du serveur, la passerelle Supabase et le front publient c
 
 Depuis la racine du dépôt, une fois par environnement (ici beta, avec les ports du tableau) :
 ```bash
-yarn env:deploy beta --api-domain api.beta.starbreakers.net --site-domain beta.starbreakers.net --api-port 9056 --front-port 9081
+yarn env:deploy beta --api-domain api.beta.starbreakers.net --site-domain beta.starbreakers.net --api-port 9056 --front-port 9081 --shared environment
 ```
-Le script génère de nouveaux secrets avec les scripts officiels, dans un dossier temporaire (le `.env` local n'est pas touché), et écrit deux fichiers non versionnés :
+Le script génère de nouveaux secrets avec les scripts officiels, dans un dossier temporaire (le `.env` local n'est pas touché), et écrit trois fichiers non versionnés :
 
 | Fichier | Contenu | À copier dans |
 |---|---|---|
-| `supabase/docker/.env.beta` | Secrets, URL publiques, `API_GW_HTTP_PORT`, `ENABLE_EMAIL_AUTOCONFIRM=false`, SMTP OVH (`ssl0.ovh.net:465`, expéditeur `noreply@starbreakers.net`), `DASHBOARD_USERNAME=admin` | Application « Supabase », Environment |
-| `.env.beta` | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (la même clé que la stack), `FRONT_HTTP_PORT` | Application « Front », Environment |
+| `.env.beta.shared` | `API_DOMAIN`, `SITE_DOMAIN`, `SUPABASE_PUBLISHABLE_KEY`, `API_GW_HTTP_PORT`, `FRONT_HTTP_PORT` (aucun secret) | [Variables de l'environnement Dokploy](https://docs.dokploy.com/docs/core/variables) (icône à droite du sélecteur d'environnement, **pas** « Project Environment », partagé avec la prod) |
+| `supabase/docker/.env.beta` | Secrets, `ENABLE_EMAIL_AUTOCONFIRM=false`, SMTP OVH (`ssl0.ovh.net:465`, expéditeur `noreply@starbreakers.net`), `DASHBOARD_USERNAME=admin`, et les valeurs communes par référence (`${{environment.API_DOMAIN}}`…) | Application « Supabase », Environment |
+| `.env.beta` | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `FRONT_HTTP_PORT`, par référence | Application « Front », Environment |
 
-Avec une version de Dokploy qui a les [variables partagées](https://docs.dokploy.com/docs/core/variables) (0.12 et plus pour celles du projet, versions récentes pour les environnements), ajouter `--shared project` (un projet Dokploy par environnement) ou `--shared environment` (environnements Dokploy). Le script écrit alors un troisième fichier, `.env.beta.shared` (`API_DOMAIN`, `SITE_DOMAIN`, `SUPABASE_PUBLISHABLE_KEY`, `API_GW_HTTP_PORT`, `FRONT_HTTP_PORT`), à coller dans les variables partagées, et les deux applications y font référence (`${{project.API_DOMAIN}}`…) : la clé publique et les domaines ne sont écrits qu'une fois.
+La clé publique et les domaines ne sont écrits qu'une fois par environnement : le front et la stack ne peuvent pas diverger. Les éditeurs signalent `${{…}}` comme une erreur de syntaxe `.env` : c'est la syntaxe de Dokploy, remplacée avant l'écriture du vrai `.env` sur le serveur. Sans `--shared`, les valeurs sont écrites directement dans les deux fichiers ; `--shared project` utilise les variables du projet (`${{project.…}}`).
 
 Ensuite : compléter `SMTP_USER` et `SMTP_PASS` dans l'application Supabase, ranger le mot de passe de Studio affiché dans le gestionnaire de mots de passe, puis **supprimer ces fichiers du poste**. Le script refuse d'écraser un fichier existant ; `--force` génère de nouveaux secrets, à ne faire que sur un environnement neuf (la base est initialisée avec les secrets du premier démarrage).
 
 ### Application « Supabase » (type Compose)
 
-- **Compose Path** : `supabase/docker/docker-compose.yml`
+- **Source** : branche `master`. Déclenchement : **On Push** en staging, **On Tag** en production (à vérifier au premier tag : commit déployé et tags qui déclenchent ; à défaut, déploiement manuel)
+- **Compose Path** : `./supabase/docker/docker-compose.yml`
 - **Advanced → Command** (remplace la commande par défaut, et Dokploy ajoute `docker` devant ; `<appName>` est le nom technique de l'application, affiché sous son titre) :
     ```
     compose -p <appName> -f supabase/docker/docker-compose.yml -f supabase/docker/docker-compose.starbreakers.yml -f supabase/docker/docker-compose.deploy.yml up -d --remove-orphans
@@ -224,7 +241,8 @@ Le dossier du code étant re-cloné à chaque déploiement, les conteneurs déj�
 
 ### Application « Front » (type Compose)
 
-- **Compose Path** : `docker-compose.front.yml` (commande par défaut)
+- **Source** : branche `master`, même déclenchement que l'application Supabase de l'environnement
+- **Compose Path** : `./docker-compose.front.yml` (commande par défaut)
 - **Environment** : le contenu de `.env.<env>`, généré en même temps
 - **Watch Paths** : `src/**`, `public/**`, `index.html`, `package.json`, `yarn.lock`, `.yarnrc.yml`, `vite.config.ts`, `tsconfig*.json`, `env.d.ts`, `Dockerfile.prod`, `nginx.conf`, `docker-compose.front.yml`
 
