@@ -24,7 +24,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
 | `supabase/docker/` | Stack Supabase self-hosted : **copie du dossier [`docker/` officiel](https://github.com/supabase/supabase/tree/master/docker)**, version notée dans `.supabase-version` |
 | `supabase/docker/docker-compose.starbreakers.yml` | Nos réglages, communs à tous les environnements (voir ci-dessous) |
 | `supabase/docker/docker-compose.local.yml` | Local uniquement : Caddy (HTTPS), Mailpit, Postgres sur `127.0.0.1` |
-| `supabase/docker/docker-compose.deploy.yml` | Staging/prod uniquement : réseau dédié partagé avec Ingressi |
+| `supabase/docker/docker-compose.deploy.yml` | Staging/prod uniquement : passerelle publiée sur l'IP du bridge Docker, pour Ingressi |
 | `supabase/docker/check-secrets.sh` | Garde-fou : refuse de démarrer avec des secrets d'exemple |
 | `docker-compose.front.yml`, `Dockerfile.prod`, `nginx.conf` | Image du front (staging/prod) |
 | `caddy/Caddyfile` | Proxy HTTPS local |
@@ -32,7 +32,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
 **Règle : on ne modifie pas les fichiers officiels de `supabase/docker/`.** Tout ce qui est propre au projet passe par le `.env` et par les trois fichiers d'override ci-dessus, pour que [`update.sh`](#mettre-à-jour-supabase) puisse mettre la stack à jour. Seule exception : les quatre lignes de `docker-compose.yml` activées par `utils/add-new-auth-keys.sh`, comme le fait l'installation officielle.
 
 `docker-compose.starbreakers.yml` :
-- **aucun port publié** : tout passe par le reverse proxy, comme dans les overrides de proxy officiels ;
+- **aucun port publié** : tout passe par le reverse proxy, comme dans les overrides de proxy officiels (en staging/prod, `docker-compose.deploy.yml` publie seulement la passerelle sur l'IP du bridge Docker) ;
 - **pas de `container_name` fixe** : beta et live tournent sur le même serveur ;
 - **données dans des volumes nommés** (`db-data`, `storage-data`, `studio-snippets`) : Dokploy vide le dossier du code à chaque déploiement ;
 - **Edge Functions et Supavisor désactivés** : réactivables en retirant leurs lignes ;
@@ -183,13 +183,14 @@ docker run --rm -p 127.0.0.1:8080:80 starbreakersnet-front
 
 Chaque environnement (beta depuis `develop`, live depuis `master`) a **deux applications Dokploy** dans le projet StarbreakersNet : **Supabase**, déployée rarement, et **Front**, déployée à chaque évolution du site. Le reverse proxy HTTPS est **Ingressi**, en dehors de ce dépôt.
 
-### Une fois par environnement, sur le serveur
+Comme les autres sites du serveur, la passerelle Supabase et le front publient chacun un port **uniquement sur l'IP du bridge Docker de l'hôte** (`172.17.0.1`). Ingressi les joint via `http://host.docker.internal:<port>`, et Internet ne les voit pas. Chaque port doit être propre à l'environnement et libre sur le serveur (AMP en utilise aussi). Exemple :
 
-```bash
-docker network create sbn-beta-edge    # sbn-live-edge pour la prod
-```
+| | beta | live |
+|---|---|---|
+| Passerelle Supabase (`API_GW_HTTP_PORT`) | 9180 | 9080 |
+| Front (`FRONT_HTTP_PORT`) | 9181 | 9081 |
 
-Ce réseau ne doit contenir que la passerelle Supabase, le front et Ingressi : Ingressi le rejoint depuis son propre compose. Aucun autre conteneur du serveur ne peut ainsi joindre l'API sans passer par Ingressi.
+> Ces ports sont joignables depuis **tous les conteneurs du serveur** (instances AMP comprises), sans passer par Ingressi ni par son portail. Pour Studio, le basic-auth de la passerelle est donc indispensable. La base, elle, n'est jamais publiée.
 
 ### Application « Supabase » (type Compose)
 
@@ -200,7 +201,7 @@ Ce réseau ne doit contenir que la passerelle Supabase, le front et Ingressi : I
     ```
     Pas de `--force-recreate` : avec, une migration en échec couperait l'API au lieu de la laisser tourner sur l'ancien schéma.
 - **Environment** : un `.env` complet, généré pour cet environnement avec les scripts officiels (`generate-keys.sh`, puis `add-new-auth-keys.sh`, dans une copie de `supabase/docker`), avec :
-    - `STACK_NAME=sbn-beta` (ou `sbn-live`) ;
+    - `API_GW_HTTP_PORT=9180` (port de l'environnement, voir le tableau) ;
     - `SUPABASE_PUBLIC_URL=https://<domaine de l'API>` et `API_EXTERNAL_URL=https://<domaine de l'API>/auth/v1` ;
     - `SITE_URL=https://<domaine du site>` et `ADDITIONAL_REDIRECT_URLS=https://<domaine du site>/**` ;
     - `ENABLE_EMAIL_AUTOCONFIRM=false` ;
@@ -216,27 +217,27 @@ Le dossier du code étant re-cloné à chaque déploiement, les conteneurs déj�
 ### Application « Front » (type Compose)
 
 - **Compose Path** : `docker-compose.front.yml` (commande par défaut)
-- **Environment** : `STACK_NAME`, `VITE_SUPABASE_URL` (le domaine de l'API), `VITE_SUPABASE_PUBLISHABLE_KEY` (celle de l'application Supabase du même environnement)
+- **Environment** : `FRONT_HTTP_PORT` (port de l'environnement), `VITE_SUPABASE_URL` (le domaine de l'API), `VITE_SUPABASE_PUBLISHABLE_KEY` (celle de l'application Supabase du même environnement)
 - **Watch Paths** : `src/**`, `public/**`, `index.html`, `package.json`, `yarn.lock`, `.yarnrc.yml`, `vite.config.ts`, `tsconfig*.json`, `env.d.ts`, `Dockerfile.prod`, `nginx.conf`, `docker-compose.front.yml`
 
 ### Ingressi
 
 | Proxy host | Upstream |
 |---|---|
-| Domaine du site | `http://sbn-beta-front:80` (ou `sbn-live-front`) |
-| Domaine de l'API | `http://sbn-beta-api:8000` (ou `sbn-live-api`) |
+| Domaine du site | `http://host.docker.internal:<FRONT_HTTP_PORT>` |
+| Domaine de l'API | `http://host.docker.internal:<API_GW_HTTP_PORT>` |
 
 Studio est servi sur `https://<domaine de l'API>/`, derrière le basic-auth `DASHBOARD_USERNAME` / `DASHBOARD_PASSWORD` de la passerelle officielle. Protection recommandée en plus : le portail **Forward Auth** d'Ingressi sur le domaine de l'API, avec en **Excluded Paths** les routes publiques de l'API : `/auth/v1/*, /rest/v1/*, /realtime/v1/*, /storage/v1/*` (le `*` final est obligatoire). Le temps réel passe par des WebSockets (`/realtime/v1/websocket`), qu'Ingressi (Caddy) relaie nativement.
 
 ### Vérifications après le premier déploiement d'un environnement
 
-- [ ] Sur le serveur, aucun conteneur de la stack ne publie de port :
+- [ ] Sur le serveur, la passerelle et le front ne publient que sur `172.17.0.1`, jamais sur `0.0.0.0` :
     ```bash
-    docker ps --format '{{.Names}}\t{{.Ports}}' | grep 0.0.0.0
+    docker ps --format '{{.Names}}\t{{.Ports}}' | grep -E 'api-gw|front'
     ```
-- [ ] Depuis une machine extérieure, les ports internes ne répondent pas (« timed out ») :
+- [ ] Depuis une machine extérieure, ces ports et les ports internes ne répondent pas (« timed out ») :
     ```bash
-    for port in 5432 6543 8000 3000; do nc -vz -w 3 starbreakers.net $port; done
+    for port in 9080 9081 9180 9181 5432 6543 8000 3000; do nc -vz -w 3 starbreakers.net $port; done
     ```
 - [ ] `https://<domaine de l'API>/` demande une authentification (Studio).
 - [ ] `https://<domaine de l'API>/auth/v1/health` avec l'en-tête `apikey: <SUPABASE_PUBLISHABLE_KEY>` répond `200`.

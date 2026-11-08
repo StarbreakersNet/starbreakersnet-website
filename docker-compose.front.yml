@@ -1,8 +1,9 @@
 # Front (Vue + nginx) : staging/prod uniquement, application Dokploy distincte de Supabase
 # (voir le README). En local, le front tourne avec `yarn dev`.
 #
-# Rejoint le réseau Docker dédié à l'environnement, partagé uniquement avec la passerelle Supabase
-# et Ingressi. Upstream Ingressi : http://<STACK_NAME>-front:80 (par ex. http://sbn-beta-front:80)
+# Publié uniquement sur l'IP du bridge Docker de l'hôte (172.17.0.1 par défaut) : joignable par
+# Ingressi via http://host.docker.internal:<FRONT_HTTP_PORT>, mais pas depuis Internet.
+# Ne jamais retirer l'IP : sans elle, le port serait publié sur toutes les interfaces.
 
 services:
   front:
@@ -14,12 +15,5 @@ services:
         VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
         VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
     restart: unless-stopped
-    networks:
-      edge:
-        aliases:
-          - ${STACK_NAME:?STACK_NAME doit être défini (sbn-beta ou sbn-live)}-front
-
-networks:
-  edge:
-    name: ${STACK_NAME}-edge
-    external: true
+    ports:
+      - "${DOCKER_BRIDGE_IP:-172.17.0.1}:${FRONT_HTTP_PORT:?FRONT_HTTP_PORT doit être défini (port propre à l'environnement)}:80"
