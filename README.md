@@ -179,16 +179,16 @@ docker run --rm -p 127.0.0.1:8080:80 starbreakersnet-front
 
 ### Branches et mises en production
 
-Une seule branche de référence, `master` :
+Une seule branche de référence, `main` :
 
 ```
-feature/xxx ──PR──▶ master ──push──▶ beta (staging), en continu
+feature/xxx ──PR──▶ main   ──push──▶ beta (staging), en continu
                        └──tag vX.Y.Z──▶ live (production), une fois la beta validée
 ```
 
-- **`master` doit toujours être livrable** : on n'y fusionne (par PR) que des fonctionnalités terminées. La beta reflète `master` en permanence.
+- **`main` doit toujours être livrable** : on n'y fusionne (par PR) que des fonctionnalités terminées. La beta reflète `main` en permanence.
 - **Mise en production** : un tag `vX.Y.Z` sur un commit déjà validé en beta. Les migrations SQL passent donc toujours par la beta avant la prod.
-- **Correctif urgent** quand `master` contient un travail pas prêt : branche depuis le tag en prod (`git checkout -b hotfix/xyz vX.Y.Z`), correctif, nouveau tag `vX.Y.(Z+1)`, puis PR de la branche vers `master`.
+- **Correctif urgent** quand `main` contient un travail pas prêt : branche depuis le tag en prod (`git checkout -b hotfix/xyz vX.Y.Z`), correctif, nouveau tag `vX.Y.(Z+1)`, puis PR de la branche vers `main`.
 
 ### Environnements Dokploy
 
@@ -223,7 +223,7 @@ Ensuite : compléter `SMTP_USER` et `SMTP_PASS` dans l'application Supabase, ran
 
 ### Application « Supabase » (type Compose)
 
-- **Source** : branche `master`. Déclenchement : **On Push** en staging, **On Tag** en production (à vérifier au premier tag : commit déployé et tags qui déclenchent ; à défaut, déploiement manuel)
+- **Source** : branche `main`. Déclenchement : **On Push** en staging, **On Tag** en production (à vérifier au premier tag : commit déployé et tags qui déclenchent ; à défaut, déploiement manuel)
 - **Compose Path** : `./supabase/docker/docker-compose.yml`
 - **Advanced → Command** (remplace la commande par défaut, et Dokploy ajoute `docker` devant ; `<appName>` est le nom technique de l'application, affiché sous son titre) :
     ```
@@ -241,7 +241,7 @@ Le dossier du code étant re-cloné à chaque déploiement, les conteneurs déj�
 
 ### Application « Front » (type Compose)
 
-- **Source** : branche `master`, même déclenchement que l'application Supabase de l'environnement
+- **Source** : branche `main`, même déclenchement que l'application Supabase de l'environnement
 - **Compose Path** : `./docker-compose.front.yml` (commande par défaut)
 - **Environment** : le contenu de `.env.<env>`, généré en même temps
 - **Watch Paths** : `src/**`, `public/**`, `index.html`, `package.json`, `yarn.lock`, `.yarnrc.yml`, `vite.config.ts`, `tsconfig*.json`, `env.d.ts`, `Dockerfile.prod`, `nginx.conf`, `docker-compose.front.yml`
