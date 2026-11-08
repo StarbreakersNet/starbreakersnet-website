@@ -61,6 +61,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
     cp .env.example .env
     sh utils/generate-keys.sh --update-env
     sh utils/add-new-auth-keys.sh --update-env
+    rm -f docker-compose.yml.old    # copie de sauvegarde laissée par le script, inutile ici
     sh run.sh config add starbreakers local
     ```
     Puis, dans `supabase/docker/.env`, mettre les valeurs locales :
