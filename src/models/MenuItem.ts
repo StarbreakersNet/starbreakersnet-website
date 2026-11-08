@@ -9,16 +9,24 @@ export type MenuItem = {
 
 export const menuItems: MenuItem[] = [
   {
-    label: "GitLab",
-    externalLink: "https://gitlab.com/starbreakersdevteam",
-    icon: ["fab", "gitlab"],
-    color: "rgb(226, 67, 41)",
+    routeName: "bonjourr",
+    label: "Bonjourr",
+    icon: ["fas", "home"],
+    color: "rgb(100, 221, 187)",
+    textColor: "rgb(255, 255, 255)",
   },
   {
     routeName: "discord",
     label: "Discord",
     icon: ["fab", "discord"],
     color: "rgb(88, 101, 242)",
+    textColor: "rgb(255, 255, 255)",
+  },
+  {
+    externalLink: "https://gitlab.com/starbreakersdevteam",
+    label: "GitLab",
+    icon: ["fab", "gitlab"],
+    color: "rgb(226, 67, 41)",
     textColor: "rgb(255, 255, 255)",
   },
   {

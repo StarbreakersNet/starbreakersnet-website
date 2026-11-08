@@ -280,3 +280,31 @@ Studio n'a pas de connexion à lui : le navigateur garde les identifiants jusqu'
 | Renouveler les clés d'API | `sh utils/rotate-new-api-keys.sh` (script officiel), puis rebuild du front |
 
 Services actifs : `db`, `auth`, `rest`, `realtime`, `storage`, `imgproxy`, `meta`, `studio`, `api-gw` (Envoy), plus `migrations` à chaque démarrage. Désactivés : `functions`, `supavisor`. Les logs centralisés (`docker-compose.logs.yml`) ne sont pas activés.
+
+## Intégrations
+
+### Bonjourr
+
+Bonjourr est une page d'accueil pour votre navigateur Internet inspirée par l'apparence d'iOS.
+Bien qu'elle se veuille minimale, elle vous offre de nombreuses options pour la personnaliser à votre guise. Voici quelques fonctionnalités :
+
+- 🍏 Langage de conception iOS
+- 🏞 Arrière-plans 4K dynamiques qui changent en fonction de l'humeur du jour
+- ⚡️ Rapide et léger !
+- 🔎 Barre de recherche (compatible avec tous les moteurs de recherche)
+- 🕰 Horloge analogique avec plusieurs visages d'horloge
+- 🌤 Météo
+- 🔗 Liens rapides
+- 👋 Vous accueille par votre nom
+- 🌘 Mode sombre
+- 🥖 Emoji comme favicon
+- 🧑‍💻 Style CSS personnalisé
+- 📝 Polices personnalisées
+- 🔒 Privacy focused
+- 🌎 Multilanguage
+
+<h1 align="center">
+  <a href="https://github.com/victrme/Bonjourr">
+    <img src="https://raw.githubusercontent.com/victrme/Bonjourr/master/src/assets/bonjourr.png" width="50%" alt="site web de Bonjourr">
+  </a>
+</h1>
