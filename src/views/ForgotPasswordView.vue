@@ -49,7 +49,10 @@ async function handleSubmit() {
         mot de passe.
       </h-text>
       <h-form-item label="Email" path="email">
-        <h-input v-model:value="form.email" placeholder="" />
+        <h-input
+          placeholder=""
+          v-model:value="form.email"
+          :input-props="{ type: 'email', autocomplete: 'email', name: 'email' }" />
       </h-form-item>
       <h-button :disabled="!formRef?.isValid" :loading="loading" attr-type="submit">
         Envoyer le lien

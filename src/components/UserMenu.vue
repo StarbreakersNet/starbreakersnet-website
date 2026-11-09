@@ -10,6 +10,7 @@ import { useAuthStore } from "@/stores/auth.ts";
 import { useUserStore } from "@/stores/user.ts";
 import { useSettingsStore } from "@/stores/settings.ts";
 import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
+import { formatUserTag } from "@/lib/userTag.ts";
 
 const auth = useAuthStore();
 const user = useUserStore();
@@ -19,8 +20,22 @@ const router = useRouter();
 const packageVersion = ref(version);
 const options = computed(() => {
   const items = [];
+  const me = user.infos.me;
 
   if (user.infos.connected) {
+    // Membre connecté, en tête du menu : « Renard#0421 »
+    if (me) {
+      items.push({
+        key: "identity",
+        type: "render",
+        render: () =>
+          h("div", { class: "user-identity" }, [
+            h("span", { class: "username" }, me.username),
+            h("span", { class: "tag" }, formatUserTag(me.tag)),
+          ]),
+      });
+      items.push({ key: "identity-divider", type: "divider" });
+    }
     items.push({
       label: "Mon compte",
       key: "account",
@@ -178,6 +193,7 @@ function handleSelect(key) {
       :show="showLoginModal"
       class="apple-menu"
       preset="dialog"
+      title="Connexion"
       transform-origin="center"
       @update:show="!$event && closeLoginModal()">
       <template #default>
@@ -194,6 +210,16 @@ function handleSelect(key) {
   &.n-dropdown-menu:not(.n-dropdown-menu--scrollable) {
     padding: variables.$sn-main-padding;
     border-radius: variables.$sn-apple-border-radius;
+  }
+
+  .user-identity {
+    padding: 0.25em 0.75em;
+    font-weight: 500;
+
+    .tag {
+      margin-left: 0.15em;
+      opacity: 0.6;
+    }
   }
 }
 </style>

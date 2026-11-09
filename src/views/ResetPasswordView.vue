@@ -30,7 +30,9 @@ const rules = {
 };
 
 // Lien expiré ou déjà utilisé : GoTrue redirige avec l'erreur dans le hash de l'URL
-const linkError = computed(() => new URLSearchParams(route.hash.replace(/^#/, "")).get("error_code"));
+const linkError = computed(() =>
+  new URLSearchParams(route.hash.replace(/^#/, "")).get("error_code")
+);
 
 async function handleSubmit() {
   loading.value = true;
@@ -45,7 +47,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <h-card class="tw:max-w-xl">
+  <h-card class="tw:max-w-xl tw:self-center">
     <template #header>Nouveau mot de passe</template>
     <template #default>
       <!-- Le formulaire n'apparaît qu'après l'événement PASSWORD_RECOVERY (lien valide) -->
@@ -56,11 +58,16 @@ async function handleSubmit() {
         :rules="rules"
         @submit.prevent="handleSubmit()">
         <h-form-item label="Nouveau mot de passe" path="password">
-          <h-input v-model:value="form.password" show-password-on="click" type="password" />
+          <h-input
+            v-model:value="form.password"
+            :input-props="{ autocomplete: 'new-password' }"
+            show-password-on="click"
+            type="password" />
         </h-form-item>
         <h-form-item label="Confirmer le nouveau mot de passe" path="passwordConfirmation">
           <h-input
             v-model:value="form.passwordConfirmation"
+            :input-props="{ autocomplete: 'new-password' }"
             show-password-on="click"
             type="password" />
         </h-form-item>
