@@ -74,9 +74,9 @@ function generateSecrets(dir) {
 // --- Valeurs propres au projet
 
 const PROJECT_VALUES = {
-  STUDIO_DEFAULT_ORGANIZATION: "Starbreakers.net",
+  STUDIO_DEFAULT_ORGANIZATION: "StarbreakersNet",
   STUDIO_DEFAULT_PROJECT: "starbreakersnet-website",
-  SMTP_SENDER_NAME: "Starbreakers.net",
+  SMTP_SENDER_NAME: "StarbreakersNet",
 };
 
 function frontEnv(path, vars) {

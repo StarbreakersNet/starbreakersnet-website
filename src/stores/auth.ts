@@ -8,6 +8,7 @@ import {
 } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 import { getAuthErrorMessage } from "@/lib/authErrors";
+import { APP_LOCALE } from "@/lib/locale";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";
@@ -175,8 +176,9 @@ export const useAuthStore = defineStore("auth", () => {
       email,
       password,
       options: {
-        // Repris par les triggers d'inscription (profil et paramètres)
-        data: { username, theme: user.settings.theme },
+        // username et theme : repris par les triggers d'inscription (profil et paramètres).
+        // locale : langue des mails envoyés par GoTrue (supabase/templates).
+        data: { username, theme: user.settings.theme, locale: APP_LOCALE },
       },
     });
 

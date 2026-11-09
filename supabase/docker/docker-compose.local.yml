@@ -1,4 +1,4 @@
-# Starbreakers.net : services réservés au développement local (jamais déployés).
+# StarbreakersNet : services réservés au développement local (jamais déployés).
 # À activer après docker-compose.starbreakers.yml : `sh run.sh config add starbreakers local`.
 # Les ports publiés ici sont tous liés à 127.0.0.1 : rien n'est joignable depuis le réseau local.
 # Ports déjà pris sur le poste (autre conteneur web, autre Postgres) : les changer dans .env avec
