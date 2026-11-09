@@ -18,8 +18,10 @@ import {
   emailRule,
   passwordConfirmationRule,
   passwordRule,
+  USERNAME_MAX_LENGTH,
   usernameRule,
 } from "@/lib/validation";
+import { formatUserTag } from "@/lib/userTag";
 
 const EMAIL_CHANGE_TEXT =
   "Un lien de confirmation a été envoyé à votre adresse actuelle et à la nouvelle. " +
@@ -73,6 +75,8 @@ const passwordRules = computed((): FormRules => {
 });
 
 const pendingEmail = computed(() => user.infos.me?.pendingEmail ?? null);
+// Numéro du pseudo enregistré (« #0421 »), recalculé par la base quand le pseudo change
+const userTag = computed(() => formatUserTag(user.infos.me?.tag));
 
 function resetAccountForm() {
   const me = user.infos.me;
@@ -189,7 +193,13 @@ onMounted(() => {
             <h-form ref="accountFormRef" :model="account" :rules="accountRules">
               <h-grid>
                 <h-form-item-gi :span="6" label="Pseudo" path="username">
-                  <h-input v-model:value="account.username" />
+                  <h-input v-model:value="account.username" :maxlength="USERNAME_MAX_LENGTH">
+                    <template v-if="userTag" #suffix>
+                      <span title="Numéro qui vous distingue des membres ayant le même pseudo">
+                        {{ userTag }}
+                      </span>
+                    </template>
+                  </h-input>
                 </h-form-item-gi>
                 <h-form-item-gi :span="6" label="Email" path="email">
                   <h-input v-model:value="account.email" />

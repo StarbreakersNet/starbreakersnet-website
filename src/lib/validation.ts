@@ -5,7 +5,9 @@ import type { FormItemRule } from "naive-ui";
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_HINT = `au moins ${PASSWORD_MIN_LENGTH} caractères, dont une minuscule, une majuscule et un chiffre`;
 
+// Doit rester aligné avec public.is_valid_username (supabase/migrations) : c'est la base qui fait foi
 export const USERNAME_MIN_LENGTH = 3;
+export const USERNAME_MAX_LENGTH = 32;
 
 type Value = string | null | undefined;
 
@@ -14,6 +16,8 @@ export function checkUsername(value: Value): Error | true {
     return new Error("Un nom d'utilisateur est requis");
   } else if (value.length < USERNAME_MIN_LENGTH) {
     return new Error(`Doit contenir au moins ${USERNAME_MIN_LENGTH} caractères`);
+  } else if (value.length > USERNAME_MAX_LENGTH) {
+    return new Error(`Doit contenir au plus ${USERNAME_MAX_LENGTH} caractères`);
   } else if (/[^a-zA-Z0-9]/.test(value)) {
     return new Error("Ne doit pas contenir de caractères spéciaux");
   }

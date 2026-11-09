@@ -69,11 +69,18 @@ export const useAuthStore = defineStore("auth", () => {
 
   function toUser(
     authUser: User,
-    profile: { username: string; first_name: string | null; last_name: string | null }
+    profile: {
+      username: string;
+      // Absent tant que la migration du numéro n'est pas appliquée (front déployé avant Supabase)
+      tag?: number | null;
+      first_name: string | null;
+      last_name: string | null;
+    }
   ): UserType {
     return {
       id: authUser.id,
       username: profile.username,
+      tag: profile.tag ?? null,
       email: authUser.email ?? null,
       pendingEmail: authUser.new_email ?? null,
       firstName: profile.first_name,
