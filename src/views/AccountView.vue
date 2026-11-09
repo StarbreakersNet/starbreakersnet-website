@@ -6,6 +6,11 @@ import HInput from "@/components/c/hInput.vue";
 import HAlert from "@/components/c/hAlert.vue";
 import HGrid from "@/components/c/hGrid.vue";
 import HFormItemGi from "@/components/c/hFormItemGi.vue";
+import HFormItem from "@/components/c/hFormItem.vue";
+import HButton from "@/components/c/hButton.vue";
+import HModal from "@/components/c/hModal.vue";
+import HText from "@/components/c/hText.vue";
+import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { FormItemRule, FormRules } from "naive-ui";
 import { computed, onMounted, reactive, ref, useTemplateRef, watch } from "vue";
@@ -36,6 +41,7 @@ const router = useRouter();
 
 const accountFormRef = useTemplateRef<HFormInst>("accountFormRef");
 const passwordFormRef = useTemplateRef<HFormInst>("passwordFormRef");
+const deleteFormRef = useTemplateRef<HFormInst>("deleteFormRef");
 
 const saving = ref(false);
 const account = reactive({
@@ -73,6 +79,32 @@ const passwordRules = computed((): FormRules => {
     newPasswordConfirmation: passwordConfirmationRule(() => passwords.newPassword),
   };
 });
+
+// Suppression du compte : confirmée par le mot de passe, dans une fenêtre dédiée
+const showDeleteModal = ref(false);
+const deleting = ref(false);
+const deleteForm = reactive({ password: "" });
+const deleteRules: FormRules = { password: currentPasswordRule };
+
+function openDeleteModal() {
+  deleteForm.password = "";
+  showDeleteModal.value = true;
+}
+
+async function handleDelete() {
+  if (deleting.value || !(await isValid(deleteFormRef.value))) {
+    return;
+  }
+
+  deleting.value = true;
+  const deleted = await auth.deleteAccount(deleteForm.password);
+  deleting.value = false;
+
+  // Plus de session : AppLayout ramène à l'accueil depuis cette page protégée
+  if (deleted) {
+    showDeleteModal.value = false;
+  }
+}
 
 const pendingEmail = computed(() => user.infos.me?.pendingEmail ?? null);
 // Numéro du pseudo enregistré (« #0421 »), recalculé par la base quand le pseudo change
@@ -181,10 +213,9 @@ onMounted(() => {
         <h-alert v-if="pendingEmail" type="info">
           <template #header>Changement d'adresse email en attente</template>
           <template #default>
-            Pour utiliser
             <strong>{{ pendingEmail }}</strong>
-            , cliquez sur les liens de confirmation envoyés à votre adresse actuelle et à la
-            nouvelle.
+            deviendra votre adresse une fois validés les liens de confirmation envoyés à votre
+            adresse actuelle et à la nouvelle.
           </template>
         </h-alert>
         <h-card :bordered="false" embedded segmented size="small">
@@ -193,7 +224,10 @@ onMounted(() => {
             <h-form ref="accountFormRef" :model="account" :rules="accountRules">
               <h-grid>
                 <h-form-item-gi :span="6" label="Pseudo" path="username">
-                  <h-input v-model:value="account.username" :maxlength="USERNAME_MAX_LENGTH">
+                  <h-input
+                    v-model:value="account.username"
+                    :input-props="{ autocomplete: 'username' }"
+                    :maxlength="USERNAME_MAX_LENGTH">
                     <template v-if="userTag" #suffix>
                       <span title="Numéro qui vous distingue des membres ayant le même pseudo">
                         {{ userTag }}
@@ -202,13 +236,19 @@ onMounted(() => {
                   </h-input>
                 </h-form-item-gi>
                 <h-form-item-gi :span="6" label="Email" path="email">
-                  <h-input v-model:value="account.email" />
+                  <h-input
+                    v-model:value="account.email"
+                    :input-props="{ type: 'email', autocomplete: 'email' }" />
                 </h-form-item-gi>
                 <h-form-item-gi :span="6" label="Prénom" path="firstName">
-                  <h-input v-model:value="account.firstName" />
+                  <h-input
+                    v-model:value="account.firstName"
+                    :input-props="{ autocomplete: 'given-name' }" />
                 </h-form-item-gi>
                 <h-form-item-gi :span="6" label="Nom" path="lastName">
-                  <h-input v-model:value="account.lastName" />
+                  <h-input
+                    v-model:value="account.lastName"
+                    :input-props="{ autocomplete: 'family-name' }" />
                 </h-form-item-gi>
               </h-grid>
             </h-form>
@@ -222,6 +262,7 @@ onMounted(() => {
                 <h-form-item-gi :span="12" label="Mot de passe actuel" path="password">
                   <h-input
                     v-model:value="passwords.password"
+                    :input-props="{ autocomplete: 'current-password' }"
                     show-password-on="click"
                     type="password" />
                 </h-form-item-gi>
@@ -229,6 +270,7 @@ onMounted(() => {
                   <h-input
                     v-model:value="passwords.newPassword"
                     :disabled="!passwords.password"
+                    :input-props="{ autocomplete: 'new-password' }"
                     show-password-on="click"
                     type="password" />
                 </h-form-item-gi>
@@ -239,6 +281,7 @@ onMounted(() => {
                   <h-input
                     v-model:value="passwords.newPasswordConfirmation"
                     :disabled="!passwords.password"
+                    :input-props="{ autocomplete: 'new-password' }"
                     show-password-on="click"
                     type="password" />
                 </h-form-item-gi>
@@ -246,7 +289,57 @@ onMounted(() => {
             </h-form>
           </template>
         </h-card>
+        <h-card :bordered="false" embedded segmented size="small">
+          <template #header>Supprimer mon compte</template>
+          <template #default>
+            <h-flex align="center" justify="space-between">
+              <h-text depth="3">
+                Votre compte, votre profil et vos paramètres sont supprimés définitivement.
+              </h-text>
+              <h-button ghost type="error" @click="openDeleteModal()">
+                Supprimer mon compte
+              </h-button>
+            </h-flex>
+          </template>
+        </h-card>
       </h-flex>
+      <h-modal
+        v-model:show="showDeleteModal"
+        :icon="() => renderNaiveFontAwesomeIcon({ fas: 'triangle-exclamation' })"
+        class="apple-menu"
+        preset="dialog"
+        title="Supprimer mon compte"
+        transform-origin="center"
+        type="error">
+        <template #default>
+          <h-form
+            ref="deleteFormRef"
+            :model="deleteForm"
+            :rules="deleteRules"
+            @submit.prevent="handleDelete()">
+            <h-flex vertical>
+              <h-text>
+                Cette action est définitive : votre compte, votre profil et vos paramètres seront
+                supprimés et ne pourront pas être récupérés. Saisissez votre mot de passe pour
+                confirmer.
+              </h-text>
+              <h-form-item label="Mot de passe" path="password">
+                <h-input
+                  v-model:value="deleteForm.password"
+                  :input-props="{ autocomplete: 'current-password' }"
+                  show-password-on="click"
+                  type="password" />
+              </h-form-item>
+              <h-flex justify="end">
+                <h-button @click="showDeleteModal = false">Annuler</h-button>
+                <h-button :loading="deleting" attr-type="submit" type="error">
+                  Supprimer définitivement
+                </h-button>
+              </h-flex>
+            </h-flex>
+          </h-form>
+        </template>
+      </h-modal>
     </template>
     <template #action-float>
       <n-float-button-group>

@@ -23,10 +23,10 @@ export const menuItems: MenuItem[] = [
     textColor: "rgb(255, 255, 255)",
   },
   {
-    externalLink: "https://gitlab.com/starbreakersdevteam",
-    label: "GitLab",
-    icon: ["fab", "gitlab"],
-    color: "rgb(226, 67, 41)",
+    externalLink: "https://github.com/StarbreakersNet",
+    label: "GitHub",
+    icon: ["fab", "github"],
+    color: "rgb(36, 41, 47)",
     textColor: "rgb(255, 255, 255)",
   },
   {

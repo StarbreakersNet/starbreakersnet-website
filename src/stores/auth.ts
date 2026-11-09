@@ -16,6 +16,9 @@ import type { UserType } from "@/types/User";
 
 type ProfileUpdate = Pick<UserType, "username" | "firstName" | "lastName">;
 
+// Résultat de la connexion : « unconfirmed » permet de proposer le renvoi du mail de confirmation
+export type LoginResult = "ok" | "unconfirmed" | "error";
+
 const CONFIRMATION_TEXT =
   "Merci de votre inscription ! Consultez vos emails et cliquez sur le lien de confirmation pour vous connecter";
 const CONFIRMATION_DURATION = 10000;
@@ -160,16 +163,36 @@ export const useAuthStore = defineStore("auth", () => {
     setTimeout(() => handleAuthChange(event, session), 0);
   });
 
-  async function login(email: string, password: string) {
+  async function login(email: string, password: string): Promise<LoginResult> {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       message.error(getAuthErrorMessage(error, "Email ou mot de passe incorrect"));
-      return false;
+      // GoTrue ne renvoie ce code qu'avec le bon mot de passe : il ne révèle pas quels emails existent
+      return error.code === "email_not_confirmed" ? "unconfirmed" : "error";
     }
 
     await loadUser(data.user);
     message.success("Vous êtes connecté");
+    return "ok";
+  }
+
+  // Nouveau lien de confirmation d'inscription, si le premier s'est perdu ou a expiré
+  async function resendConfirmation(email: string) {
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
+
+    if (error) {
+      message.error(getAuthErrorMessage(error, "Impossible de renvoyer le mail de confirmation"));
+      return false;
+    }
+
+    message.success("Un nouveau lien de confirmation vient de vous être envoyé", {
+      duration: CONFIRMATION_DURATION,
+    });
     return true;
   }
 
@@ -252,23 +275,34 @@ export const useAuthStore = defineStore("auth", () => {
     return true;
   }
 
-  async function updatePassword(currentPassword: string, newPassword: string) {
+  // Vérifie le mot de passe du membre connecté en se reconnectant avec (limites d'essais de GoTrue)
+  async function verifyPassword(
+    password: string,
+    wrongPasswordText = "Mot de passe actuel incorrect"
+  ) {
     if (!user.infos.me?.email) {
       return false;
     }
 
-    // Vérifie le mot de passe actuel en se reconnectant avec
-    const { error: verifyError } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: user.infos.me.email,
-      password: currentPassword,
+      password,
     });
 
-    if (verifyError) {
+    if (error) {
       const text =
-        verifyError.code === "invalid_credentials"
-          ? "Mot de passe actuel incorrect"
-          : getAuthErrorMessage(verifyError, "Impossible de vérifier le mot de passe actuel");
+        error.code === "invalid_credentials"
+          ? wrongPasswordText
+          : getAuthErrorMessage(error, "Impossible de vérifier le mot de passe actuel");
       message.error(text);
+      return false;
+    }
+
+    return true;
+  }
+
+  async function updatePassword(currentPassword: string, newPassword: string) {
+    if (!(await verifyPassword(currentPassword))) {
       return false;
     }
 
@@ -279,6 +313,26 @@ export const useAuthStore = defineStore("auth", () => {
       return false;
     }
 
+    return true;
+  }
+
+  // Suppression définitive du compte (profil et paramètres compris), après vérification du mot de passe
+  async function deleteAccount(password: string) {
+    if (!(await verifyPassword(password, "Mot de passe incorrect"))) {
+      return false;
+    }
+
+    const { error } = await supabase.rpc("delete_own_account");
+
+    if (error) {
+      message.error("Impossible de supprimer le compte");
+      return false;
+    }
+
+    // Le compte n'existe plus côté serveur : on efface seulement la session locale
+    await supabase.auth.signOut({ scope: "local" });
+    clearUser();
+    message.success("Votre compte a été supprimé");
     return true;
   }
 
@@ -320,11 +374,13 @@ export const useAuthStore = defineStore("auth", () => {
     passwordRecovery,
     whenReady,
     login,
+    resendConfirmation,
     logout,
     register,
     updateProfile,
     updateEmail,
     updatePassword,
+    deleteAccount,
     requestPasswordReset,
     resetPassword,
   };

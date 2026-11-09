@@ -168,7 +168,7 @@ yarn build      # type-check + build Vite dans dist/
 yarn preview    # sert dist/ en local
 ```
 
-L'image (`Dockerfile.prod`) installe les dépendances avec `yarn install --immutable`, construit le front avec `VITE_SUPABASE_URL` et `VITE_SUPABASE_PUBLISHABLE_KEY` passées en build args (le `.env` n'entre pas dans l'image), puis le sert avec nginx (`nginx.conf`, fallback SPA). Pour la tester en local :
+L'image (`Dockerfile.prod`) installe les dépendances avec `yarn install --immutable`, construit le front avec `VITE_SUPABASE_URL` et `VITE_SUPABASE_PUBLISHABLE_KEY` passées en build args (le `.env` n'entre pas dans l'image), puis le sert avec nginx. `nginx.conf` est un modèle traité au démarrage du conteneur : fallback SPA, compression gzip, cache d'un an sur `/assets/` (fichiers nommés d'après leur contenu) et revalidation d'`index.html`, et en-tête `X-Robots-Tag` pris dans la variable `ROBOTS_TAG` (vide en prod : pas d'en-tête). Pour la tester en local :
 
 ```bash
 docker build -f Dockerfile.prod -t starbreakersnet-front \
@@ -185,12 +185,12 @@ Une seule branche de référence, `main` :
 
 ```
 feature/xxx ──PR──▶ main   ──push──▶ beta (staging), en continu
-                       └──tag vX.Y.Z──▶ live (production), une fois la beta validée
+                       └──tag X.Y.Z───▶ live (production), une fois la beta validée
 ```
 
 - **`main` doit toujours être livrable** : on n'y fusionne (par PR) que des fonctionnalités terminées. La beta reflète `main` en permanence.
-- **Mise en production** : un tag `vX.Y.Z` sur un commit déjà validé en beta. Les migrations SQL passent donc toujours par la beta avant la prod.
-- **Correctif urgent** quand `main` contient un travail pas prêt : branche depuis le tag en prod (`git checkout -b hotfix/xyz vX.Y.Z`), correctif, nouveau tag `vX.Y.(Z+1)`, puis PR de la branche vers `main`.
+- **Mise en production** : un tag `X.Y.Z` (sans « v », comme les tags existants) sur un commit déjà validé en beta. Les migrations SQL passent donc toujours par la beta avant la prod.
+- **Correctif urgent** quand `main` contient un travail pas prêt : branche depuis le tag en prod (`git checkout -b hotfix/xyz X.Y.Z`), correctif, nouveau tag `X.Y.(Z+1)`, puis PR de la branche vers `main`.
 
 ### Environnements Dokploy
 
@@ -217,7 +217,7 @@ Le script génère de nouveaux secrets avec les scripts officiels, dans un dossi
 |---|---|---|
 | `.env.beta.shared` | `API_DOMAIN`, `SITE_DOMAIN`, `SUPABASE_PUBLISHABLE_KEY`, `API_GW_HTTP_PORT`, `FRONT_HTTP_PORT` (aucun secret) | [Variables de l'environnement Dokploy](https://docs.dokploy.com/docs/core/variables) (icône à droite du sélecteur d'environnement, **pas** « Project Environment », partagé avec la prod) |
 | `supabase/docker/.env.beta` | Secrets, `ENABLE_EMAIL_AUTOCONFIRM=false`, SMTP OVH (`ssl0.ovh.net:465`, expéditeur `noreply@starbreakers.net`), `DASHBOARD_USERNAME=admin`, et les valeurs communes par référence (`${{environment.API_DOMAIN}}`…) | Application « Supabase », Environment |
-| `.env.beta` | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `FRONT_HTTP_PORT`, par référence | Application « Front », Environment |
+| `.env.beta` | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `FRONT_HTTP_PORT` par référence, et `ROBOTS_TAG` (`noindex, nofollow` partout sauf sur `live`, pour que seule la prod soit indexée) | Application « Front », Environment |
 
 La clé publique et les domaines ne sont écrits qu'une fois par environnement : le front et la stack ne peuvent pas diverger. Les éditeurs signalent `${{…}}` comme une erreur de syntaxe `.env` : c'est la syntaxe de Dokploy, remplacée avant l'écriture du vrai `.env` sur le serveur. Sans `--shared`, les valeurs sont écrites directement dans les deux fichiers ; `--shared project` utilise les variables du projet (`${{project.…}}`).
 

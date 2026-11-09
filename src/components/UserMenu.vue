@@ -10,6 +10,7 @@ import { useAuthStore } from "@/stores/auth.ts";
 import { useUserStore } from "@/stores/user.ts";
 import { useSettingsStore } from "@/stores/settings.ts";
 import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
+import { formatUserTag } from "@/lib/userTag.ts";
 
 const auth = useAuthStore();
 const user = useUserStore();
@@ -17,10 +18,25 @@ const settings = useSettingsStore();
 const route = useRoute();
 const router = useRouter();
 const packageVersion = ref(version);
+const currentYear = new Date().getFullYear();
 const options = computed(() => {
   const items = [];
+  const me = user.infos.me;
 
   if (user.infos.connected) {
+    // Membre connecté, en tête du menu : « Renard#0421 »
+    if (me) {
+      items.push({
+        key: "identity",
+        type: "render",
+        render: () =>
+          h("div", { class: "user-identity" }, [
+            h("span", { class: "username" }, me.username),
+            h("span", { class: "tag" }, formatUserTag(me.tag)),
+          ]),
+      });
+      items.push({ key: "identity-divider", type: "divider" });
+    }
     items.push({
       label: "Mon compte",
       key: "account",
@@ -44,6 +60,11 @@ const options = computed(() => {
   items.push({
     label: "À propos",
     key: "about",
+  });
+
+  items.push({
+    label: "Mentions légales",
+    key: "legal",
   });
 
   items.push({
@@ -160,10 +181,11 @@ function handleSelect(key) {
           <n-text>
             Si vous êtes intéressé pour participer au développement, n'hésitez pas à contacter
             <n-text strong type="info">TheRedfoox</n-text>
-            sur Discord ou le GitLab.
+            sur Discord ou à passer sur notre
+            <n-a href="https://github.com/StarbreakersNet" target="_blank">GitHub</n-a>
           </n-text>
           <n-text code>
-            <p>Version {{ packageVersion }} © 2024</p>
+            <p>Version {{ packageVersion }} © 2024–{{ currentYear }}</p>
           </n-text>
         </n-flex>
       </template>
@@ -173,6 +195,7 @@ function handleSelect(key) {
       :show="showLoginModal"
       class="apple-menu"
       preset="dialog"
+      title="Connexion"
       transform-origin="center"
       @update:show="!$event && closeLoginModal()">
       <template #default>
@@ -189,6 +212,16 @@ function handleSelect(key) {
   &.n-dropdown-menu:not(.n-dropdown-menu--scrollable) {
     padding: variables.$sn-main-padding;
     border-radius: variables.$sn-apple-border-radius;
+  }
+
+  .user-identity {
+    padding: 0.25em 0.75em;
+    font-weight: 500;
+
+    .tag {
+      margin-left: 0.15em;
+      opacity: 0.6;
+    }
   }
 }
 </style>

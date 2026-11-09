@@ -273,6 +273,8 @@ function setupDeploy(name, options) {
 VITE_SUPABASE_URL=https://${ref("API_DOMAIN")}
 VITE_SUPABASE_PUBLISHABLE_KEY=${ref("SUPABASE_PUBLISHABLE_KEY")}
 FRONT_HTTP_PORT=${ref("FRONT_HTTP_PORT")}
+# Moteurs de recherche : seule la prod (« live ») est indexée
+ROBOTS_TAG=${name === "live" ? "" : "noindex, nofollow"}
 `
   );
 
