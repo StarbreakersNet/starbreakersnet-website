@@ -47,6 +47,11 @@ const options = computed(() => {
   });
 
   items.push({
+    label: "Mentions légales",
+    key: "legal",
+  });
+
+  items.push({
     key: "version",
     type: "render",
     render: () => {

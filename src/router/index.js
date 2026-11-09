@@ -31,12 +31,9 @@ const router = createRouter({
       component: ViewerYoutube,
     },
     {
-      path: "/about",
-      name: "about",
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import("@/views/AboutView.vue"),
+      path: "/mentions-legales",
+      name: "legal",
+      component: () => import("@/views/LegalView.vue"),
     },
     {
       path: "/account",
@@ -49,6 +46,12 @@ const router = createRouter({
       path: "/reset-password",
       name: "reset-password",
       component: () => import("@/views/ResetPasswordView.vue"),
+    },
+    {
+      // Toute adresse inconnue (doit rester la dernière route)
+      path: "/:pathMatch(.*)*",
+      name: "not-found",
+      component: () => import("@/views/NotFoundView.vue"),
     },
   ],
 });
