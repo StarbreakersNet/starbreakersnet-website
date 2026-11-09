@@ -14,5 +14,8 @@ RUN yarn build
 # Stage 2 : Serve with Nginx
 FROM nginx:alpine AS production-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+# Modèle traité au démarrage par l'image officielle (envsubst) vers /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf /etc/nginx/templates/default.conf.template
+# Valeur de X-Robots-Tag : vide par défaut (prod, en-tête absent), remplacée par docker-compose.front.yml
+ENV ROBOTS_TAG=""
 CMD ["nginx", "-g", "daemon off;"]

@@ -15,5 +15,9 @@ services:
         VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
         VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
     restart: unless-stopped
+    environment:
+      # En-tête X-Robots-Tag : « noindex, nofollow » sur la beta pour qu'elle ne soit pas indexée,
+      # vide en prod (voir nginx.conf)
+      ROBOTS_TAG: ${ROBOTS_TAG:-}
     ports:
       - "${DOCKER_BRIDGE_IP:-172.17.0.1}:${FRONT_HTTP_PORT:?FRONT_HTTP_PORT doit être défini (port propre à l'environnement)}:80"
