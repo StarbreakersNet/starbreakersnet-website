@@ -7,7 +7,7 @@ import HFormItem from "@/components/c/hFormItem.vue";
 import HInput from "@/components/c/hInput.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HButton from "@/components/c/hButton.vue";
-import { emailRule, passwordRule, usernameRule } from "@/lib/validation";
+import { emailRule, passwordRule, USERNAME_MAX_LENGTH, usernameRule } from "@/lib/validation";
 
 const auth = useAuthStore();
 
@@ -46,7 +46,10 @@ async function handleSubmit() {
   <div class="signup-container">
     <h-form ref="formRef" :model="registerForm" :rules="rules" @submit.prevent="handleSubmit()">
       <h-form-item label="Nom d'utilisateur" path="username">
-        <h-input v-model:value="registerForm.username" placeholder="" />
+        <h-input
+          v-model:value="registerForm.username"
+          :maxlength="USERNAME_MAX_LENGTH"
+          placeholder="" />
       </h-form-item>
       <h-form-item label="Email" path="email">
         <h-input v-model:value="registerForm.email" placeholder="" />
