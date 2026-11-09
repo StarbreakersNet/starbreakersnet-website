@@ -1,0 +1,65 @@
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faArrowLeft,
+  faArrowUpRightFromSquare,
+  faBars,
+  faCartShopping,
+  faCircleUser,
+  faClock,
+  faCookieBite,
+  faDatabase,
+  faDownload,
+  faEnvelope,
+  faFloppyDisk,
+  faHouse,
+  faImage,
+  faKey,
+  faMagnifyingGlass,
+  faMessage,
+  faRightToBracket,
+  faScaleBalanced,
+  faServer,
+  faSpinner,
+  faTriangleExclamation,
+  faUpRightFromSquare,
+  faUser,
+  faUserPlus,
+  faUserShield,
+} from "@fortawesome/free-solid-svg-icons";
+import { faDiscord, faGithub, faYoutube } from "@fortawesome/free-brands-svg-icons";
+
+// Icônes FontAwesome du site, enregistrées une par une : charger les collections entières (fas, far,
+// fab) ajoutait plusieurs milliers d'icônes au bundle. Une icône utilisée par son nom
+// (icon="…" ou ["fas", "…"]) doit figurer ici, sinon elle ne s'affiche pas (avertissement en console).
+// Les anciens noms (home, save, user-circle, sign-in-alt…) restent valables : ce sont des alias des
+// icônes ci-dessous.
+library.add(
+  faArrowLeft,
+  faArrowUpRightFromSquare,
+  faBars,
+  faCartShopping,
+  faCircleUser,
+  faClock,
+  faCookieBite,
+  faDatabase,
+  faDownload,
+  faEnvelope,
+  faFloppyDisk,
+  faHouse,
+  faImage,
+  faKey,
+  faMagnifyingGlass,
+  faMessage,
+  faRightToBracket,
+  faScaleBalanced,
+  faServer,
+  faSpinner,
+  faTriangleExclamation,
+  faUpRightFromSquare,
+  faUser,
+  faUserPlus,
+  faUserShield,
+  faDiscord,
+  faGithub,
+  faYoutube
+);
