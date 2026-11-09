@@ -1,0 +1,64 @@
+{{- /* Mot de passe oublié : lien de réinitialisation. Voir supabase/templates/README.md */ -}}
+{{- $en := and .Data (eq (printf "%v" .Data.locale) "en") -}}
+<!doctype html>
+<html lang="{{ if $en }}en{{ else }}fr{{ end }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{{ if $en }}Reset your password{{ else }}Réinitialisez votre mot de passe{{ end }}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f2f2f4;">
+  <div style="display:none;max-height:0;overflow:hidden;">
+    {{ if $en }}Choose a new password for your StarbreakersNet account.{{ else }}Choisissez un nouveau mot de passe pour votre compte StarbreakersNet.{{ end }}
+  </div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f2f2f4;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background-color:#ffffff;border-radius:12px;">
+          <tr>
+            <td align="center" style="padding:32px 32px 8px;">
+              <img src="{{ .SiteURL }}/icon-192.png" width="64" height="64" alt="StarbreakersNet" style="display:block;border:0;">
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 32px 0;font-family:Arial,Helvetica,sans-serif;color:#1f1f24;font-size:16px;line-height:24px;">
+              {{ if $en }}
+              <h1 style="margin:0 0 16px;font-size:22px;line-height:30px;">Reset your password</h1>
+              <p style="margin:0 0 16px;">We received a request to reset the password of the StarbreakersNet account linked to {{ .Email }}. Click the button below to choose a new one.</p>
+              {{ else }}
+              <h1 style="margin:0 0 16px;font-size:22px;line-height:30px;">Réinitialisez votre mot de passe</h1>
+              <p style="margin:0 0 16px;">Nous avons reçu une demande de réinitialisation du mot de passe du compte StarbreakersNet associé à {{ .Email }}. Cliquez sur le bouton ci-dessous pour en choisir un nouveau.</p>
+              {{ end }}
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:8px 32px 24px;">
+              <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:12px 28px;background-color:#bd0000;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;text-decoration:none;border-radius:8px;">{{ if $en }}Choose a new password{{ else }}Choisir un nouveau mot de passe{{ end }}</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 32px 32px;font-family:Arial,Helvetica,sans-serif;color:#5c5c66;font-size:13px;line-height:20px;">
+              {{ if $en }}
+              <p style="margin:0 0 12px;">If the button doesn't work, copy this link into your browser:</p>
+              {{ else }}
+              <p style="margin:0 0 12px;">Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</p>
+              {{ end }}
+              <p style="margin:0 0 16px;word-break:break-all;"><a href="{{ .ConfirmationURL }}" style="color:#bd0000;">{{ .ConfirmationURL }}</a></p>
+              {{ if $en }}
+              <p style="margin:0;">If you didn't request this, you can ignore this email: your password stays the same.</p>
+              {{ else }}
+              <p style="margin:0;">Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : votre mot de passe reste inchangé.</p>
+              {{ end }}
+            </td>
+          </tr>
+        </table>
+        <p style="margin:16px 0 0;font-family:Arial,Helvetica,sans-serif;color:#8a8a94;font-size:12px;line-height:18px;">
+          {{ if $en }}Automated email, please do not reply.{{ else }}Email automatique, merci de ne pas y répondre.{{ end }}
+          · <a href="{{ .SiteURL }}" style="color:#8a8a94;">StarbreakersNet</a>
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Starbreakers.net : ajustements communs à tous les environnements (local, staging, prod).
+# StarbreakersNet : ajustements communs à tous les environnements (local, staging, prod).
 #
 # Les fichiers officiels de Supabase (docker-compose.yml, volumes/, utils/…) ne sont pas modifiés,
 # pour que `sh update.sh` puisse les mettre à jour. Tout ce qui est propre au projet est ici.
@@ -29,6 +29,29 @@ services:
       # Règles de mot de passe, à garder alignées avec src/lib/validation.ts
       GOTRUE_PASSWORD_MIN_LENGTH: 8
       GOTRUE_PASSWORD_REQUIRED_CHARACTERS: "abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789"
+      # Mails en français, ou en anglais si user_metadata.locale vaut "en" (voir ../templates/README.md).
+      # GoTrue télécharge les modèles par URL (service mail-templates) et les garde 10 min en cache.
+      # Les objets sont eux aussi des modèles Go, évalués avec les mêmes données.
+      GOTRUE_MAILER_TEMPLATES_CONFIRMATION: http://mail-templates/confirmation.html
+      GOTRUE_MAILER_TEMPLATES_RECOVERY: http://mail-templates/recovery.html
+      GOTRUE_MAILER_TEMPLATES_EMAIL_CHANGE: http://mail-templates/email_change.html
+      GOTRUE_MAILER_TEMPLATES_INVITE: http://mail-templates/invite.html
+      GOTRUE_MAILER_SUBJECTS_CONFIRMATION: '{{ if and .Data (eq (printf "%v" .Data.locale) "en") }}Confirm your StarbreakersNet sign-up{{ else }}Confirmez votre inscription sur StarbreakersNet{{ end }}'
+      GOTRUE_MAILER_SUBJECTS_RECOVERY: '{{ if and .Data (eq (printf "%v" .Data.locale) "en") }}Reset your StarbreakersNet password{{ else }}Réinitialisation de votre mot de passe StarbreakersNet{{ end }}'
+      GOTRUE_MAILER_SUBJECTS_EMAIL_CHANGE: '{{ if and .Data (eq (printf "%v" .Data.locale) "en") }}Confirm your new email address{{ else }}Confirmez votre nouvelle adresse email{{ end }}'
+      GOTRUE_MAILER_SUBJECTS_INVITE: '{{ if and .Data (eq (printf "%v" .Data.locale) "en") }}You''re invited to StarbreakersNet{{ else }}Invitation à rejoindre StarbreakersNet{{ end }}'
+  # Sert les modèles de mail de GoTrue (../templates), uniquement sur le réseau interne de la stack.
+  # Modèles copiés dans l'image plutôt que montés : Dokploy re-clone le code à chaque déploiement, et
+  # un conteneur qui monte le dossier supprimé continuerait de tourner en servant un dossier vide.
+  # pull_policy: build reconstruit l'image à chaque `up` (sans --build dans la commande Dokploy).
+  mail-templates:
+    build:
+      context: ../templates
+      dockerfile_inline: |
+        FROM nginx:1.29-alpine
+        COPY *.html /usr/share/nginx/html/
+    pull_policy: build
+    restart: unless-stopped
   rest:
     container_name: !reset null
   realtime:

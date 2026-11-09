@@ -21,6 +21,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
 |---|---|
 | `src/`, `public/`… | Front Vue |
 | `supabase/config.toml`, `supabase/migrations/` | Projet de la [CLI Supabase](https://supabase.com/docs/guides/cli) : le schéma de la base, en migrations SQL |
+| `supabase/templates/` | Modèles des mails d'authentification, en français et en anglais (voir [son README](supabase/templates/README.md)) |
 | `supabase/docker/` | Stack Supabase self-hosted : **copie du dossier [`docker/` officiel](https://github.com/supabase/supabase/tree/master/docker)**, version notée dans `.supabase-version` |
 | `supabase/docker/docker-compose.starbreakers.yml` | Nos réglages, communs à tous les environnements (voir ci-dessous) |
 | `supabase/docker/docker-compose.local.yml` | Local uniquement : Caddy (HTTPS), Mailpit, Postgres sur `127.0.0.1` |
@@ -38,6 +39,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
 - **données dans des volumes nommés** (`db-data`, `storage-data`, `studio-snippets`) : Dokploy vide le dossier du code à chaque déploiement ;
 - **Edge Functions et Supavisor désactivés** : réactivables en retirant leurs lignes ;
 - **règles de mot de passe** de GoTrue : 8 caractères minimum, avec minuscule, majuscule et chiffre, alignées avec `src/lib/validation.ts` ;
+- **mails d'authentification en français** (ou en anglais selon `user_metadata.locale`) : modèles de `supabase/templates`, servis à GoTrue par le service interne `mail-templates` (image nginx reconstruite à chaque `up`), et objets des mails ;
 - **service `migrations`** : vérifie les secrets, puis applique `supabase/migrations`. La passerelle (et donc l'API et Studio) ne démarre que s'il réussit.
 
 ## Prérequis
@@ -78,8 +80,8 @@ Aucun service tiers : tout tourne sur nos serveurs.
     | `SMTP_HOST` / `SMTP_PORT` | `mailpit` / `1025` |
     | `SMTP_USER` / `SMTP_PASS` | vides |
     | `SMTP_ADMIN_EMAIL` | `noreply@starbreakers.localhost` |
-    | `SMTP_SENDER_NAME` | `Starbreakers.net` |
-    | `STUDIO_DEFAULT_ORGANIZATION` / `STUDIO_DEFAULT_PROJECT` | `Starbreakers.net` / `starbreakersnet-website` |
+    | `SMTP_SENDER_NAME` | `StarbreakersNet` |
+    | `STUDIO_DEFAULT_ORGANIZATION` / `STUDIO_DEFAULT_PROJECT` | `StarbreakersNet` / `starbreakersnet-website` |
 
 3. Démarrer la stack (depuis `supabase/docker`, ou avec la run configuration IntelliJ **dev**) :
     ```bash
@@ -285,7 +287,8 @@ Studio n'a pas de connexion à lui : le navigateur garde les identifiants jusqu'
 - [ ] La double authentification est active sur Dokploy.
 - [ ] `https://<domaine de l'API>/auth/v1/health` avec l'en-tête `apikey: <SUPABASE_PUBLISHABLE_KEY>` répond `200`.
 - [ ] Logs du service `migrations` : secrets acceptés, migrations appliquées.
-- [ ] Inscription → mail de confirmation reçu → connexion → `/account` → mot de passe oublié.
+- [ ] Inscription → mail de confirmation reçu, en français et hors spam → connexion → `/account` → mot de passe oublié.
+- [ ] Source brute d'un mail reçu : `spf=pass`, `dkim=pass` et `dmarc=pass` dans `Authentication-Results`.
 
 ## Exploitation
 
