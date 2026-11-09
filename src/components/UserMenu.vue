@@ -18,6 +18,7 @@ const settings = useSettingsStore();
 const route = useRoute();
 const router = useRouter();
 const packageVersion = ref(version);
+const currentYear = new Date().getFullYear();
 const options = computed(() => {
   const items = [];
   const me = user.infos.me;
@@ -180,10 +181,11 @@ function handleSelect(key) {
           <n-text>
             Si vous êtes intéressé pour participer au développement, n'hésitez pas à contacter
             <n-text strong type="info">TheRedfoox</n-text>
-            sur Discord ou le GitLab.
+            sur Discord ou à passer sur notre
+            <n-a href="https://github.com/StarbreakersNet" target="_blank">GitHub</n-a>
           </n-text>
           <n-text code>
-            <p>Version {{ packageVersion }} © 2024</p>
+            <p>Version {{ packageVersion }} © 2024–{{ currentYear }}</p>
           </n-text>
         </n-flex>
       </template>

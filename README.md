@@ -185,12 +185,12 @@ Une seule branche de référence, `main` :
 
 ```
 feature/xxx ──PR──▶ main   ──push──▶ beta (staging), en continu
-                       └──tag vX.Y.Z──▶ live (production), une fois la beta validée
+                       └──tag X.Y.Z───▶ live (production), une fois la beta validée
 ```
 
 - **`main` doit toujours être livrable** : on n'y fusionne (par PR) que des fonctionnalités terminées. La beta reflète `main` en permanence.
-- **Mise en production** : un tag `vX.Y.Z` sur un commit déjà validé en beta. Les migrations SQL passent donc toujours par la beta avant la prod.
-- **Correctif urgent** quand `main` contient un travail pas prêt : branche depuis le tag en prod (`git checkout -b hotfix/xyz vX.Y.Z`), correctif, nouveau tag `vX.Y.(Z+1)`, puis PR de la branche vers `main`.
+- **Mise en production** : un tag `X.Y.Z` (sans « v », comme les tags existants) sur un commit déjà validé en beta. Les migrations SQL passent donc toujours par la beta avant la prod.
+- **Correctif urgent** quand `main` contient un travail pas prêt : branche depuis le tag en prod (`git checkout -b hotfix/xyz X.Y.Z`), correctif, nouveau tag `X.Y.(Z+1)`, puis PR de la branche vers `main`.
 
 ### Environnements Dokploy
 
