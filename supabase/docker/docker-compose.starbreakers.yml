@@ -90,8 +90,20 @@ services:
 
   # --- Migrations du projet (../migrations), appliquées par la CLI Supabase après vérification
   # des secrets. One-shot : l'API ne démarre que s'il se termine avec succès.
+  #
+  # La CLI est installée dans une image construite une seule fois par serveur (et non par npm à
+  # chaque déploiement, qui dépendait du registre npm). Pour changer de version : modifier
+  # SUPABASE_CLI_VERSION et le tag de l'image ensemble, ce qui fait construire la nouvelle image.
   migrations:
-    image: node:22-alpine
+    image: starbreakersnet-migrations:supabase-3.0.0
+    build:
+      context: .
+      args:
+        SUPABASE_CLI_VERSION: 3.0.0
+      dockerfile_inline: |
+        FROM node:22-alpine
+        ARG SUPABASE_CLI_VERSION
+        RUN npm install -g supabase@$${SUPABASE_CLI_VERSION} --silent
     restart: "no"
     depends_on:
       db:
@@ -123,7 +135,6 @@ services:
     command:
       - |
         sh /check-secrets.sh /env.example &&
-        npm install -g supabase@3.0.0 --silent &&
         supabase db push --yes --remote="postgresql://postgres:$${POSTGRES_PASSWORD}@db:5432/$${POSTGRES_DB}?sslmode=disable"
 
 volumes:
