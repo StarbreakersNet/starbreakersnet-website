@@ -19,6 +19,8 @@ const router = createRouter({
       path: "/bonjourr",
       name: "bonjourr",
       component: ViewerBonjourr,
+      // Bonjourr affiche déjà l'heure : pas d'horloge dans l'en-tête (voir UserMenu.vue)
+      meta: { hideClock: true },
     },
     {
       path: "/discord",

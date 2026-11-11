@@ -138,7 +138,12 @@ function handleSelect(key) {
   <div>
     <n-flex key="menu" :size="0" align="center" class="apple-container">
       <transition-group name="insert">
-        <n-tag key="icon" :bordered="false" :color="{ color: 'transparent' }" round>
+        <n-tag
+          v-if="!route.meta.hideClock"
+          key="icon"
+          :bordered="false"
+          :color="{ color: 'transparent' }"
+          round>
           <n-flex align="center">
             <time-clock key="time" />
           </n-flex>
