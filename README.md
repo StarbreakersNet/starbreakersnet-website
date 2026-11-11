@@ -31,6 +31,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
 | `scripts/setup-env.mjs` | Génération des `.env` (`yarn env:local`, `yarn env:deploy`) |
 | `scripts/bonjourr/`, `public/apps/bonjourr/` | Bonjourr auto-hébergé : script de build et build installé (voir [Bonjourr](#bonjourr)) |
 | `caddy/Caddyfile` | Proxy HTTPS local |
+| `.claude/settings.json` | Réglages Claude Code partagés (sessions locales et cloud) : pas de mention « Generated with Claude Code » ni de lien de session dans les commits et les PR |
 
 **Règle : on ne modifie pas les fichiers officiels de `supabase/docker/`.** Tout ce qui est propre au projet passe par le `.env` et par les trois fichiers d'override ci-dessus, pour que [`update.sh`](#mettre-à-jour-supabase) puisse mettre la stack à jour. Seule exception : les quatre lignes de `docker-compose.yml` activées par `utils/add-new-auth-keys.sh`, comme le fait l'installation officielle.
 
