@@ -29,6 +29,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
 | `supabase/docker/check-secrets.sh` | Garde-fou : refuse de démarrer avec des secrets d'exemple |
 | `docker-compose.front.yml`, `Dockerfile.prod`, `nginx.conf` | Image du front (staging/prod) |
 | `scripts/setup-env.mjs` | Génération des `.env` (`yarn env:local`, `yarn env:deploy`) |
+| `scripts/bonjourr/`, `public/apps/bonjourr/` | Bonjourr auto-hébergé : script de build et build installé (voir [Bonjourr](#bonjourr)) |
 | `caddy/Caddyfile` | Proxy HTTPS local |
 
 **Règle : on ne modifie pas les fichiers officiels de `supabase/docker/`.** Tout ce qui est propre au projet passe par le `.env` et par les trois fichiers d'override ci-dessus, pour que [`update.sh`](#mettre-à-jour-supabase) puisse mettre la stack à jour. Seule exception : les quatre lignes de `docker-compose.yml` activées par `utils/add-new-auth-keys.sh`, comme le fait l'installation officielle.
@@ -325,6 +326,15 @@ Bien qu'elle se veuille minimale, elle vous offre de nombreuses options pour la 
 - 📝 Polices personnalisées
 - 🔒 Privacy focused
 - 🌎 Multilanguage
+
+#### Auto-hébergement
+
+La page `/bonjourr` affiche notre propre build de Bonjourr, servi par le site depuis `public/apps/bonjourr/` (et non plus le site online.bonjourr.fr).
+
+- **Mise à jour** : modifier `BONJOURR_COMMIT` et `BONJOURR_VERSION` dans `scripts/bonjourr/update.mjs`, lancer `yarn bonjourr:update`, vérifier la page `/bonjourr`, puis committer `public/apps/bonjourr/`. Le script récupère les sources à ce commit, lance le build officiel (`deno task build online`, Deno via `npx`) et applique nos adaptations, listées dans `public/apps/bonjourr/SOURCE.md`. Il échoue si une adaptation ne s'applique plus, plutôt que de livrer un build cassé.
+- **Stockage cloisonné** : Bonjourr partage l'origine du site. `storage-shim.js` préfixe ses clés de `localStorage` et `sessionStorage` (`bonjourr:…`), car son bouton « Réinitialiser » vide sinon tout le stockage de l'origine, session Supabase comprise.
+- **Services externes** : fonds d'écran, météo et citations viennent toujours de `services.bonjourr.fr`, `weather.bonjourr.fr` et `images.unsplash.com`.
+- **Licence** : Bonjourr est sous GPL-3.0, comme ce dépôt. La licence et la provenance du build sont dans `public/apps/bonjourr/` (`LICENSE.md`, `SOURCE.md`).
 
 <h1 align="center">
   <a href="https://github.com/victrme/Bonjourr">

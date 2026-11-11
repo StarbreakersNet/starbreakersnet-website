@@ -167,12 +167,15 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                   <h-text>
                     Aucun cookie publicitaire ni de mesure d'audience. Votre navigateur garde
                     seulement votre session et votre choix de thème, indispensables au
-                    fonctionnement du site : ils ne demandent donc pas de consentement.
+                    fonctionnement du site : ils ne demandent donc pas de consentement. Si vous
+                    utilisez Bonjourr, ses réglages y sont aussi enregistrés.
                   </h-text>
                   <h-text depth="3">
-                    Les pages Discord, Le Zap et Bonjourr affichent des contenus de services tiers,
-                    qui peuvent déposer leurs propres cookies. La vidéo YouTube est intégrée en mode
-                    « confidentialité renforcée ».
+                    Les pages Discord et Le Zap affichent des contenus de services tiers, qui
+                    peuvent déposer leurs propres cookies. La vidéo YouTube est intégrée en mode «
+                    confidentialité renforcée ». Bonjourr est hébergé par le site, mais interroge
+                    les services de Bonjourr (fonds d'écran, météo, citations) et charge ses images
+                    depuis Unsplash.
                   </h-text>
                 </h-flex>
               </template>

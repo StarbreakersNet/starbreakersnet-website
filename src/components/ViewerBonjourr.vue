@@ -1,15 +1,16 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import MimicBackend from "@/stores/MimicBackend";
 import AppContainer from "@/components/AppContainer.vue";
 
-const url: string = MimicBackend.getViewerBonjourrUrl();
+// Bonjourr auto-hébergé : build installé dans public/apps/bonjourr par `yarn bonjourr:update`
+// (scripts/bonjourr/update.mjs). Même origine que le site, stockage cloisonné (storage-shim.js).
+const url = `${import.meta.env.BASE_URL}apps/bonjourr/index.html`;
 const isIframeLoaded = ref(false);
 </script>
 
 <template>
   <app-container :loaded="isIframeLoaded" app="bonjourr">
-    <iframe :src="url" allowtransparency="true" @load="isIframeLoaded = true" />
+    <iframe :src="url" title="Bonjourr" @load="isIframeLoaded = true" />
   </app-container>
 </template>
 
