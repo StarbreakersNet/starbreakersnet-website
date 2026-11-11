@@ -37,9 +37,10 @@ function patch(file, search, replacement) {
   writeFileSync(file, content.replace(search, replacement));
 }
 
-// site-sync.js (réglages communs avec le site) s'appuie sur des éléments internes de Bonjourr, sans
-// modifier son code. Si une nouvelle version les change, la synchronisation cesserait sans erreur :
+// site-sync.js (intégration dans la page du site) s'appuie sur des éléments internes de Bonjourr,
+// sans modifier son code. Si une nouvelle version les change, l'intégration cesserait sans erreur :
 // on refuse donc la mise à jour, en expliquant quoi corriger dans site-sync.js.
+// Chaque élément est vérifié par « search » (texte présent dans le fichier) ou par « check ».
 const SITE_SYNC_REQUIREMENTS = [
   {
     file: "src/scripts/main.js",
@@ -57,24 +58,50 @@ const SITE_SYNC_REQUIREMENTS = [
   },
   {
     file: "index.html",
-    search: 'class="darkmode wrapper"',
-    what: "Le bloc « Mode sombre » des réglages de Bonjourr n'a plus la classe « darkmode wrapper »",
-    impact: "l'option « Mode sombre » réapparaîtrait dans Bonjourr, sans effet",
-    fix: "retrouver le bloc qui contient <select id=\"i_dark\"> dans index.html et adapter la règle CSS de site-sync.js",
+    search:
+      'le bloc <div class="as as_visuals dropdown">, jusqu\'à class="settingshide wrapper", ' +
+      "avec pour seuls réglages i_dark, i_favicon et i_tabtitle",
+    check(html) {
+      const start = html.indexOf('<div class="as as_visuals dropdown">');
+      const end = html.indexOf('class="settingshide wrapper"', start);
+      if (start === -1 || end === -1) return false;
+      const ids = [...html.slice(start, end).matchAll(/id="(i_[^"]+)"/g)].map(match => match[1]);
+      return ids.sort().join(",") === "i_dark,i_favicon,i_tabtitle";
+    },
+    what: "Le bloc « as_visuals » des réglages, masqué par site-sync.js, a changé (il ne doit contenir que « Mode sombre » et « Onglet »)",
+    impact:
+      "un nouveau réglage de ce bloc serait masqué sans raison, ou « Mode sombre » et « Onglet » réapparaîtraient sans effet",
+    fix: "regarder le contenu de ce bloc dans index.html et adapter la règle CSS de site-sync.js pour ne masquer que « Mode sombre » et « Onglet »",
+  },
+  {
+    file: "src/scripts/main.js",
+    search: 'globalThis.open(url, "_self");',
+    what: "La barre de recherche de Bonjourr n'ouvre plus ses résultats avec globalThis.open(url, \"_self\") (fonction submitSearch)",
+    impact:
+      "avec « Ouvrir dans un nouvel onglet » désactivé, les recherches pourraient s'ouvrir dans l'iframe, où la plupart des sites refusent de s'afficher",
+    fix: "retrouver comment submitSearch (main.js) ouvre les résultats et adapter le remplacement de window.open dans site-sync.js",
+  },
+  {
+    file: "src/scripts/main.js",
+    search: 'anchor.removeAttribute("target");',
+    what: "Les liens rapides ne sont plus de simples liens sans cible quand « Ouvrir dans un nouvel onglet » est désactivé (fonction setOpenInNewTab)",
+    impact: "les liens rapides pourraient s'ouvrir dans l'iframe, où la plupart des sites refusent de s'afficher",
+    fix: "retrouver comment setOpenInNewTab et les liens rapides (main.js) ouvrent les pages et adapter l'écouteur de clic de site-sync.js",
   },
 ];
 
 function checkSiteSync(release) {
-  const broken = SITE_SYNC_REQUIREMENTS.filter(
-    ({ file, search }) => !readFileSync(join(release, file), "utf8").includes(search)
-  );
+  const broken = SITE_SYNC_REQUIREMENTS.filter(({ file, search, check }) => {
+    const content = readFileSync(join(release, file), "utf8");
+    return check ? !check(content) : !content.includes(search);
+  });
   if (broken.length === 0) return;
 
   const details = broken
     .map(
       ({ file, search, what, impact, fix }, index) =>
         `${index + 1}. ${what}.\n` +
-        `   Introuvable dans ${file} : ${search}\n` +
+        `   Attendu dans ${file} : ${search}\n` +
         `   Conséquence : ${impact}.\n` +
         `   À faire : ${fix}.`
     )
@@ -82,7 +109,7 @@ function checkSiteSync(release) {
 
   throw new Error(
     `Bonjourr ${BONJOURR_VERSION} (commit ${BONJOURR_COMMIT}) n'est pas compatible avec ` +
-      `scripts/bonjourr/site-sync.js (thème synchronisé avec le site).\n\n${details}\n\n` +
+      `scripts/bonjourr/site-sync.js (intégration dans la page du site).\n\n${details}\n\n` +
       `Rien n'a été installé : public/apps/bonjourr contient toujours la version précédente.\n` +
       `Corriger site-sync.js, puis mettre à jour SITE_SYNC_REQUIREMENTS dans ce script et relancer ` +
       `yarn bonjourr:update.`
@@ -151,7 +178,8 @@ Construit par scripts/bonjourr/update.mjs depuis ${BONJOURR_REPO.replace(/\.git$
 Licence : GNU GPL v3 (LICENSE.md). Modifications apportées au build :
 
 - index.html : chargement de storage-shim.js, qui préfixe les clés de localStorage et sessionStorage,
-  et de site-sync.js, qui applique le thème du site et masque l'option « Mode sombre »
+  et de site-sync.js, qui intègre Bonjourr à la page du site : thème du site appliqué, options
+  « Mode sombre » et « Onglet » masquées, liens et recherche ouverts dans l'onglet plutôt que dans l'iframe
 - src/scripts/main.js : traductions chargées depuis _locales/ (relatif à index.html, et non à la
   racine du domaine) ; enregistrement du service worker supprimé
 `

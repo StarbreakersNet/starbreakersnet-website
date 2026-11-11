@@ -334,7 +334,12 @@ La page `/bonjourr` affiche notre propre build de Bonjourr, servi par le site de
 
 - **Mise à jour** : modifier `BONJOURR_COMMIT` et `BONJOURR_VERSION` dans `scripts/bonjourr/update.mjs`, lancer `yarn bonjourr:update`, vérifier la page `/bonjourr`, puis committer `public/apps/bonjourr/`. Le script récupère les sources à ce commit, lance le build officiel (`deno task build online`, Deno via `npx`) et applique nos adaptations, listées dans `public/apps/bonjourr/SOURCE.md`. Il échoue si une adaptation ne s'applique plus, plutôt que de livrer un build cassé.
 - **Stockage cloisonné** : Bonjourr partage l'origine du site. `storage-shim.js` préfixe ses clés de `localStorage` et `sessionStorage` (`bonjourr:…`), car son bouton « Réinitialiser » vide sinon tout le stockage de l'origine, session Supabase comprise.
-- **Réglages communs** : le site est la seule source. `site-sync.js` applique le thème du site (menu utilisateur) à Bonjourr, en direct, et masque l'option « Mode sombre » de Bonjourr. Il dépend d'éléments internes de Bonjourr, listés dans `SITE_SYNC_REQUIREMENTS` (`update.mjs`) : si une nouvelle version ne les a plus, `yarn bonjourr:update` s'arrête avant d'installer quoi que ce soit, en indiquant ce qui a changé et quoi adapter dans `site-sync.js`.
+- **Intégration dans le site** : `site-sync.js` adapte Bonjourr à son affichage dans une iframe, sans modifier son code :
+  - le site est la seule source pour le thème : celui du menu utilisateur s'applique à Bonjourr (rechargé quand il change, car une partie de son affichage n'est calculée qu'au démarrage), et l'option « Mode sombre » de Bonjourr est masquée ;
+  - l'option « Onglet » (titre et icône de la page) est masquée : dans une iframe, l'onglet affiche toujours ceux du site ;
+  - avec « Ouvrir dans un nouvel onglet » désactivé, les liens rapides et la barre de recherche ouvrent la page dans l'onglet courant, et non dans l'iframe où la plupart des sites refusent de s'afficher.
+
+  Ces adaptations dépendent d'éléments internes de Bonjourr, listés dans `SITE_SYNC_REQUIREMENTS` (`update.mjs`) : si une nouvelle version ne les a plus, `yarn bonjourr:update` s'arrête avant d'installer quoi que ce soit, en indiquant ce qui a changé et quoi adapter dans `site-sync.js`.
 - **Services externes** : fonds d'écran, météo et citations viennent toujours de `services.bonjourr.fr`, `weather.bonjourr.fr` et `images.unsplash.com`.
 - **Licence** : Bonjourr est sous GPL-3.0, comme ce dépôt. La licence et la provenance du build sont dans `public/apps/bonjourr/` (`LICENSE.md`, `SOURCE.md`).
 
