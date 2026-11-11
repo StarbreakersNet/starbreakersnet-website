@@ -21,6 +21,7 @@ const DENO_VERSION = "2.9.6";
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const target = join(root, "public/apps/bonjourr");
 const shim = join(root, "scripts/bonjourr/storage-shim.js");
+const siteSync = join(root, "scripts/bonjourr/site-sync.js");
 
 function run(cmd, args, cwd) {
   execFileSync(cmd, args, { cwd, stdio: "inherit" });
@@ -34,6 +35,58 @@ function patch(file, search, replacement) {
     throw new Error(`${file} : ${count} occurrence(s) de « ${search} » au lieu d'une`);
   }
   writeFileSync(file, content.replace(search, replacement));
+}
+
+// site-sync.js (réglages communs avec le site) s'appuie sur des éléments internes de Bonjourr, sans
+// modifier son code. Si une nouvelle version les change, la synchronisation cesserait sans erreur :
+// on refuse donc la mise à jour, en expliquant quoi corriger dans site-sync.js.
+const SITE_SYNC_REQUIREMENTS = [
+  {
+    file: "src/scripts/main.js",
+    search: "document.documentElement.dataset.theme = theme;",
+    what: "Bonjourr ne pose plus son thème dans l'attribut data-theme de <html> (fonction darkmode)",
+    impact: "Bonjourr ne suivrait plus le thème du site",
+    fix: "retrouver comment Bonjourr applique son thème (fonction darkmode de main.js) et adapter applyTheme",
+  },
+  {
+    file: "src/styles/style.css",
+    search: "[data-theme=dark]",
+    what: "Le CSS de Bonjourr ne s'appuie plus sur [data-theme=dark]",
+    impact: "le thème recopié par site-sync.js n'aurait plus d'effet sur l'affichage",
+    fix: "retrouver le sélecteur du thème sombre dans style.css et adapter applyTheme",
+  },
+  {
+    file: "index.html",
+    search: 'class="darkmode wrapper"',
+    what: "Le bloc « Mode sombre » des réglages de Bonjourr n'a plus la classe « darkmode wrapper »",
+    impact: "l'option « Mode sombre » réapparaîtrait dans Bonjourr, sans effet",
+    fix: "retrouver le bloc qui contient <select id=\"i_dark\"> dans index.html et adapter la règle CSS de site-sync.js",
+  },
+];
+
+function checkSiteSync(release) {
+  const broken = SITE_SYNC_REQUIREMENTS.filter(
+    ({ file, search }) => !readFileSync(join(release, file), "utf8").includes(search)
+  );
+  if (broken.length === 0) return;
+
+  const details = broken
+    .map(
+      ({ file, search, what, impact, fix }, index) =>
+        `${index + 1}. ${what}.\n` +
+        `   Introuvable dans ${file} : ${search}\n` +
+        `   Conséquence : ${impact}.\n` +
+        `   À faire : ${fix}.`
+    )
+    .join("\n\n");
+
+  throw new Error(
+    `Bonjourr ${BONJOURR_VERSION} (commit ${BONJOURR_COMMIT}) n'est pas compatible avec ` +
+      `scripts/bonjourr/site-sync.js (thème synchronisé avec le site).\n\n${details}\n\n` +
+      `Rien n'a été installé : public/apps/bonjourr contient toujours la version précédente.\n` +
+      `Corriger site-sync.js, puis mettre à jour SITE_SYNC_REQUIREMENTS dans ce script et relancer ` +
+      `yarn bonjourr:update.`
+  );
 }
 
 const work = mkdtempSync(join(tmpdir(), "bonjourr-"));
@@ -51,19 +104,26 @@ try {
 
   // 2. Build officiel, version web (« online ») de production : release/online
   run("npx", ["--yes", `deno@${DENO_VERSION}`, "task", "build", "online"], work);
+  const release = join(work, "release/online");
+
+  // Ce dont dépend site-sync.js, vérifié avant d'installer quoi que ce soit : en cas d'échec,
+  // le build actuel de public/apps/bonjourr reste en place
+  checkSiteSync(release);
 
   // 3. Installation dans public/
   rmSync(target, { recursive: true, force: true });
-  cpSync(join(work, "release/online"), target, { recursive: true });
+  cpSync(release, target, { recursive: true });
   cpSync(join(work, "LICENSE.md"), join(target, "LICENSE.md"));
   cpSync(shim, join(target, "storage-shim.js"));
+  cpSync(siteSync, join(target, "site-sync.js"));
 
   // 4. Adaptations à l'intégration dans le site
-  // Stockage cloisonné, chargé avant les scripts de Bonjourr (voir storage-shim.js)
+  // Stockage cloisonné et réglages communs avec le site, chargés avant les scripts de Bonjourr
+  // (voir storage-shim.js et site-sync.js)
   patch(
     join(target, "index.html"),
     '<script src="src/scripts/help-mode.js" defer></script>',
-    '<script src="storage-shim.js"></script>\n        <script src="src/scripts/help-mode.js" defer></script>'
+    '<script src="storage-shim.js"></script>\n        <script src="site-sync.js"></script>\n        <script src="src/scripts/help-mode.js" defer></script>'
   );
   // Traductions : chemin prévu pour un Bonjourr servi à la racine du domaine (online.bonjourr.fr)
   patch(
@@ -90,7 +150,8 @@ Construit par scripts/bonjourr/update.mjs depuis ${BONJOURR_REPO.replace(/\.git$
 
 Licence : GNU GPL v3 (LICENSE.md). Modifications apportées au build :
 
-- index.html : chargement de storage-shim.js, qui préfixe les clés de localStorage et sessionStorage
+- index.html : chargement de storage-shim.js, qui préfixe les clés de localStorage et sessionStorage,
+  et de site-sync.js, qui applique le thème du site et masque l'option « Mode sombre »
 - src/scripts/main.js : traductions chargées depuis _locales/ (relatif à index.html, et non à la
   racine du domaine) ; enregistrement du service worker supprimé
 `
