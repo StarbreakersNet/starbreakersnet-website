@@ -32,6 +32,8 @@ function updateSettings(settings: unknown) {
 
 function updateSize(size: WidgetSize) {
   if (widget.value) {
+    // Taille choisie à la main : plus d'agrandissement automatique
+    store.stopGrowing();
     store.resize(widget.value.id, size);
   }
 }

@@ -1,6 +1,6 @@
 // Widgets de la page Bureau (/bureau), placés sur une grille comme ceux du bureau de macOS
 
-export type WidgetType = "clock" | "markdown" | "links";
+export type WidgetType = "clock" | "markdown" | "links" | "weather" | "countdown" | "calendar";
 
 // Tailles en cases de la grille, comme les widgets de macOS : petit carré, moyen, grand
 export type WidgetSize = "small" | "medium" | "large";
@@ -29,10 +29,36 @@ export interface LinksSettings {
   newTab: boolean;
 }
 
+export interface WeatherLocation {
+  name: string;
+  // Région et pays, pour distinguer les homonymes (« Paris, Texas »)
+  detail: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface WeatherSettings {
+  location: WeatherLocation;
+  unit: "celsius" | "fahrenheit";
+}
+
+export interface CountdownSettings {
+  title: string;
+  // Date et heure visées, au format ISO
+  target: string;
+}
+
+export interface CalendarSettings {
+  weekNumbers: boolean;
+}
+
 export interface WidgetSettingsMap {
   clock: ClockSettings;
   markdown: MarkdownSettings;
   links: LinksSettings;
+  weather: WeatherSettings;
+  countdown: CountdownSettings;
+  calendar: CalendarSettings;
 }
 
 interface WidgetOf<T extends WidgetType> {

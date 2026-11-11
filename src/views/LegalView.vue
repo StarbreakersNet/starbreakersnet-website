@@ -176,8 +176,9 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                   <h-text depth="3">
                     Les pages Discord et Le Zap affichent des contenus de services tiers, qui
                     peuvent déposer leurs propres cookies. La vidéo YouTube est intégrée en mode «
-                    confidentialité renforcée ». Les icônes du widget Liens viennent de DuckDuckGo,
-                    qui ne reçoit que le nom de domaine de chaque lien.
+                    confidentialité renforcée ». Sur la page Bureau, les icônes du widget Liens
+                    viennent de DuckDuckGo, qui ne reçoit que le nom de domaine de chaque lien, et
+                    la météo d'Open-Meteo, qui ne reçoit que les coordonnées de la ville choisie.
                   </h-text>
                 </h-flex>
               </template>

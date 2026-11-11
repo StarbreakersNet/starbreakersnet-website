@@ -1,5 +1,8 @@
+import { DateTime } from "luxon";
 import type {
+  CalendarSettings,
   ClockSettings,
+  CountdownSettings,
   LinkItem,
   LinksSettings,
   MarkdownSettings,
@@ -7,6 +10,8 @@ import type {
   WidgetSettingsMap,
   WidgetSize,
   WidgetType,
+  WeatherLocation,
+  WeatherSettings,
   WidgetsDocument,
 } from "@/types/Widget";
 
@@ -78,7 +83,78 @@ export const WIDGET_DEFINITIONS: { [T in WidgetType]: WidgetDefinition<T> } = {
       newTab: typeof raw.newTab === "boolean" ? raw.newTab : true,
     }),
   },
+  weather: {
+    label: "Météo",
+    description: "Le temps qu'il fait, et les jours à venir.",
+    icon: "cloud-sun",
+    sizes: ["small", "medium"],
+    defaultSize: "small",
+    defaultSettings: (): WeatherSettings => ({ location: DEFAULT_LOCATION, unit: "celsius" }),
+    normalize: raw => ({
+      location: normalizeLocation(raw.location) ?? DEFAULT_LOCATION,
+      unit: raw.unit === "fahrenheit" ? "fahrenheit" : "celsius",
+    }),
+  },
+  countdown: {
+    label: "Compte à rebours",
+    description: "Le temps qui reste avant un évènement.",
+    icon: "hourglass-half",
+    sizes: ["small", "medium"],
+    defaultSize: "small",
+    defaultSettings: (): CountdownSettings => ({
+      title: "Nouvel an",
+      target: DateTime.now().plus({ years: 1 }).startOf("year").toISO()!,
+    }),
+    normalize: raw => ({
+      title: typeof raw.title === "string" ? raw.title.slice(0, 40) : "",
+      target:
+        typeof raw.target === "string" && DateTime.fromISO(raw.target).isValid
+          ? raw.target
+          : DateTime.now().plus({ years: 1 }).startOf("year").toISO()!,
+    }),
+  },
+  calendar: {
+    label: "Calendrier",
+    description: "Le mois en cours, et la date du jour.",
+    icon: "calendar-days",
+    sizes: ["small", "medium"],
+    defaultSize: "small",
+    defaultSettings: (): CalendarSettings => ({ weekNumbers: false }),
+    normalize: raw => ({
+      weekNumbers: typeof raw.weekNumbers === "boolean" ? raw.weekNumbers : false,
+    }),
+  },
 };
+
+const DEFAULT_LOCATION: WeatherLocation = {
+  name: "Paris",
+  detail: "Île-de-France, France",
+  latitude: 48.85341,
+  longitude: 2.3488,
+};
+
+function normalizeLocation(raw: unknown): WeatherLocation | null {
+  if (!raw || typeof raw !== "object") return null;
+  const location = raw as Record<string, unknown>;
+  const { latitude, longitude } = location;
+
+  if (
+    typeof location.name !== "string" ||
+    typeof latitude !== "number" ||
+    typeof longitude !== "number" ||
+    Math.abs(latitude) > 90 ||
+    Math.abs(longitude) > 180
+  ) {
+    return null;
+  }
+
+  return {
+    name: location.name.slice(0, 80),
+    detail: typeof location.detail === "string" ? location.detail.slice(0, 120) : "",
+    latitude,
+    longitude,
+  };
+}
 
 export const WIDGET_TYPES = Object.keys(WIDGET_DEFINITIONS) as WidgetType[];
 

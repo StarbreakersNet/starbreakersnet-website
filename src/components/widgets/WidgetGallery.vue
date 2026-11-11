@@ -16,7 +16,7 @@ const selectedSizes = reactive(
 </script>
 
 <template>
-  <section aria-label="Ajouter un widget" class="gallery liquid-glass liquid-glass--strong">
+  <section aria-label="Ajouter un widget" class="gallery liquid-glass liquid-glass--overlay">
     <h2 class="title">Ajouter un widget</h2>
     <ul class="items">
       <li v-for="type in WIDGET_TYPES" :key="type" class="item">

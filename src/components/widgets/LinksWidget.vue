@@ -1,9 +1,14 @@
 <script lang="ts" setup>
-import { computed, reactive } from "vue";
+import { computed, reactive, ref } from "vue";
+import { type FitState, useFitContent } from "@/composables/useFitContent";
 import type { LinksSettings } from "@/types/Widget";
 
 const props = defineProps<{
   settings: LinksSettings;
+}>();
+
+const emit = defineEmits<{
+  fit: [state: FitState];
 }>();
 
 // Icônes servies par DuckDuckGo (seul le nom de domaine lui est transmis), lettre à défaut
@@ -22,10 +27,16 @@ const links = computed(() =>
     };
   })
 );
+
+// Pas d'ascenseur : icônes réduites pour que tous les liens tiennent (voir useFitContent)
+const root = ref<HTMLElement | null>(null);
+const { overflowing } = useFitContent(root, [links], {
+  onFit: state => emit("fit", state),
+});
 </script>
 
 <template>
-  <div class="links">
+  <div ref="root" :class="{ clipped: overflowing }" class="links">
     <p v-if="links.length === 0" class="empty">
       Aucun lien pour l'instant. Ajoutez-en dans les réglages du widget.
     </p>
@@ -57,12 +68,17 @@ const links = computed(() =>
 </template>
 
 <style lang="scss" scoped>
+// Tailles en em, proportionnelles à --fit
 .links {
   width: 100%;
   height: 100%;
   padding: 14px;
-  overflow-y: auto;
-  scrollbar-width: thin;
+  overflow: hidden;
+  font-size: calc(var(--fit, 1) * 15px);
+
+  &.clipped {
+    mask-image: linear-gradient(to bottom, #000 80%, transparent);
+  }
 }
 
 .empty {
@@ -77,8 +93,8 @@ const links = computed(() =>
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-  gap: 10px 6px;
+  grid-template-columns: repeat(auto-fill, minmax(4.8em, 1fr));
+  gap: 0.6em 0.4em;
   padding: 0;
   list-style: none;
 }
@@ -87,9 +103,9 @@ const links = computed(() =>
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 6px 2px;
-  border-radius: 14px;
+  gap: 0.4em;
+  padding: 0.4em 0.15em;
+  border-radius: 0.9em;
   transition: background 0.2s ease;
 
   &:hover {
@@ -104,16 +120,16 @@ const links = computed(() =>
 .icon {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
+  width: 3em;
+  height: 3em;
+  border-radius: 0.8em;
   background: rgb(255 255 255 / 0.9);
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
   overflow: hidden;
 
   img {
-    width: 28px;
-    height: 28px;
+    width: 1.85em;
+    height: 1.85em;
     object-fit: contain;
   }
 
@@ -123,7 +139,7 @@ const links = computed(() =>
     width: 100%;
     height: 100%;
     color: white;
-    font-size: 1.2rem;
+    font-size: 1.2em;
     font-weight: 700;
   }
 }
@@ -133,7 +149,7 @@ const links = computed(() =>
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.78rem;
+  font-size: 0.8em;
   color: var(--glass-text);
 }
 </style>

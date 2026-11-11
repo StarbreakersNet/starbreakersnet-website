@@ -7,6 +7,7 @@ import WidgetSettingsModal from "@/components/widgets/WidgetSettingsModal.vue";
 import { WIDGET_COMPONENTS } from "@/components/widgets/registry";
 import { GRID_COLUMNS, WIDGET_DEFINITIONS, WIDGET_SIZES } from "@/models/widgets";
 import { useWidgetsStore } from "@/stores/widgets";
+import type { FitState } from "@/composables/useFitContent";
 import type { Widget, WidgetSize, WidgetType } from "@/types/Widget";
 
 // Bureau à widgets, à la manière de macOS : grille libre où l'on place et règle ses widgets.
@@ -95,6 +96,11 @@ function addWidget(type: WidgetType, size: WidgetSize) {
   }
 }
 
+function closeSettings() {
+  configuredId.value = null;
+  store.stopGrowing();
+}
+
 function toggleEditing() {
   editing.value = !editing.value;
   if (!editing.value) {
@@ -121,7 +127,8 @@ function toggleEditing() {
           <component
             :is="WIDGET_COMPONENTS[widget.type].view"
             :settings="widget.settings"
-            :size="widget.size" />
+            :size="widget.size"
+            @fit="(state: FitState) => store.growIfCramped(widget.id, state)" />
         </widget-frame>
       </div>
     </div>
@@ -147,7 +154,8 @@ function toggleEditing() {
             <component
               :is="WIDGET_COMPONENTS[widgetsById.get(String(item.i))!.type].view"
               :settings="widgetsById.get(String(item.i))!.settings"
-              :size="widgetsById.get(String(item.i))!.size" />
+              :size="widgetsById.get(String(item.i))!.size"
+              @fit="(state: FitState) => store.growIfCramped(String(item.i), state)" />
           </widget-frame>
         </template>
       </grid-layout>
@@ -157,7 +165,7 @@ function toggleEditing() {
       <transition name="slide-up">
         <widget-gallery v-if="editing" @add="addWidget" />
       </transition>
-      <div class="toolbar liquid-glass">
+      <div class="toolbar liquid-glass liquid-glass--overlay">
         <n-popconfirm
           v-if="editing"
           negative-text="Annuler"
@@ -182,7 +190,7 @@ function toggleEditing() {
       </div>
     </div>
 
-    <widget-settings-modal :widget-id="configuredId" @close="configuredId = null" />
+    <widget-settings-modal :widget-id="configuredId" @close="closeSettings" />
   </main>
 </template>
 

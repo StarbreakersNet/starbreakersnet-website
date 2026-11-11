@@ -13,11 +13,14 @@ import {
   WIDGET_SIZES,
   widgetRect,
 } from "@/models/widgets";
+import type { FitState } from "@/composables/useFitContent";
 import type { Widget, WidgetSettingsMap, WidgetSize, WidgetType } from "@/types/Widget";
 
 const STORAGE_KEY = "widgets";
 // Délai avant d'enregistrer sur le compte : un déplacement ou une saisie n'envoie qu'une requête
 const REMOTE_SAVE_DELAY = 800;
+// En dessous de cette échelle, le texte d'un widget qu'on modifie devient trop petit : taille du dessus
+const GROW_BELOW_SCALE = 0.85;
 
 function readLocal(): Widget[] | null {
   try {
@@ -152,7 +155,28 @@ export const useWidgetsStore = defineStore("widgets", () => {
     if (!widget) return;
 
     widget.settings = settings;
+    growingId.value = id;
     persist();
+  }
+
+  // Widget dont on modifie le contenu : s'il ne tient plus qu'en réduisant trop son texte, il passe
+  // à la taille du dessus (s'il en a une). Seulement pendant ses réglages, pour qu'une fenêtre plus
+  // étroite ne change jamais la disposition enregistrée : le contenu est alors juste réduit.
+  const growingId = ref<string | null>(null);
+
+  function growIfCramped(id: string, { scale, overflowing }: FitState) {
+    if (growingId.value !== id || (scale >= GROW_BELOW_SCALE && !overflowing)) return;
+
+    const widget = widgets.value.find(item => item.id === id);
+    if (!widget) return;
+
+    const sizes = WIDGET_DEFINITIONS[widget.type].sizes;
+    const next = sizes[sizes.indexOf(widget.size) + 1];
+    if (next) resize(id, next);
+  }
+
+  function stopGrowing() {
+    growingId.value = null;
   }
 
   // Positions après un glisser-déposer sur la grille
@@ -184,6 +208,8 @@ export const useWidgetsStore = defineStore("widgets", () => {
     remove,
     resize,
     updateSettings,
+    growIfCramped,
+    stopGrowing,
     move,
     reset,
   };

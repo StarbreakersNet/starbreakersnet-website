@@ -52,11 +52,13 @@ const emit = defineEmits<{
     transform 0.25s ease,
     box-shadow 0.25s ease;
 
+  // Conteneur de référence des tailles en cqh des widgets (le contenu suit la taille du cadre)
   .content {
     width: 100%;
     height: 100%;
     overflow: hidden;
     border-radius: inherit;
+    container-type: size;
   }
 
   &.editing {
@@ -88,7 +90,6 @@ const emit = defineEmits<{
   color: rgb(29 29 31);
   background: rgb(245 245 247 / 0.9);
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.3);
-  backdrop-filter: blur(8px);
   font-size: 12px;
   cursor: pointer;
 
@@ -106,7 +107,6 @@ const emit = defineEmits<{
   height: 2rem;
   padding: 0;
   background: var(--glass-bg-strong);
-  backdrop-filter: blur(12px);
 }
 
 .pop-enter-active,
