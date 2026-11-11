@@ -1,7 +1,4 @@
 export default {
-  getViewerBonjourrUrl: () => {
-    return 'https://online.bonjourr.fr/';
-  },
   getViewerDiscordUrl: () => {
     return 'https://discordapp.com/widget?id=674668711566639114&theme=dark';
   },

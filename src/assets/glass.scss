@@ -1,0 +1,106 @@
+// « Liquid Glass » à la manière de macOS : verre translucide flouté, reflet sur le bord, ombre douce.
+// Utilisé par les widgets et les panneaux de la page Bureau (views/DesktopView.vue).
+
+:root {
+  --glass-radius: 26px;
+  --glass-blur: 24px;
+  --glass-bg: rgb(255 255 255 / 0.1);
+  --glass-bg-strong: rgb(30 30 34 / 0.55);
+  --glass-rim: rgb(255 255 255 / 0.5);
+  --glass-rim-soft: rgb(255 255 255 / 0.06);
+  --glass-shadow: 0 12px 36px rgb(0 0 0 / 0.3);
+  --glass-text: rgb(255 255 255);
+  --glass-text-soft: rgb(255 255 255 / 0.65);
+  --glass-separator: rgb(255 255 255 / 0.14);
+  --glass-control: rgb(255 255 255 / 0.14);
+  --glass-control-hover: rgb(255 255 255 / 0.24);
+
+  &[data-theme="light"] {
+    --glass-bg: rgb(255 255 255 / 0.42);
+    --glass-bg-strong: rgb(255 255 255 / 0.72);
+    --glass-rim: rgb(255 255 255 / 0.95);
+    --glass-rim-soft: rgb(255 255 255 / 0.25);
+    --glass-shadow: 0 12px 36px rgb(60 20 40 / 0.16);
+    --glass-text: rgb(29 29 31);
+    --glass-text-soft: rgb(29 29 31 / 0.6);
+    --glass-separator: rgb(29 29 31 / 0.1);
+    --glass-control: rgb(29 29 31 / 0.07);
+    --glass-control-hover: rgb(29 29 31 / 0.13);
+  }
+}
+
+.liquid-glass {
+  position: relative;
+  isolation: isolate;
+  color: var(--glass-text);
+  background: var(--glass-bg);
+  border-radius: var(--glass-radius);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 1px 1px var(--glass-rim),
+    inset 0 -1px 1px var(--glass-rim-soft);
+
+  // Reflet sur le pourtour : bord dégradé, plus lumineux en haut à gauche et en bas à droite
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      var(--glass-rim),
+      var(--glass-rim-soft) 35%,
+      var(--glass-rim-soft) 65%,
+      var(--glass-rim)
+    );
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+  }
+
+  &.liquid-glass--strong {
+    background: var(--glass-bg-strong);
+  }
+}
+
+// Bouton rond translucide (barres d'outils, contrôles des widgets)
+.glass-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  height: 2.25rem;
+  padding: 0 1rem;
+  border: none;
+  border-radius: 999px;
+  color: var(--glass-text);
+  background: var(--glass-control);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    background: var(--glass-control-hover);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgb(10 132 255);
+    outline-offset: 2px;
+  }
+}

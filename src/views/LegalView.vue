@@ -88,7 +88,10 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                   votre mot de passe, enregistré uniquement sous forme chiffrée (hachée) ;
                 </n-li>
                 <n-li>votre prénom et votre nom, seulement si vous les renseignez ;</n-li>
-                <n-li>vos préférences d'affichage (thème clair ou sombre) ;</n-li>
+                <n-li>
+                  vos préférences d'affichage (thème clair ou sombre) et les widgets de votre
+                  bureau, avec leur contenu (notes, liens) ;
+                </n-li>
                 <n-li>
                   des données techniques de connexion (adresse IP, date, navigateur), conservées
                   dans les journaux du serveur pour la sécurité des comptes.
@@ -166,13 +169,15 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 <h-flex vertical>
                   <h-text>
                     Aucun cookie publicitaire ni de mesure d'audience. Votre navigateur garde
-                    seulement votre session et votre choix de thème, indispensables au
-                    fonctionnement du site : ils ne demandent donc pas de consentement.
+                    seulement votre session, votre choix de thème et les widgets de votre bureau,
+                    nécessaires au fonctionnement du site : ils ne demandent donc pas de
+                    consentement.
                   </h-text>
                   <h-text depth="3">
-                    Les pages Discord, Le Zap et Bonjourr affichent des contenus de services tiers,
-                    qui peuvent déposer leurs propres cookies. La vidéo YouTube est intégrée en mode
-                    « confidentialité renforcée ».
+                    Les pages Discord et Le Zap affichent des contenus de services tiers, qui
+                    peuvent déposer leurs propres cookies. La vidéo YouTube est intégrée en mode «
+                    confidentialité renforcée ». Les icônes du widget Liens viennent de DuckDuckGo,
+                    qui ne reçoit que le nom de domaine de chaque lien.
                   </h-text>
                 </h-flex>
               </template>

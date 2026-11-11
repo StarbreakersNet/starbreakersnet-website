@@ -668,6 +668,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@floating-ui/core@npm:^1.8.0":
+  version: 1.8.0
+  resolution: "@floating-ui/core@npm:1.8.0"
+  dependencies:
+    "@floating-ui/utils": "npm:^0.2.12"
+  checksum: 10c0/cece958f6fab0f8cd7740cd57988c4f8bc5356dca39dd4c093433d44c91952c3a02c7a54d93d7ed6c078b6544d531a29f66621d2839c8bfbb4467dca6aed7df0
+  languageName: node
+  linkType: hard
+
+"@floating-ui/dom@npm:^1.7.0":
+  version: 1.8.0
+  resolution: "@floating-ui/dom@npm:1.8.0"
+  dependencies:
+    "@floating-ui/core": "npm:^1.8.0"
+    "@floating-ui/utils": "npm:^0.2.12"
+  checksum: 10c0/c32b2de7a596b69cfffa909c7028825e14f6319be1b45da529f8943c89fe16b75a49c214e800c87ded3f172353d3b99163d50072f11410488e756961b7b629cc
+  languageName: node
+  linkType: hard
+
+"@floating-ui/utils@npm:^0.2.12":
+  version: 0.2.12
+  resolution: "@floating-ui/utils@npm:0.2.12"
+  checksum: 10c0/bb910b90d56991a62011afaf5f8e0c4b7fb6dab69403f4dd17fbd6eb25560b28d533dff9791f270b4f459852e9006a1077b5d73cbedb5e34d9424afc6a828314
+  languageName: node
+  linkType: hard
+
 "@fortawesome/fontawesome-common-types@npm:6.7.2":
   version: 6.7.2
   resolution: "@fortawesome/fontawesome-common-types@npm:6.7.2"
@@ -752,6 +778,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@interactjs/types@npm:1.10.28":
+  version: 1.10.28
+  resolution: "@interactjs/types@npm:1.10.28"
+  checksum: 10c0/abc3295087f2f0a8e32b3d703d53790a161660bd337836a042f0b855588a043808c9f6351ab3015c1fc1236ac75fc90f724e10e33f5903515041a55b99c8971c
+  languageName: node
+  linkType: hard
+
 "@isaacs/cliui@npm:^8.0.2":
   version: 8.0.2
   resolution: "@isaacs/cliui@npm:8.0.2"
@@ -819,7 +852,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@juggle/resize-observer@npm:^3.3.1":
+"@juggle/resize-observer@npm:^3.3.1, @juggle/resize-observer@npm:^3.4.0":
   version: 3.4.0
   resolution: "@juggle/resize-observer@npm:3.4.0"
   checksum: 10c0/12930242357298c6f2ad5d4ec7cf631dfb344ca7c8c830ab7f64e6ac11eb1aae486901d8d880fd08fb1b257800c160a0da3aee1e7ed9adac0ccbb9b7c5d93347
@@ -2086,6 +2119,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/trusted-types@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "@types/trusted-types@npm:2.0.7"
+  checksum: 10c0/4c4855f10de7c6c135e0d32ce462419d8abbbc33713b31d294596c0cc34ae1fa6112a2f9da729c8f7a20707782b0d69da3b1f8df6645b0366d08825ca1522e0c
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/eslint-plugin@npm:8.46.2":
   version: 8.46.2
   resolution: "@typescript-eslint/eslint-plugin@npm:8.46.2"
@@ -2220,6 +2260,26 @@ __metadata:
     "@typescript-eslint/types": "npm:8.46.2"
     eslint-visitor-keys: "npm:^4.2.1"
   checksum: 10c0/2067cd9a3c90b3817242cc49b5fa77428e1b92b28e16a12f45c2b399acbba7bd17e503553e5e68924e40078477a5c247dfa12e7709c24fe11c0b17a0c8486c33
+  languageName: node
+  linkType: hard
+
+"@vexip-ui/hooks@npm:^2.8.0":
+  version: 2.9.4
+  resolution: "@vexip-ui/hooks@npm:2.9.4"
+  dependencies:
+    "@floating-ui/dom": "npm:^1.7.0"
+    "@juggle/resize-observer": "npm:^3.4.0"
+    "@vexip-ui/utils": "npm:2.16.4"
+  peerDependencies:
+    vue: ^3.2.25
+  checksum: 10c0/39757399e50504be3f524276aaf5c577e450dd68fe3f6df335066777f9da38ba0766eab78a559e98c00f478f0e2f3581427eb0f6753f0d26931fd4d64f0da7a3
+  languageName: node
+  linkType: hard
+
+"@vexip-ui/utils@npm:2.16.4, @vexip-ui/utils@npm:^2.16.1":
+  version: 2.16.4
+  resolution: "@vexip-ui/utils@npm:2.16.4"
+  checksum: 10c0/3eff51d3f05d0ee40ec57ba37f7e8d9188380864e2dbcfdef0cec2a4d757fd43f4bea3d5afa77ad072dcc711297981bbba723f75794a046b25114e1194e1d79e
   languageName: node
   linkType: hard
 
@@ -2955,6 +3015,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dompurify@npm:^3.4.17":
+  version: 3.4.17
+  resolution: "dompurify@npm:3.4.17"
+  dependencies:
+    "@types/trusted-types": "npm:^2.0.7"
+  dependenciesMeta:
+    "@types/trusted-types":
+      optional: true
+  checksum: 10c0/6a12251ef5e700fc91b6d96d33e9f8b5fd590c55276f632cf42d182c5808e9f48d5bef435ab26eac235dfcc05ed8fe95e1c8308dcc502bf1050e561f14d0361a
+  languageName: node
+  linkType: hard
+
 "eastasianwidth@npm:^0.2.0":
   version: 0.2.0
   resolution: "eastasianwidth@npm:0.2.0"
@@ -3541,6 +3613,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"grid-layout-plus@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "grid-layout-plus@npm:1.1.1"
+  dependencies:
+    "@vexip-ui/hooks": "npm:^2.8.0"
+    "@vexip-ui/utils": "npm:^2.16.1"
+    interactjs: "npm:^1.10.27"
+  peerDependencies:
+    vue: ^3.0.0
+  checksum: 10c0/b19de9305e8f6a8dd22816adcc4eb2d497db67a65374ee47dabb27030aa70ab447fd58dca9af3473935d42af46746f8aac6399520c21c7ef2cc6a070e57694a8
+  languageName: node
+  linkType: hard
+
 "has-flag@npm:^4.0.0":
   version: 4.0.0
   resolution: "has-flag@npm:4.0.0"
@@ -3640,6 +3725,15 @@ __metadata:
   version: 0.1.4
   resolution: "imurmurhash@npm:0.1.4"
   checksum: 10c0/8b51313850dd33605c6c9d3fd9638b714f4c4c40250cff658209f30d40da60f78992fb2df5dabee4acf589a6a82bbc79ad5486550754bd9ec4e3fc0d4a57d6a6
+  languageName: node
+  linkType: hard
+
+"interactjs@npm:^1.10.27":
+  version: 1.10.28
+  resolution: "interactjs@npm:1.10.28"
+  dependencies:
+    "@interactjs/types": "npm:1.10.28"
+  checksum: 10c0/ad6bb86e256fabd90a2ddde21e1c80beee2d30f22bef9f0f29a5372b5e6908e4dbefa6ca25feade2622203378b82627c1f274c9b22bcfbcd37b122215037b069
   languageName: node
   linkType: hard
 
@@ -4047,6 +4141,15 @@ __metadata:
     promise-retry: "npm:^2.0.1"
     ssri: "npm:^12.0.0"
   checksum: 10c0/c40efb5e5296e7feb8e37155bde8eb70bc57d731b1f7d90e35a092fde403d7697c56fb49334d92d330d6f1ca29a98142036d6480a12681133a0a1453164cb2f0
+  languageName: node
+  linkType: hard
+
+"marked@npm:^18.2.0":
+  version: 18.2.0
+  resolution: "marked@npm:18.2.0"
+  bin:
+    marked: bin/marked.js
+  checksum: 10c0/7766e5564cc6dbe3e8d6ee0091f3a4656002dd993817e68c5510e2ff1fa1d6456c9bcd18af1a4a5e8ea87382832a07026c109ab333913f125d51c93f29ba9017
   languageName: node
   linkType: hard
 
@@ -4991,12 +5094,15 @@ __metadata:
     "@vue/eslint-config-prettier": "npm:^10.2.0"
     "@vue/eslint-config-typescript": "npm:^14.6.0"
     "@vue/tsconfig": "npm:^0.8.1"
+    dompurify: "npm:^3.4.17"
     eslint: "npm:^9.37.0"
     eslint-plugin-oxlint: "npm:~1.23.0"
     eslint-plugin-vue: "npm:~10.5.0"
+    grid-layout-plus: "npm:^1.1.1"
     jiti: "npm:^2.6.1"
     lodash: "npm:^4.17.21"
     luxon: "npm:^3.7.2"
+    marked: "npm:^18.2.0"
     naive-ui: "npm:^2.39.0"
     npm-run-all2: "npm:^8.0.4"
     oxlint: "npm:~1.23.0"

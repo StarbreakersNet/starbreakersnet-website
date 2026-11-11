@@ -306,28 +306,11 @@ Services actifs : `db`, `auth`, `rest`, `realtime`, `storage`, `imgproxy`, `meta
 
 ## Intégrations
 
-### Bonjourr
+### Bureau (`/bureau`)
 
-Bonjourr est une page d'accueil pour votre navigateur Internet inspirée par l'apparence d'iOS.
-Bien qu'elle se veuille minimale, elle vous offre de nombreuses options pour la personnaliser à votre guise. Voici quelques fonctionnalités :
+Page d'accueil personnelle à widgets, dans l'esprit des widgets de macOS, avec un style « Liquid Glass » (verre translucide flouté, reflet sur le bord) défini dans `src/assets/glass.scss`. Elle remplace l'ancienne intégration de Bonjourr ; `/bonjourr` redirige vers `/bureau`.
 
-- 🍏 Langage de conception iOS
-- 🏞 Arrière-plans 4K dynamiques qui changent en fonction de l'humeur du jour
-- ⚡️ Rapide et léger !
-- 🔎 Barre de recherche (compatible avec tous les moteurs de recherche)
-- 🕰 Horloge analogique avec plusieurs visages d'horloge
-- 🌤 Météo
-- 🔗 Liens rapides
-- 👋 Vous accueille par votre nom
-- 🌘 Mode sombre
-- 🥖 Emoji comme favicon
-- 🧑‍💻 Style CSS personnalisé
-- 📝 Polices personnalisées
-- 🔒 Privacy focused
-- 🌎 Multilanguage
-
-<h1 align="center">
-  <a href="https://github.com/victrme/Bonjourr">
-    <img src="https://raw.githubusercontent.com/victrme/Bonjourr/master/src/assets/bonjourr.png" width="50%" alt="site web de Bonjourr">
-  </a>
-</h1>
+- **Grille libre** : en mode « Modifier les widgets », on ajoute un widget depuis la galerie (type et taille : petit, moyen, grand), on le déplace par glisser-déposer ([grid-layout-plus](https://github.com/qmhc/grid-layout-plus)), on le règle ou on le supprime. Sur petit écran, les widgets s'empilent sur deux colonnes.
+- **Widgets** : Horloge (à aiguilles ou en chiffres, fuseau au choix), Note (Markdown via `marked`, HTML nettoyé par `dompurify`), Liens (icônes servies par DuckDuckGo).
+- **Enregistrement** : dans le navigateur pour les visiteurs, et sur le compte pour les membres connectés (colonne `user_settings.widgets`), comme le thème. Voir `src/stores/widgets.ts`.
+- **Ajouter un type de widget** : le déclarer dans `src/types/Widget.ts` et `src/models/widgets.ts` (métadonnées, tailles, réglages par défaut, validation), puis ajouter son affichage et son formulaire de réglages dans `src/components/widgets/registry.ts`.
