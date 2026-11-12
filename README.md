@@ -306,16 +306,16 @@ Services actifs : `db`, `auth`, `rest`, `realtime`, `storage`, `imgproxy`, `meta
 
 ## Intégrations
 
-### Bureau (`/bureau`)
+### Buroh (`/buroh`)
 
-Page d'accueil personnelle à widgets, dans l'esprit des widgets de macOS, avec un style « Liquid Glass ». Elle remplace l'ancienne intégration de Bonjourr ; `/bonjourr` redirige vers `/bureau`.
+Buroh est la page d'accueil personnelle à widgets du site, dans l'esprit des widgets de macOS, avec un style « Liquid Glass ». Elle remplace l'ancienne intégration de Bonjourr. Code : `src/views/BurohView.vue` (route `buroh`) et `src/components/widgets/`.
 
 - **Grille libre** : en mode « Modifier les widgets », on ajoute un widget depuis la galerie (type et taille : petit, moyen, grand), on le déplace par glisser-déposer ([grid-layout-plus](https://github.com/qmhc/grid-layout-plus)), on le règle ou on le supprime. Sur petit écran, les widgets s'empilent sur deux colonnes.
 - **Widgets** : Horloge, Note (Markdown via `marked`, HTML nettoyé par `dompurify`), Liens (icônes DuckDuckGo), Météo ([Open-Meteo](https://open-meteo.com), sans clé), Compte à rebours, Calendrier. Idées reprises de [Homarr](https://github.com/homarr-labs/homarr), code écrit pour le site.
 - **Pas d'ascenseur dans les widgets** : les widgets à contenu fixe (horloge, météo, calendrier, compte à rebours) sont dimensionnés en unités `cqh`, relatives à la hauteur du cadre. Les widgets à contenu libre (note, liens) réduisent leur contenu juste assez pour tenir (`useFitContent`) ; si on le modifie et qu'il ne tient plus qu'en devenant trop petit, le widget passe à la taille du dessus. Au-delà de la plus grande taille, la fin s'estompe.
 - **Liquid Glass sans surcoût** (`src/assets/glass.scss`) : pas de `backdrop-filter` sur les widgets, qui reposent sur un fond en dégradé que le flou ne changerait presque pas. L'effet vient du remplissage translucide, du reflet spéculaire (ombres internes), d'un éclat courbe (dégradé radial) et d'une ombre douce. Seuls la barre d'outils et la galerie, posées au-dessus des widgets, gardent un flou. Les réglages « Réduire la transparence » et « Augmenter le contraste » du système sont respectés.
-- **Barre d'outils discrète** : « Fond d'écran » et « Modifier les widgets » s'effacent après 1,5 seconde sans activité, et reviennent au moindre mouvement de souris, appui sur une touche ou toucher. Clic droit sur le bureau : menu « Modifier les widgets » / « Changer le fond d'écran… », comme sur macOS.
-- **Fond d'écran** (`src/models/wallpapers.ts`, `DesktopWallpaper.vue`, `WallpaperModal.vue`) :
+- **Barre d'outils discrète** : « Fond d'écran » et « Modifier les widgets » s'effacent après 1,5 seconde sans activité, et reviennent au moindre mouvement de souris, appui sur une touche ou toucher. Clic droit sur le Buroh : menu « Modifier les widgets » / « Changer le fond d'écran… », comme sur macOS.
+- **Fond d'écran** (`src/models/wallpapers.ts`, `BurohWallpaper.vue`, `WallpaperModal.vue`) :
   - dégradés, avec une variante pour chaque thème ;
   - photos Unsplash ou vidéos de la sélection du site, avec les mêmes options : renouvelées à chaque visite, toutes les heures, chaque jour, ou fixes, avec leur crédit. L'API Unsplash ne propose pas de vidéos : la sélection est une liste choisie pour le site (`WALLPAPER_VIDEOS` dans `src/models/wallpapers.ts`). Pour ajouter une vidéo : déposer le fichier dans `public/` (boucle courte, WebM ou MP4, 20 Mo au plus de préférence) ou utiliser l'adresse d'une vidéo libre de droits, puis l'ajouter à la liste avec son crédit.
   - photos Unsplash : avec `VITE_UNSPLASH_ACCESS_KEY` (clé d'accès gratuite, [unsplash.com/developers](https://unsplash.com/developers)), choix d'un thème ou d'une collection Unsplash (adresse ou identifiant) par l'API officielle ; sans clé, photos Unsplash au hasard via [Lorem Picsum](https://picsum.photos) ;

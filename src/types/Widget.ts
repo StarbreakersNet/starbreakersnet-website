@@ -1,6 +1,6 @@
 import type { Wallpaper } from "@/types/Wallpaper";
 
-// Widgets de la page Bureau (/bureau), placés sur une grille comme ceux du bureau de macOS
+// Widgets de Buroh (/buroh), placés sur une grille comme ceux du bureau de macOS
 
 export type WidgetType = "clock" | "markdown" | "links" | "weather" | "countdown" | "calendar";
 

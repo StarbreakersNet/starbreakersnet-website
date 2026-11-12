@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { GridLayout } from "grid-layout-plus";
-import DesktopWallpaper from "@/components/widgets/DesktopWallpaper.vue";
+import BurohWallpaper from "@/components/widgets/BurohWallpaper.vue";
 import WallpaperModal from "@/components/widgets/WallpaperModal.vue";
 import WidgetFrame from "@/components/widgets/WidgetFrame.vue";
 import WidgetGallery from "@/components/widgets/WidgetGallery.vue";
@@ -13,7 +13,8 @@ import type { FitState } from "@/composables/useFitContent";
 import type { WallpaperAppearance } from "@/types/Wallpaper";
 import type { Widget, WidgetSize, WidgetType } from "@/types/Widget";
 
-// Bureau à widgets, à la manière de macOS : grille libre où l'on place et règle ses widgets.
+// Buroh, page d'accueil à widgets à la manière du bureau de macOS : grille libre où l'on place
+// et règle ses widgets.
 // Sur petit écran, les widgets s'empilent sur deux colonnes, sans glisser-déposer.
 
 const GAP = 16;
@@ -119,7 +120,7 @@ const showWallpaper = ref(false);
 const appearance = ref<WallpaperAppearance>({ kind: "gradient", backdrop: null });
 
 // Miniature floue du fond pour le verre des widgets (voir lib/backdrop.ts)
-const desktopStyle = computed(() =>
+const burohStyle = computed(() =>
   appearance.value.backdrop ? { "--wallpaper-backdrop": `url("${appearance.value.backdrop}")` } : {}
 );
 
@@ -147,7 +148,7 @@ onBeforeUnmount(() => {
   ACTIVITY_EVENTS.forEach(event => window.removeEventListener(event, wake));
 });
 
-// --- Menu du clic droit sur le bureau, comme sur macOS
+// --- Menu du clic droit sur le Buroh, comme sur macOS
 
 const menu = ref({ show: false, x: 0, y: 0 });
 
@@ -184,10 +185,10 @@ const toolbarVisible = computed(
   <main
     :class="{ editing, 'has-backdrop': !!appearance.backdrop }"
     :data-wallpaper="appearance.kind"
-    :style="desktopStyle"
-    class="desktop"
+    :style="burohStyle"
+    class="buroh"
     @contextmenu="onContextMenu">
-    <desktop-wallpaper @appearance="appearance = $event" />
+    <buroh-wallpaper @appearance="appearance = $event" />
 
     <div v-if="isMobile" class="stack">
       <div
@@ -292,7 +293,7 @@ const toolbarVisible = computed(
 </template>
 
 <style lang="scss" scoped>
-.desktop {
+.buroh {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -304,8 +305,8 @@ const toolbarVisible = computed(
 }
 
 // Verre sur une photo ou une vidéo : plus couvrant, pour que le texte reste lisible
-.desktop[data-wallpaper="image"],
-.desktop[data-wallpaper="video"] {
+.buroh[data-wallpaper="image"],
+.buroh[data-wallpaper="video"] {
   --glass-bg: rgb(28 22 26 / 0.5);
 
   :root[data-theme="light"] & {
@@ -315,7 +316,7 @@ const toolbarVisible = computed(
 
 // Photo : verre dépoli, avec la miniature floue du fond derrière chaque widget, alignée sur le
 // fond (fixed). Calculée une fois, sans backdrop-filter.
-.desktop.has-backdrop {
+.buroh.has-backdrop {
   --glass-bg: rgb(28 22 26 / 0.22);
 
   :root[data-theme="light"] & {

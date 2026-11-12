@@ -9,8 +9,8 @@ export type MenuItem = {
 
 export const menuItems: MenuItem[] = [
   {
-    routeName: "desktop",
-    label: "Bureau",
+    routeName: "buroh",
+    label: "Buroh",
     icon: ["fas", "table-cells-large"],
     color: "rgb(100, 221, 187)",
     textColor: "rgb(255, 255, 255)",

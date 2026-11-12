@@ -43,7 +43,7 @@ function writeLocal(widgets: Widget[], wallpaper: Wallpaper) {
   }
 }
 
-// Widgets de la page Bureau. Comme le thème (stores/settings.ts) : la copie du compte l'emporte à
+// Widgets de Buroh. Comme le thème (stores/settings.ts) : la copie du compte l'emporte à
 // la connexion, la copie locale sert aux visiteurs et au premier affichage.
 export const useWidgetsStore = defineStore("widgets", () => {
   const message = useMessage();
@@ -82,12 +82,12 @@ export const useWidgetsStore = defineStore("widgets", () => {
       wallpaper.value = normalizeWallpaper(data.widgets?.wallpaper);
       writeLocal(remote, wallpaper.value);
     } else {
-      // Premier passage du membre : son bureau actuel (local ou par défaut) devient celui du compte
+      // Premier passage du membre : son Buroh actuel (local ou par défaut) devient celui du compte
       scheduleRemoteSave(0);
     }
   }
 
-  // Déconnexion : on garde le bureau affiché, qui n'est plus enregistré que dans le navigateur
+  // Déconnexion : on garde le Buroh affiché, qui n'est plus enregistré que dans le navigateur
   function unload() {
     clearTimeout(saveTimer);
     savePending = false;

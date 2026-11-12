@@ -1,6 +1,6 @@
 import type { UnsplashPhoto } from "@/types/Wallpaper";
 
-// Photos Unsplash pour le fond d'écran de la page Bureau.
+// Photos Unsplash pour le fond d'écran de Buroh.
 // - Avec une clé d'API (VITE_UNSPLASH_ACCESS_KEY, gratuite sur unsplash.com/developers) : photo au
 //   hasard dans un thème ou une collection, par l'API officielle, avec le suivi de téléchargement
 //   qu'elle demande.

@@ -91,7 +91,7 @@ export interface WallpaperVideo {
   id: string;
   label: string;
   src: string;
-  // Auteur ou ayant droit, affiché en bas à gauche du bureau
+  // Auteur ou ayant droit, affiché en bas à gauche du Buroh
   credit: string;
 }
 

@@ -1,4 +1,4 @@
-// Fond d'écran de la page Bureau : dégradé, photo Unsplash ou vidéo de la sélection du site (avec
+// Fond d'écran de Buroh : dégradé, photo Unsplash ou vidéo de la sélection du site (avec
 // renouvellement), image ou vidéo par adresse, ou fichier de l'ordinateur (gardé dans le navigateur,
 // voir lib/wallpaperFile.ts)
 

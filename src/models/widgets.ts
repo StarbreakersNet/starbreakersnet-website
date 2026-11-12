@@ -16,7 +16,7 @@ import type {
   WidgetsDocument,
 } from "@/types/Widget";
 
-// Grille du bureau : colonnes de cases carrées
+// Grille du Buroh : colonnes de cases carrées
 export const GRID_COLUMNS = 12;
 
 export const WIDGET_SIZES: Record<WidgetSize, { w: number; h: number; label: string }> = {
@@ -306,7 +306,7 @@ export function toDocument(widgets: Widget[], wallpaper: Wallpaper): WidgetsDocu
   return { version: 1, widgets, wallpaper };
 }
 
-// --- Bureau par défaut (visiteurs, et membres qui n'ont encore rien changé)
+// --- Buroh par défaut (visiteurs, et membres qui n'ont encore rien changé)
 
 export function defaultWidgets(): Widget[] {
   return [
@@ -326,7 +326,7 @@ export function defaultWidgets(): Widget[] {
       y: 0,
       settings: {
         content:
-          "## Bienvenue sur votre bureau\n\n" +
+          "## Bienvenue sur Buroh\n\n" +
           "Cliquez sur **Modifier les widgets** pour ajouter, déplacer ou régler vos widgets.",
       },
     },

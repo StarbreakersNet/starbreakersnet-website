@@ -1,7 +1,7 @@
 // Fond d'écran choisi sur l'ordinateur : gardé dans le navigateur (IndexedDB), jamais envoyé au
-// serveur. Sur un autre appareil, le bureau retombe sur le fond par défaut.
+// serveur. Sur un autre appareil, Buroh retombe sur le fond par défaut.
 
-const DB_NAME = "starbreakers-desktop";
+const DB_NAME = "starbreakers-buroh";
 const STORE = "files";
 const KEY = "wallpaper";
 

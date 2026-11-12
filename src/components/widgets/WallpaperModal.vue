@@ -98,7 +98,7 @@ function updateUnsplash(patch: {
 }) {
   const current = unsplash.value;
   if (!current) return;
-  // Autre thème ou autre collection : nouvelle photo (récupérée par DesktopWallpaper)
+  // Autre thème ou autre collection : nouvelle photo (récupérée par BurohWallpaper)
   const newSource = patch.topic !== undefined || patch.collection !== undefined;
   store.setWallpaper({ ...current, ...patch, photo: newSource ? null : current.photo });
 }
@@ -411,7 +411,7 @@ async function onFileChosen(event: Event) {
         </n-form>
         <n-text depth="3">
           Un fichier de l'ordinateur reste dans ce navigateur (100 Mo au maximum) : sur un autre
-          appareil, le bureau affiche le fond par défaut. Les vidéos sont lues en boucle, sans son.
+          appareil, Buroh affiche le fond par défaut. Les vidéos sont lues en boucle, sans son.
         </n-text>
       </n-tab-pane>
     </n-tabs>

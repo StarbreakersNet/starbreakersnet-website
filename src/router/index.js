@@ -15,14 +15,10 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      // Bureau à widgets, qui remplace l'ancienne page Bonjourr
-      path: "/bureau",
-      name: "desktop",
-      component: () => import("@/views/DesktopView.vue"),
-    },
-    {
-      path: "/bonjourr",
-      redirect: { name: "desktop" },
+      // Buroh, page d'accueil à widgets
+      path: "/buroh",
+      name: "buroh",
+      component: () => import("@/views/BurohView.vue"),
     },
     {
       path: "/discord",

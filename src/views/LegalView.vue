@@ -89,8 +89,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 </n-li>
                 <n-li>votre prénom et votre nom, seulement si vous les renseignez ;</n-li>
                 <n-li>
-                  vos préférences d'affichage (thème clair ou sombre) et les widgets de votre
-                  bureau, avec leur contenu (notes, liens) ;
+                  vos préférences d'affichage (thème clair ou sombre) et les widgets de votre page
+                  Buroh, avec leur contenu (notes, liens) ;
                 </n-li>
                 <n-li>
                   des données techniques de connexion (adresse IP, date, navigateur), conservées
@@ -169,19 +169,19 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 <h-flex vertical>
                   <h-text>
                     Aucun cookie publicitaire ni de mesure d'audience. Votre navigateur garde
-                    seulement votre session, votre choix de thème et les widgets de votre bureau,
-                    nécessaires au fonctionnement du site : ils ne demandent donc pas de
-                    consentement. Le fond d'écran du bureau y est gardé aussi : une image ou une
+                    seulement votre session, votre choix de thème et les widgets de votre page
+                    Buroh, nécessaires au fonctionnement du site : ils ne demandent donc pas de
+                    consentement. Le fond d'écran de Buroh y est gardé aussi : une image ou une
                     vidéo choisie sur votre ordinateur n'est jamais envoyée au site.
                   </h-text>
                   <h-text depth="3">
                     Les pages Discord et Le Zap affichent des contenus de services tiers, qui
                     peuvent déposer leurs propres cookies. La vidéo YouTube est intégrée en mode «
-                    confidentialité renforcée ». Sur la page Bureau, les icônes du widget Liens
-                    viennent de DuckDuckGo, qui ne reçoit que le nom de domaine de chaque lien, et
-                    la météo d'Open-Meteo, qui ne reçoit que les coordonnées de la ville choisie.
-                    Les photos de fond d'écran viennent d'Unsplash (directement ou par Lorem Picsum)
-                    ; une image ou une vidéo donnée par son adresse est chargée depuis le site qui
+                    confidentialité renforcée ». Sur Buroh, les icônes du widget Liens viennent de
+                    DuckDuckGo, qui ne reçoit que le nom de domaine de chaque lien, et la météo
+                    d'Open-Meteo, qui ne reçoit que les coordonnées de la ville choisie. Les photos
+                    de fond d'écran viennent d'Unsplash (directement ou par Lorem Picsum) ; une
+                    image ou une vidéo donnée par son adresse est chargée depuis le site qui
                     l'héberge.
                   </h-text>
                 </h-flex>

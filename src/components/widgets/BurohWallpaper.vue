@@ -9,7 +9,7 @@ import { useUserStore } from "@/stores/user";
 import { useWidgetsStore } from "@/stores/widgets";
 import type { MediaKind, WallpaperAppearance } from "@/types/Wallpaper";
 
-// Fond d'écran du Bureau, en plein écran derrière les widgets. Le dégradé par défaut reste dessous
+// Fond d'écran de Buroh, en plein écran derrière les widgets. Le dégradé par défaut reste dessous
 // pendant le chargement d'une photo ou d'une vidéo, et en cas d'échec.
 
 const emit = defineEmits<{
