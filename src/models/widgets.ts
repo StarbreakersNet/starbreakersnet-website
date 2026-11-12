@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import type { Wallpaper } from "@/types/Wallpaper";
 import type {
   CalendarSettings,
   ClockSettings,
@@ -301,8 +302,8 @@ export function normalizeDocument(raw: unknown): Widget[] | null {
   return widgets;
 }
 
-export function toDocument(widgets: Widget[]): WidgetsDocument {
-  return { version: 1, widgets };
+export function toDocument(widgets: Widget[], wallpaper: Wallpaper): WidgetsDocument {
+  return { version: 1, widgets, wallpaper };
 }
 
 // --- Bureau par défaut (visiteurs, et membres qui n'ont encore rien changé)

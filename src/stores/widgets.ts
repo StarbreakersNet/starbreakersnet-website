@@ -13,7 +13,10 @@ import {
   WIDGET_SIZES,
   widgetRect,
 } from "@/models/widgets";
+import { DEFAULT_WALLPAPER, normalizeWallpaper } from "@/models/wallpapers";
+import { deleteWallpaperFile } from "@/lib/wallpaperFile";
 import type { FitState } from "@/composables/useFitContent";
+import type { Wallpaper } from "@/types/Wallpaper";
 import type { Widget, WidgetSettingsMap, WidgetSize, WidgetType } from "@/types/Widget";
 
 const STORAGE_KEY = "widgets";
@@ -22,18 +25,19 @@ const REMOTE_SAVE_DELAY = 800;
 // En dessous de cette échelle, le texte d'un widget qu'on modifie devient trop petit : taille du dessus
 const GROW_BELOW_SCALE = 0.85;
 
-function readLocal(): Widget[] | null {
+function readLocal(): { widgets: Widget[] | null; wallpaper: Wallpaper } {
   try {
     const value = localStorage.getItem(STORAGE_KEY);
-    return value ? normalizeDocument(JSON.parse(value)) : null;
+    const raw = value ? JSON.parse(value) : null;
+    return { widgets: normalizeDocument(raw), wallpaper: normalizeWallpaper(raw?.wallpaper) };
   } catch {
-    return null;
+    return { widgets: null, wallpaper: DEFAULT_WALLPAPER };
   }
 }
 
-function writeLocal(widgets: Widget[]) {
+function writeLocal(widgets: Widget[], wallpaper: Wallpaper) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(toDocument(widgets)));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toDocument(widgets, wallpaper)));
   } catch {
     // Pas de persistance locale possible : les widgets restent valables pour la session
   }
@@ -44,7 +48,9 @@ function writeLocal(widgets: Widget[]) {
 export const useWidgetsStore = defineStore("widgets", () => {
   const message = useMessage();
 
-  const widgets = ref<Widget[]>(readLocal() ?? defaultWidgets());
+  const local = readLocal();
+  const widgets = ref<Widget[]>(local.widgets ?? defaultWidgets());
+  const wallpaper = ref<Wallpaper>(local.wallpaper);
 
   // Compte sur lequel enregistrer, connu une fois ses widgets chargés (null pour un visiteur, ou si
   // la colonne user_settings.widgets n'existe pas encore : front déployé avant la migration)
@@ -73,7 +79,8 @@ export const useWidgetsStore = defineStore("widgets", () => {
         return;
       }
       widgets.value = remote;
-      writeLocal(remote);
+      wallpaper.value = normalizeWallpaper(data.widgets?.wallpaper);
+      writeLocal(remote, wallpaper.value);
     } else {
       // Premier passage du membre : son bureau actuel (local ou par défaut) devient celui du compte
       scheduleRemoteSave(0);
@@ -97,7 +104,7 @@ export const useWidgetsStore = defineStore("widgets", () => {
       savePending = false;
       const { error } = await supabase
         .from("user_settings")
-        .update({ widgets: toDocument(widgets.value) })
+        .update({ widgets: toDocument(widgets.value, wallpaper.value) })
         .eq("user_id", userId);
 
       if (error) {
@@ -107,8 +114,17 @@ export const useWidgetsStore = defineStore("widgets", () => {
   }
 
   function persist() {
-    writeLocal(widgets.value);
+    writeLocal(widgets.value, wallpaper.value);
     scheduleRemoteSave();
+  }
+
+  // Nouveau fond d'écran. Un fichier de l'ordinateur remplacé est supprimé du navigateur.
+  function setWallpaper(next: Wallpaper) {
+    if (wallpaper.value.source === "file" && next.source !== "file") {
+      deleteWallpaperFile();
+    }
+    wallpaper.value = next;
+    persist();
   }
 
   function others(id?: string) {
@@ -202,6 +218,8 @@ export const useWidgetsStore = defineStore("widgets", () => {
 
   return {
     widgets,
+    wallpaper,
+    setWallpaper,
     load,
     unload,
     add,

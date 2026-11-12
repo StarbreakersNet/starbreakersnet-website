@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { GridLayout } from "grid-layout-plus";
+import DesktopWallpaper from "@/components/widgets/DesktopWallpaper.vue";
+import WallpaperModal from "@/components/widgets/WallpaperModal.vue";
 import WidgetFrame from "@/components/widgets/WidgetFrame.vue";
 import WidgetGallery from "@/components/widgets/WidgetGallery.vue";
 import WidgetSettingsModal from "@/components/widgets/WidgetSettingsModal.vue";
@@ -8,6 +10,7 @@ import { WIDGET_COMPONENTS } from "@/components/widgets/registry";
 import { GRID_COLUMNS, WIDGET_DEFINITIONS, WIDGET_SIZES } from "@/models/widgets";
 import { useWidgetsStore } from "@/stores/widgets";
 import type { FitState } from "@/composables/useFitContent";
+import type { WallpaperAppearance } from "@/types/Wallpaper";
 import type { Widget, WidgetSize, WidgetType } from "@/types/Widget";
 
 // Bureau à widgets, à la manière de macOS : grille libre où l'on place et règle ses widgets.
@@ -15,6 +18,8 @@ import type { Widget, WidgetSize, WidgetType } from "@/types/Widget";
 
 const GAP = 16;
 const MOBILE_QUERY = "(max-width: 720px)";
+// Barre d'outils masquée après ce délai sans activité (souris, clavier, toucher)
+const TOOLBAR_IDLE_DELAY = 1500;
 
 const store = useWidgetsStore();
 
@@ -107,11 +112,82 @@ function toggleEditing() {
     configuredId.value = null;
   }
 }
+
+// --- Fond d'écran
+
+const showWallpaper = ref(false);
+const appearance = ref<WallpaperAppearance>({ kind: "gradient", backdrop: null });
+
+// Miniature floue du fond pour le verre des widgets (voir lib/backdrop.ts)
+const desktopStyle = computed(() =>
+  appearance.value.backdrop ? { "--wallpaper-backdrop": `url("${appearance.value.backdrop}")` } : {}
+);
+
+// --- Barre d'outils discrète : elle s'efface quand on ne fait rien, et revient au moindre
+// mouvement de souris, appui sur une touche ou toucher. Toujours visible en mode édition.
+
+const awake = ref(true);
+const toolbarHovered = ref(false);
+const toolbarFocused = ref(false);
+let idleTimer: ReturnType<typeof setTimeout> | undefined;
+
+function wake() {
+  awake.value = true;
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => (awake.value = false), TOOLBAR_IDLE_DELAY);
+}
+
+const ACTIVITY_EVENTS = ["pointermove", "pointerdown", "keydown", "wheel"] as const;
+onMounted(() => {
+  wake();
+  ACTIVITY_EVENTS.forEach(event => window.addEventListener(event, wake, { passive: true }));
+});
+onBeforeUnmount(() => {
+  clearTimeout(idleTimer);
+  ACTIVITY_EVENTS.forEach(event => window.removeEventListener(event, wake));
+});
+
+// --- Menu du clic droit sur le bureau, comme sur macOS
+
+const menu = ref({ show: false, x: 0, y: 0 });
+
+const menuOptions = computed(() => [
+  { key: "edit", label: editing.value ? "Terminer la modification" : "Modifier les widgets" },
+  { key: "wallpaper", label: "Changer le fond d'écran…" },
+]);
+
+function onContextMenu(event: MouseEvent) {
+  // Menu du navigateur conservé sur les liens et les champs de saisie
+  if ((event.target as Element).closest("a, input, textarea, [contenteditable]")) return;
+  event.preventDefault();
+  menu.value = { show: true, x: event.clientX, y: event.clientY };
+}
+
+function onMenuSelect(key: string) {
+  menu.value.show = false;
+  if (key === "edit") toggleEditing();
+  if (key === "wallpaper") showWallpaper.value = true;
+}
+
+const toolbarVisible = computed(
+  () =>
+    editing.value ||
+    awake.value ||
+    toolbarHovered.value ||
+    toolbarFocused.value ||
+    showWallpaper.value ||
+    menu.value.show
+);
 </script>
 
 <template>
-  <main :class="{ editing }" class="desktop">
-    <div aria-hidden="true" class="wallpaper" />
+  <main
+    :class="{ editing, 'has-backdrop': !!appearance.backdrop }"
+    :data-wallpaper="appearance.kind"
+    :style="desktopStyle"
+    class="desktop"
+    @contextmenu="onContextMenu">
+    <desktop-wallpaper @appearance="appearance = $event" />
 
     <div v-if="isMobile" class="stack">
       <div
@@ -142,6 +218,7 @@ function toggleEditing() {
         :margin="[GAP, GAP]"
         :prevent-collision="true"
         :row-height="cellSize"
+        :use-css-transforms="false"
         :vertical-compact="false"
         @layout-updated="onLayoutUpdated">
         <template #item="{ item }">
@@ -165,7 +242,17 @@ function toggleEditing() {
       <transition name="slide-up">
         <widget-gallery v-if="editing" @add="addWidget" />
       </transition>
-      <div class="toolbar liquid-glass liquid-glass--overlay">
+      <div
+        :class="{ hidden: !toolbarVisible }"
+        class="toolbar liquid-glass liquid-glass--overlay"
+        @focusin="toolbarFocused = true"
+        @focusout="toolbarFocused = false"
+        @pointerenter="toolbarHovered = true"
+        @pointerleave="toolbarHovered = false">
+        <button class="glass-button" type="button" @click="showWallpaper = true">
+          <font-awesome-icon icon="image" />
+          <span class="label">Fond d'écran</span>
+        </button>
         <n-popconfirm
           v-if="editing"
           negative-text="Annuler"
@@ -174,7 +261,7 @@ function toggleEditing() {
           <template #trigger>
             <button class="glass-button" type="button">
               <font-awesome-icon icon="rotate-left" />
-              Réinitialiser
+              <span class="label">Réinitialiser</span>
             </button>
           </template>
           Remplacer vos widgets par ceux d'origine ?
@@ -185,12 +272,22 @@ function toggleEditing() {
           type="button"
           @click="toggleEditing">
           <font-awesome-icon :icon="editing ? 'check' : 'pen'" />
-          {{ editing ? "Terminé" : "Modifier les widgets" }}
+          <span class="label">{{ editing ? "Terminé" : "Modifier les widgets" }}</span>
         </button>
       </div>
     </div>
 
     <widget-settings-modal :widget-id="configuredId" @close="closeSettings" />
+    <wallpaper-modal v-model:show="showWallpaper" />
+    <n-dropdown
+      :options="menuOptions"
+      :show="menu.show"
+      :x="menu.x"
+      :y="menu.y"
+      placement="bottom-start"
+      trigger="manual"
+      @clickoutside="menu.show = false"
+      @select="onMenuSelect" />
   </main>
 </template>
 
@@ -206,23 +303,30 @@ function toggleEditing() {
   margin: 0 auto;
 }
 
-// Fond d'écran : dégradés aux couleurs du site, derrière le verre des widgets
-.wallpaper {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(60% 50% at 15% 20%, rgb(190 30 45 / 0.85), transparent 70%),
-    radial-gradient(50% 45% at 85% 25%, rgb(120 40 160 / 0.75), transparent 70%),
-    radial-gradient(55% 50% at 70% 85%, rgb(255 120 60 / 0.55), transparent 70%),
-    radial-gradient(45% 40% at 20% 85%, rgb(60 20 120 / 0.8), transparent 70%), rgb(41 0 5);
+// Verre sur une photo ou une vidéo : plus couvrant, pour que le texte reste lisible
+.desktop[data-wallpaper="image"],
+.desktop[data-wallpaper="video"] {
+  --glass-bg: rgb(28 22 26 / 0.5);
 
   :root[data-theme="light"] & {
+    --glass-bg: rgb(255 255 255 / 0.62);
+  }
+}
+
+// Photo : verre dépoli, avec la miniature floue du fond derrière chaque widget, alignée sur le
+// fond (fixed). Calculée une fois, sans backdrop-filter.
+.desktop.has-backdrop {
+  --glass-bg: rgb(28 22 26 / 0.22);
+
+  :root[data-theme="light"] & {
+    --glass-bg: rgb(255 255 255 / 0.4);
+  }
+
+  :deep(.widget.liquid-glass) {
     background:
-      radial-gradient(60% 50% at 15% 20%, rgb(255 160 170 / 0.9), transparent 70%),
-      radial-gradient(50% 45% at 85% 25%, rgb(200 170 255 / 0.85), transparent 70%),
-      radial-gradient(55% 50% at 70% 85%, rgb(255 205 150 / 0.85), transparent 70%),
-      radial-gradient(45% 40% at 20% 85%, rgb(170 190 255 / 0.8), transparent 70%), rgb(250 238 240);
+      radial-gradient(120% 90% at 0% 0%, var(--glass-sheen), transparent 55%),
+      linear-gradient(var(--glass-bg), var(--glass-bg)),
+      var(--wallpaper-backdrop) center / cover fixed;
   }
 }
 
@@ -240,9 +344,8 @@ function toggleEditing() {
     border-radius: var(--glass-radius);
   }
 
+  // Pas de transform : il décalerait la miniature floue du fond (background-attachment: fixed)
   :deep(.vgl-item--dragging) {
-    transform: scale(1.03);
-
     .widget {
       box-shadow: 0 24px 48px rgb(0 0 0 / 0.35);
     }
@@ -293,6 +396,36 @@ function toggleEditing() {
   display: flex;
   gap: 8px;
   padding: 6px;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+
+  &.hidden {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+    pointer-events: none;
+  }
+
+  .glass-button {
+    white-space: nowrap;
+  }
+
+  // Petit écran : icônes seules (libellés gardés pour les lecteurs d'écran), sauf « Terminé »
+  @media (max-width: 720px) {
+    .glass-button:not(.primary) {
+      width: 2.25rem;
+      padding: 0;
+
+      .label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+    }
+  }
 
   .glass-button.primary {
     color: white;

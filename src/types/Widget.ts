@@ -1,3 +1,5 @@
+import type { Wallpaper } from "@/types/Wallpaper";
+
 // Widgets de la page Bureau (/bureau), placés sur une grille comme ceux du bureau de macOS
 
 export type WidgetType = "clock" | "markdown" | "links" | "weather" | "countdown" | "calendar";
@@ -73,8 +75,9 @@ interface WidgetOf<T extends WidgetType> {
 
 export type Widget = { [T in WidgetType]: WidgetOf<T> }[WidgetType];
 
-// Format enregistré (navigateur et colonne user_settings.widgets)
+// Format enregistré (navigateur et colonne user_settings.widgets) : widgets et fond d'écran
 export interface WidgetsDocument {
   version: 1;
   widgets: Widget[];
+  wallpaper?: Wallpaper;
 }

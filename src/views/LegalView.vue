@@ -171,7 +171,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                     Aucun cookie publicitaire ni de mesure d'audience. Votre navigateur garde
                     seulement votre session, votre choix de thème et les widgets de votre bureau,
                     nécessaires au fonctionnement du site : ils ne demandent donc pas de
-                    consentement.
+                    consentement. Le fond d'écran du bureau y est gardé aussi : une image ou une
+                    vidéo choisie sur votre ordinateur n'est jamais envoyée au site.
                   </h-text>
                   <h-text depth="3">
                     Les pages Discord et Le Zap affichent des contenus de services tiers, qui
@@ -179,6 +180,9 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                     confidentialité renforcée ». Sur la page Bureau, les icônes du widget Liens
                     viennent de DuckDuckGo, qui ne reçoit que le nom de domaine de chaque lien, et
                     la météo d'Open-Meteo, qui ne reçoit que les coordonnées de la ville choisie.
+                    Les photos de fond d'écran viennent d'Unsplash (directement ou par Lorem Picsum)
+                    ; une image ou une vidéo donnée par son adresse est chargée depuis le site qui
+                    l'héberge.
                   </h-text>
                 </h-flex>
               </template>
