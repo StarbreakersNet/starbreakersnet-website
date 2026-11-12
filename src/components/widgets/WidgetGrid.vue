@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, type PropType, ref, watch } from "vue";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.min.css";
+import type { GridItem, GridPosition } from "@/types/Widget";
 
 // Grille de Buroh, confiée à gridstack.js : cases carrées, glisser-déposer à la souris et au toucher.
 // Au toucher, un widget se saisit par un appui long (300 ms) : un doigt qui glisse tout de suite fait
@@ -9,36 +10,41 @@ import "gridstack/dist/gridstack.min.css";
 // Vue affiche les widgets ; gridstack les place. Les changements venus du store (ajout, suppression,
 // nouvelle taille) lui sont transmis ici, et ses glisser-déposer remontent par l'événement « moved ».
 
-export interface GridItem {
-  id: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-const props = defineProps<{
-  items: GridItem[];
-  columns: number;
+const props = defineProps({
+  items: {
+    type: Array as PropType<GridItem[]>,
+    required: true,
+  },
+  columns: {
+    type: Number,
+    required: true,
+  },
   // Espace entre deux widgets, en pixels
-  gap: number;
-  editable: boolean;
+  gap: {
+    type: Number,
+    required: true,
+  },
+  editable: {
+    type: Boolean,
+    default: false,
+  },
   // Widgets réordonnés comme une liste, à la manière de l'écran d'accueil d'un téléphone (mobile),
   // ou laissés où on les pose (ordinateur)
-  list?: boolean;
-}>();
+  list: {
+    type: Boolean,
+    default: false,
+  },
+});
 
 const emit = defineEmits<{
-  moved: [positions: { id: string; x: number; y: number }[]];
-}>();
-
-defineSlots<{
-  item(props: { id: string }): unknown;
+  (e: "moved", positions: GridPosition[]): void;
 }>();
 
 const root = ref<HTMLElement | null>(null);
 const elements = new Map<string, HTMLElement>();
+
 let grid: GridStack | null = null;
+
 // Widgets tels que gridstack les connaît
 let known = new Map<string, GridItem>();
 
@@ -50,12 +56,16 @@ function setElement(id: string, element: unknown) {
   }
 }
 
-const same = (a: GridItem, b: GridItem) => a.x === b.x && a.y === b.y && a.w === b.w && a.h === b.h;
+function samePlace(a: GridItem, b: GridItem) {
+  return a.x === b.x && a.y === b.y && a.w === b.w && a.h === b.h;
+}
 
-onMounted(() => {
-  if (!root.value) return;
+function remember(items: GridItem[]) {
+  known = new Map(items.map(item => [item.id, { ...item }]));
+}
 
-  const instance = GridStack.init(
+function createGrid(element: HTMLElement) {
+  return GridStack.init(
     {
       column: props.columns,
       // Cases carrées, recalculées avec la largeur de la page
@@ -68,72 +78,87 @@ onMounted(() => {
       // Boutons du cadre (supprimer, régler) cliquables sans déplacer le widget
       draggable: { cancel: "button, a, input, textarea, select, .no-drag" },
     },
-    root.value
+    element
   );
-  if (!instance) return;
-  grid = instance;
-  known = new Map(props.items.map(item => [item.id, { ...item }]));
+}
 
-  instance.on("dragstop", () => {
-    const positions = instance.engine.nodes.map(node => ({
-      id: String(node.id),
-      x: node.x ?? 0,
-      y: node.y ?? 0,
-    }));
-    positions.forEach(({ id, x, y }) => {
-      const item = known.get(id);
-      if (item) known.set(id, { ...item, x, y });
-    });
-    emit("moved", positions);
-  });
-});
+// Fin d'un glisser-déposer : positions de tous les widgets, poussés compris
+function onDragStop() {
+  const nodes = grid?.engine.nodes ?? [];
 
-onBeforeUnmount(() => {
-  // Vue retire lui-même les éléments
-  grid?.destroy(false);
-  grid = null;
-});
+  const positions = nodes.map(node => ({
+    id: String(node.id),
+    x: node.x ?? 0,
+    y: node.y ?? 0,
+  }));
+
+  for (const { id, x, y } of positions) {
+    const item = known.get(id);
+
+    if (item) {
+      known.set(id, { ...item, x, y });
+    }
+  }
+
+  emit("moved", positions);
+}
+
+// Changements du store. Avant la mise à jour du DOM : retrait des widgets supprimés, tant que leurs
+// éléments existent. Après : ajout des nouveaux et déplacement des autres.
+async function sync(items: GridItem[]) {
+  const next = new Map(items.map(item => [item.id, item]));
+
+  for (const id of known.keys()) {
+    const element = elements.get(id);
+
+    if (grid && element && !next.has(id)) {
+      grid.removeWidget(element, false, false);
+    }
+  }
+
+  await nextTick();
+
+  if (grid) {
+    grid.batchUpdate();
+
+    for (const item of items) {
+      const element = elements.get(item.id);
+      const previous = known.get(item.id);
+
+      if (element && !previous) {
+        grid.makeWidget(element, { ...item });
+      }
+
+      if (element && previous && !samePlace(previous, item)) {
+        grid.update(element, { x: item.x, y: item.y, w: item.w, h: item.h });
+      }
+    }
+
+    grid.batchUpdate(false);
+    remember(items);
+  }
+}
 
 watch(
   () => props.editable,
   editable => grid?.setStatic(!editable)
 );
 
-// Changements du store. Avant la mise à jour du DOM : retrait des widgets supprimés, tant que leurs
-// éléments existent. Après : ajout des nouveaux et déplacement des autres.
-watch(
-  () => props.items,
-  async items => {
-    if (!grid) return;
-    const next = new Map(items.map(item => [item.id, item]));
+watch(() => props.items, sync, { deep: true });
 
-    for (const id of known.keys()) {
-      const element = elements.get(id);
-      if (!next.has(id) && element) {
-        grid.removeWidget(element, false, false);
-      }
-    }
+onMounted(() => {
+  grid = root.value ? createGrid(root.value) : null;
 
-    await nextTick();
-    if (!grid) return;
+  if (grid) {
+    remember(props.items);
+    grid.on("dragstop", onDragStop);
+  }
+});
 
-    grid.batchUpdate();
-    for (const item of items) {
-      const element = elements.get(item.id);
-      const previous = known.get(item.id);
-      if (!element) continue;
-
-      if (!previous) {
-        grid.makeWidget(element, { ...item });
-      } else if (!same(previous, item)) {
-        grid.update(element, { x: item.x, y: item.y, w: item.w, h: item.h });
-      }
-    }
-    grid.batchUpdate(false);
-    known = new Map(items.map(item => [item.id, { ...item }]));
-  },
-  { deep: true }
-);
+onBeforeUnmount(() => {
+  grid?.destroy(false);
+  grid = null;
+});
 </script>
 
 <template>

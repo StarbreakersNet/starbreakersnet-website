@@ -1,9 +1,20 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { type PropType, ref } from "vue";
+import HButton from "@/components/c/hButton.vue";
+import HFlex from "@/components/c/hFlex.vue";
+import HForm from "@/components/c/hForm.vue";
+import HFormItem from "@/components/c/hFormItem.vue";
+import HInput from "@/components/c/hInput.vue";
+import HInputGroup from "@/components/c/hInputGroup.vue";
+import HSwitch from "@/components/c/hSwitch.vue";
+import HText from "@/components/c/hText.vue";
 import { createId, LINKS_MAX, normalizeUrl } from "@/models/widgets";
 import type { LinkItem, LinksSettings } from "@/types/Widget";
 
-const settings = defineModel<LinksSettings>("settings", { required: true });
+const settings = defineModel("settings", {
+  type: Object as PropType<LinksSettings>,
+  required: true,
+});
 
 const newTitle = ref("");
 const newUrl = ref("");
@@ -20,15 +31,17 @@ function setLinks(links: LinkItem[]) {
 function addLink() {
   const url = normalizeUrl(newUrl.value);
 
-  if (!url) {
-    urlError.value = "Adresse invalide (http ou https uniquement)";
-    return;
-  }
+  if (url) {
+    const link = { id: createId(), title: newTitle.value.trim(), url };
 
-  setLinks([...settings.value.links, { id: createId(), title: newTitle.value.trim(), url }]);
-  newTitle.value = "";
-  newUrl.value = "";
-  urlError.value = "";
+    setLinks([...settings.value.links, link]);
+
+    newTitle.value = "";
+    newUrl.value = "";
+    urlError.value = "";
+  } else {
+    urlError.value = "Adresse invalide (http ou https uniquement)";
+  }
 }
 
 function removeLink(id: string) {
@@ -38,73 +51,89 @@ function removeLink(id: string) {
 function moveLink(index: number, direction: -1 | 1) {
   const links = [...settings.value.links];
   const [link] = links.splice(index, 1);
+
   links.splice(index + direction, 0, link!);
   setLinks(links);
 }
 
 function renameLink(id: string, title: string) {
-  setLinks(settings.value.links.map(link => (link.id === id ? { ...link, title } : link)));
+  const links = settings.value.links.map(link => (link.id === id ? { ...link, title } : link));
+
+  setLinks(links);
+}
+
+function updateNewTab(newTab: boolean) {
+  settings.value = { ...settings.value, newTab };
 }
 </script>
 
 <template>
-  <n-form label-placement="top" @submit.prevent="addLink">
-    <n-form-item label="Liens">
-      <n-text v-if="settings.links.length === 0" depth="3">Aucun lien pour l'instant.</n-text>
+  <h-form :model="settings" label-placement="top" @submit="addLink">
+    <h-form-item label="Liens">
+      <h-text v-if="settings.links.length === 0" depth="3">Aucun lien pour l'instant.</h-text>
       <ol v-else class="list">
-        <li v-for="(link, index) in settings.links" :key="link.id" class="row">
-          <n-input
-            :maxlength="40"
-            :placeholder="hostname(link.url)"
-            :value="link.title"
-            size="small"
-            @update:value="(title: string) => renameLink(link.id, title)" />
-          <n-text class="url" depth="3">{{ link.url }}</n-text>
-          <n-button-group size="small">
-            <n-button
-              :disabled="index === 0"
-              aria-label="Monter"
-              quaternary
-              @click="moveLink(index, -1)">
-              <font-awesome-icon icon="arrow-up" />
-            </n-button>
-            <n-button
-              :disabled="index === settings.links.length - 1"
-              aria-label="Descendre"
-              quaternary
-              @click="moveLink(index, 1)">
-              <font-awesome-icon icon="arrow-down" />
-            </n-button>
-            <n-button aria-label="Supprimer" quaternary type="error" @click="removeLink(link.id)">
-              <font-awesome-icon icon="trash" />
-            </n-button>
-          </n-button-group>
+        <li v-for="(link, index) in settings.links" :key="link.id">
+          <h-flex :size="8" :wrap="false">
+            <h-input
+              :maxlength="40"
+              :placeholder="hostname(link.url)"
+              :value="link.title"
+              class="title"
+              size="small"
+              @update:value="(title: string) => renameLink(link.id, title)" />
+            <h-text class="url" depth="3">{{ link.url }}</h-text>
+            <h-flex :size="2">
+              <h-button
+                :disabled="index === 0"
+                aria-label="Monter"
+                quaternary
+                size="small"
+                tooltip="Monter"
+                @click="moveLink(index, -1)">
+                <font-awesome-icon icon="arrow-up" />
+              </h-button>
+              <h-button
+                :disabled="index === settings.links.length - 1"
+                aria-label="Descendre"
+                quaternary
+                size="small"
+                tooltip="Descendre"
+                @click="moveLink(index, 1)">
+                <font-awesome-icon icon="arrow-down" />
+              </h-button>
+              <h-button
+                aria-label="Supprimer"
+                quaternary
+                size="small"
+                tooltip="Supprimer"
+                type="error"
+                @click="removeLink(link.id)">
+                <font-awesome-icon icon="trash" />
+              </h-button>
+            </h-flex>
+          </h-flex>
         </li>
       </ol>
-    </n-form-item>
-
-    <n-form-item
+    </h-form-item>
+    <h-form-item
       v-if="settings.links.length < LINKS_MAX"
       :feedback="urlError"
       :validation-status="urlError ? 'error' : undefined"
       label="Ajouter un lien">
-      <n-input-group>
-        <n-input v-model:value="newTitle" :maxlength="40" placeholder="Nom (facultatif)" />
-        <n-input
+      <h-input-group>
+        <h-input v-model:value="newTitle" :maxlength="40" placeholder="Nom (facultatif)" />
+        <h-input
           v-model:value="newUrl"
           placeholder="exemple.fr"
           @keydown.enter.prevent="addLink"
           @update:value="urlError = ''" />
-        <n-button :disabled="!newUrl.trim()" type="primary" @click="addLink">Ajouter</n-button>
-      </n-input-group>
-    </n-form-item>
-
-    <n-form-item label="Ouvrir dans un nouvel onglet">
-      <n-switch
-        :value="settings.newTab"
-        @update:value="(newTab: boolean) => (settings = { ...settings, newTab })" />
-    </n-form-item>
-  </n-form>
+        <h-button :disabled="!newUrl.trim()" type="primary" @click="addLink">Ajouter</h-button>
+      </h-input-group>
+    </h-form-item>
+    <h-form-item label="Ouvrir dans un nouvel onglet">
+      <h-switch :value="settings.newTab" @update:value="updateNewTab" />
+    </h-form-item>
+  </h-form>
 </template>
 
 <style lang="scss" scoped>
@@ -117,14 +146,13 @@ function renameLink(id: string, title: string) {
   list-style: none;
 }
 
-.row {
-  display: grid;
-  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
+.title {
+  flex: 0 1 10rem;
 }
 
 .url {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

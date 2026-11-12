@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import _ from "lodash";
 import { supabase } from "@/lib/supabaseClient";
 import { useMessage } from "@/composables/useMessage";
 import {
@@ -17,11 +18,19 @@ import { DEFAULT_WALLPAPER, normalizeWallpaper } from "@/models/wallpapers";
 import { deleteWallpaperFile } from "@/lib/wallpaperFile";
 import type { FitState } from "@/composables/useFitContent";
 import type { Wallpaper } from "@/types/Wallpaper";
-import type { Widget, WidgetSettingsMap, WidgetSize, WidgetType } from "@/types/Widget";
+import type {
+  GridPosition,
+  Widget,
+  WidgetSettingsMap,
+  WidgetSize,
+  WidgetType,
+} from "@/types/Widget";
 
 const STORAGE_KEY = "widgets";
+
 // Délai avant d'enregistrer sur le compte : un déplacement ou une saisie n'envoie qu'une requête
 const REMOTE_SAVE_DELAY = 800;
+
 // En dessous de cette échelle, le texte d'un widget qu'on modifie devient trop petit : taille du dessus
 const GROW_BELOW_SCALE = 0.85;
 
@@ -29,7 +38,11 @@ function readLocal(): { widgets: Widget[] | null; wallpaper: Wallpaper } {
   try {
     const value = localStorage.getItem(STORAGE_KEY);
     const raw = value ? JSON.parse(value) : null;
-    return { widgets: normalizeDocument(raw), wallpaper: normalizeWallpaper(raw?.wallpaper) };
+
+    return {
+      widgets: normalizeDocument(raw),
+      wallpaper: normalizeWallpaper(raw?.wallpaper),
+    };
   } catch {
     return { widgets: null, wallpaper: DEFAULT_WALLPAPER };
   }
@@ -55,62 +68,35 @@ export const useWidgetsStore = defineStore("widgets", () => {
   // Compte sur lequel enregistrer, connu une fois ses widgets chargés (null pour un visiteur, ou si
   // la colonne user_settings.widgets n'existe pas encore : front déployé avant la migration)
   let accountId: string | null = null;
-  let saveTimer: ReturnType<typeof setTimeout> | undefined;
+
   // Modification pas encore envoyée : un rechargement du compte ne doit pas l'écraser
   let savePending = false;
 
-  async function load(userId: string) {
-    accountId = null;
-    const { data, error } = await supabase
-      .from("user_settings")
-      .select("widgets")
-      .eq("user_id", userId)
-      .maybeSingle();
+  // --- Enregistrement sur le compte
 
-    // En cas d'erreur, on garde simplement les widgets locaux, sans enregistrer sur le compte
-    if (error || !data) return;
-
-    accountId = userId;
-    const remote = normalizeDocument(data.widgets);
-
-    if (remote) {
-      if (savePending) {
-        scheduleRemoteSave();
-        return;
-      }
-      widgets.value = remote;
-      wallpaper.value = normalizeWallpaper(data.widgets?.wallpaper);
-      writeLocal(remote, wallpaper.value);
-    } else {
-      // Premier passage du membre : son Buroh actuel (local ou par défaut) devient celui du compte
-      scheduleRemoteSave(0);
-    }
-  }
-
-  // Déconnexion : on garde le Buroh affiché, qui n'est plus enregistré que dans le navigateur
-  function unload() {
-    clearTimeout(saveTimer);
+  async function saveRemote() {
     savePending = false;
-    accountId = null;
-  }
 
-  function scheduleRemoteSave(delay = REMOTE_SAVE_DELAY) {
-    if (!accountId) return;
-    const userId = accountId;
-
-    clearTimeout(saveTimer);
-    savePending = true;
-    saveTimer = setTimeout(async () => {
-      savePending = false;
+    if (accountId) {
       const { error } = await supabase
         .from("user_settings")
         .update({ widgets: toDocument(widgets.value, wallpaper.value) })
-        .eq("user_id", userId);
+        .eq("user_id", accountId);
 
       if (error) {
         message.error("Impossible d'enregistrer vos widgets sur votre compte");
       }
-    }, delay);
+    }
+  }
+
+  // Une série de modifications rapprochées (glisser-déposer, saisie) n'envoie qu'une requête
+  const saveRemoteLater = _.debounce(saveRemote, REMOTE_SAVE_DELAY);
+
+  function scheduleRemoteSave() {
+    if (accountId) {
+      savePending = true;
+      saveRemoteLater();
+    }
   }
 
   function persist() {
@@ -118,13 +104,56 @@ export const useWidgetsStore = defineStore("widgets", () => {
     scheduleRemoteSave();
   }
 
-  // Nouveau fond d'écran. Un fichier de l'ordinateur remplacé est supprimé du navigateur.
+  async function load(userId: string) {
+    accountId = null;
+
+    const { data, error } = await supabase
+      .from("user_settings")
+      .select("widgets")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    // En cas d'erreur, on garde simplement les widgets locaux, sans enregistrer sur le compte
+    if (!error && data) {
+      accountId = userId;
+
+      const remote = normalizeDocument(data.widgets);
+
+      if (!remote || savePending) {
+        // Premier passage du membre, ou modification en attente : le Buroh affiché devient celui du
+        // compte
+        scheduleRemoteSave();
+      } else {
+        widgets.value = remote;
+        wallpaper.value = normalizeWallpaper(data.widgets?.wallpaper);
+        writeLocal(remote, wallpaper.value);
+      }
+    }
+  }
+
+  // Déconnexion : on garde le Buroh affiché, qui n'est plus enregistré que dans le navigateur
+  function unload() {
+    saveRemoteLater.cancel();
+    savePending = false;
+    accountId = null;
+  }
+
+  // --- Fond d'écran
+
+  // Un fichier de l'ordinateur remplacé est supprimé du navigateur
   function setWallpaper(next: Wallpaper) {
     if (wallpaper.value.source === "file" && next.source !== "file") {
       deleteWallpaperFile();
     }
+
     wallpaper.value = next;
     persist();
+  }
+
+  // --- Widgets
+
+  function find(id: string) {
+    return widgets.value.find(widget => widget.id === id);
   }
 
   function others(id?: string) {
@@ -133,7 +162,9 @@ export const useWidgetsStore = defineStore("widgets", () => {
 
   function add(type: WidgetType, size?: WidgetSize) {
     const definition = WIDGET_DEFINITIONS[type];
-    const widgetSize = size && definition.sizes.includes(size) ? size : definition.defaultSize;
+    const allowed = size !== undefined && definition.sizes.includes(size);
+    const widgetSize = allowed ? size : definition.defaultSize;
+
     const widget = {
       id: createId(),
       type,
@@ -144,6 +175,7 @@ export const useWidgetsStore = defineStore("widgets", () => {
 
     widgets.value.push(widget);
     persist();
+
     return widget;
   }
 
@@ -154,25 +186,26 @@ export const useWidgetsStore = defineStore("widgets", () => {
 
   // Nouvelle taille : même place si elle tient, sinon la première place libre
   function resize(id: string, size: WidgetSize) {
-    const widget = widgets.value.find(item => item.id === id);
-    if (!widget || widget.size === size) return;
+    const widget = find(id);
 
-    const rect = { x: widget.x, y: widget.y, ...WIDGET_SIZES[size] };
-    const position = fits(rect, others(id))
-      ? { x: widget.x, y: widget.y }
-      : findFreeSpot(size, others(id));
+    if (widget && widget.size !== size) {
+      const rect = { x: widget.x, y: widget.y, ...WIDGET_SIZES[size] };
+      const samePlace = fits(rect, others(id));
+      const position = samePlace ? { x: widget.x, y: widget.y } : findFreeSpot(size, others(id));
 
-    Object.assign(widget, { size, ...position });
-    persist();
+      Object.assign(widget, { size, ...position });
+      persist();
+    }
   }
 
   function updateSettings<T extends WidgetType>(id: string, settings: WidgetSettingsMap[T]) {
-    const widget = widgets.value.find(item => item.id === id);
-    if (!widget) return;
+    const widget = find(id);
 
-    widget.settings = settings;
-    growingId.value = id;
-    persist();
+    if (widget) {
+      widget.settings = settings;
+      growingId.value = id;
+      persist();
+    }
   }
 
   // Widget dont on modifie le contenu : s'il ne tient plus qu'en réduisant trop son texte, il passe
@@ -181,14 +214,17 @@ export const useWidgetsStore = defineStore("widgets", () => {
   const growingId = ref<string | null>(null);
 
   function growIfCramped(id: string, { scale, overflowing }: FitState) {
-    if (growingId.value !== id || (scale >= GROW_BELOW_SCALE && !overflowing)) return;
+    const cramped = scale < GROW_BELOW_SCALE || overflowing;
+    const widget = growingId.value === id && cramped ? find(id) : undefined;
 
-    const widget = widgets.value.find(item => item.id === id);
-    if (!widget) return;
+    if (widget) {
+      const sizes = WIDGET_DEFINITIONS[widget.type].sizes;
+      const next = sizes[sizes.indexOf(widget.size) + 1];
 
-    const sizes = WIDGET_DEFINITIONS[widget.type].sizes;
-    const next = sizes[sizes.indexOf(widget.size) + 1];
-    if (next) resize(id, next);
+      if (next) {
+        resize(id, next);
+      }
+    }
   }
 
   function stopGrowing() {
@@ -197,26 +233,27 @@ export const useWidgetsStore = defineStore("widgets", () => {
 
   // Positions après un glisser-déposer, sur la grille de l'ordinateur ou sur celle du mobile (qui ne
   // change pas la disposition de l'ordinateur)
-  function move(positions: { id: string; x: number; y: number }[], grid: "desktop" | "mobile") {
+  function move(positions: GridPosition[], grid: "desktop" | "mobile") {
     let changed = false;
 
     for (const { id, x, y } of positions) {
-      const widget = widgets.value.find(item => item.id === id);
-      if (!widget) continue;
+      const widget = find(id);
 
-      if (grid === "mobile") {
-        if (widget.mobile?.x !== x || widget.mobile?.y !== y) {
-          widget.mobile = { x, y };
-          changed = true;
-        }
-      } else if (widget.x !== x || widget.y !== y) {
+      if (widget && grid === "mobile" && (widget.mobile?.x !== x || widget.mobile?.y !== y)) {
+        widget.mobile = { x, y };
+        changed = true;
+      }
+
+      if (widget && grid === "desktop" && (widget.x !== x || widget.y !== y)) {
         widget.x = x;
         widget.y = y;
         changed = true;
       }
     }
 
-    if (changed) persist();
+    if (changed) {
+      persist();
+    }
   }
 
   function reset() {

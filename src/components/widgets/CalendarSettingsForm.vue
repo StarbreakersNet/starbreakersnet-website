@@ -1,15 +1,24 @@
 <script lang="ts" setup>
+import { type PropType } from "vue";
+import HForm from "@/components/c/hForm.vue";
+import HFormItem from "@/components/c/hFormItem.vue";
+import HSwitch from "@/components/c/hSwitch.vue";
 import type { CalendarSettings } from "@/types/Widget";
 
-const settings = defineModel<CalendarSettings>("settings", { required: true });
+const settings = defineModel("settings", {
+  type: Object as PropType<CalendarSettings>,
+  required: true,
+});
+
+function updateWeekNumbers(weekNumbers: boolean) {
+  settings.value = { ...settings.value, weekNumbers };
+}
 </script>
 
 <template>
-  <n-form label-placement="top">
-    <n-form-item label="Numéros de semaine">
-      <n-switch
-        :value="settings.weekNumbers"
-        @update:value="(weekNumbers: boolean) => (settings = { ...settings, weekNumbers })" />
-    </n-form-item>
-  </n-form>
+  <h-form :model="settings" label-placement="top">
+    <h-form-item label="Numéros de semaine">
+      <h-switch :value="settings.weekNumbers" @update:value="updateWeekNumbers" />
+    </h-form-item>
+  </h-form>
 </template>

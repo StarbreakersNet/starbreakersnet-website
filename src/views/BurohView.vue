@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import HDropdown from "@/components/c/hDropdown.vue";
+import HPopconfirm from "@/components/c/hPopconfirm.vue";
 import BurohWallpaper from "@/components/widgets/BurohWallpaper.vue";
 import WallpaperModal from "@/components/widgets/WallpaperModal.vue";
 import WidgetFrame from "@/components/widgets/WidgetFrame.vue";
 import WidgetGallery from "@/components/widgets/WidgetGallery.vue";
-import WidgetGrid, { type GridItem } from "@/components/widgets/WidgetGrid.vue";
+import WidgetGrid from "@/components/widgets/WidgetGrid.vue";
 import WidgetSettingsModal from "@/components/widgets/WidgetSettingsModal.vue";
 import { WIDGET_COMPONENTS } from "@/components/widgets/registry";
 import {
@@ -17,18 +19,23 @@ import {
 import { useWidgetsStore } from "@/stores/widgets";
 import type { FitState } from "@/composables/useFitContent";
 import type { WallpaperAppearance } from "@/types/Wallpaper";
-import type { WidgetSize, WidgetType } from "@/types/Widget";
+import type { GridItem, GridPosition, WidgetSize, WidgetType } from "@/types/Widget";
 
 // Buroh, page d'accueil à widgets à la manière du bureau de macOS : grille libre où l'on place
 // et règle ses widgets.
 // Sur petit écran, grille de 4 colonnes (deux petits widgets par ligne), avec sa propre disposition :
 // déplacer un widget sur mobile ne change pas la disposition de l'ordinateur.
+// Barre d'outils et galerie en verre (glass.scss) plutôt qu'avec les boutons de Naive UI, pour
+// rester dans le style Liquid Glass.
 
 const GAP = 16;
 const MOBILE_GAP = 14;
 const MOBILE_QUERY = "(max-width: 720px)";
+
 // Barre d'outils masquée après ce délai sans activité (souris, clavier, toucher)
 const TOOLBAR_IDLE_DELAY = 1500;
+
+const ACTIVITY_EVENTS = ["pointermove", "pointerdown", "keydown", "wheel"] as const;
 
 const store = useWidgetsStore();
 
@@ -39,24 +46,26 @@ const configuredId = ref<string | null>(null);
 
 const mobileQuery = window.matchMedia(MOBILE_QUERY);
 const isMobile = ref(mobileQuery.matches);
-const onMobileChange = (event: MediaQueryListEvent) => (isMobile.value = event.matches);
-onMounted(() => mobileQuery.addEventListener("change", onMobileChange));
-onBeforeUnmount(() => mobileQuery.removeEventListener("change", onMobileChange));
+
+function onMobileChange(event: MediaQueryListEvent) {
+  isMobile.value = event.matches;
+}
 
 // --- Grille (voir components/widgets/WidgetGrid.vue)
 
 const gridItems = computed<GridItem[]>(() => {
   const mobile = isMobile.value ? mobileLayout(store.widgets) : null;
-  return store.widgets.map(widget => ({
-    id: widget.id,
-    ...(mobile?.get(widget.id) ?? { x: widget.x, y: widget.y }),
-    ...WIDGET_SIZES[widget.size],
-  }));
+
+  return store.widgets.map(widget => {
+    const position = mobile?.get(widget.id) ?? { x: widget.x, y: widget.y };
+
+    return { id: widget.id, ...position, ...WIDGET_SIZES[widget.size] };
+  });
 });
 
 const widgetsById = computed(() => new Map(store.widgets.map(widget => [widget.id, widget])));
 
-function onMoved(positions: { id: string; x: number; y: number }[]) {
+function onMoved(positions: GridPosition[]) {
   store.move(positions, isMobile.value ? "mobile" : "desktop");
 }
 
@@ -65,11 +74,18 @@ function onMoved(positions: { id: string; x: number; y: number }[]) {
 // Sur mobile, la galerie couvrirait les widgets à déplacer : elle s'ouvre avec le bouton « + »,
 // comme sur iPhone, et se referme après un ajout
 const galleryOpen = ref(false);
+
 const showGallery = computed(() => editing.value && (!isMobile.value || galleryOpen.value));
+
+const galleryLabel = computed(() =>
+  galleryOpen.value ? "Fermer la galerie" : "Ajouter un widget"
+);
 
 function addWidget(type: WidgetType, size: WidgetSize) {
   galleryOpen.value = false;
+
   const widget = store.add(type, size);
+
   // Un widget sans contenu par défaut s'ouvre directement sur ses réglages
   if (type === "links") {
     configuredId.value = widget.id;
@@ -84,6 +100,7 @@ function closeSettings() {
 function toggleEditing() {
   editing.value = !editing.value;
   galleryOpen.value = false;
+
   if (!editing.value) {
     configuredId.value = null;
   }
@@ -95,9 +112,11 @@ const showWallpaper = ref(false);
 const appearance = ref<WallpaperAppearance>({ kind: "gradient", backdrop: null });
 
 // Miniature floue du fond pour le verre des widgets (voir lib/backdrop.ts)
-const burohStyle = computed(() =>
-  appearance.value.backdrop ? { "--wallpaper-backdrop": `url("${appearance.value.backdrop}")` } : {}
-);
+const burohStyle = computed(() => {
+  const backdrop = appearance.value.backdrop;
+
+  return backdrop ? { "--wallpaper-backdrop": `url("${backdrop}")` } : {};
+});
 
 // --- Barre d'outils discrète : elle s'efface quand on ne fait rien, et revient au moindre
 // mouvement de souris, appui sur une touche ou toucher. Toujours visible en mode édition.
@@ -105,23 +124,15 @@ const burohStyle = computed(() =>
 const awake = ref(true);
 const toolbarHovered = ref(false);
 const toolbarFocused = ref(false);
+
 let idleTimer: ReturnType<typeof setTimeout> | undefined;
 
 function wake() {
   awake.value = true;
+
   clearTimeout(idleTimer);
   idleTimer = setTimeout(() => (awake.value = false), TOOLBAR_IDLE_DELAY);
 }
-
-const ACTIVITY_EVENTS = ["pointermove", "pointerdown", "keydown", "wheel"] as const;
-onMounted(() => {
-  wake();
-  ACTIVITY_EVENTS.forEach(event => window.addEventListener(event, wake, { passive: true }));
-});
-onBeforeUnmount(() => {
-  clearTimeout(idleTimer);
-  ACTIVITY_EVENTS.forEach(event => window.removeEventListener(event, wake));
-});
 
 // --- Menu du clic droit sur le Buroh, comme sur macOS
 
@@ -134,15 +145,24 @@ const menuOptions = computed(() => [
 
 function onContextMenu(event: MouseEvent) {
   // Menu du navigateur conservé sur les liens et les champs de saisie
-  if ((event.target as Element).closest("a, input, textarea, [contenteditable]")) return;
-  event.preventDefault();
-  menu.value = { show: true, x: event.clientX, y: event.clientY };
+  const onField = (event.target as Element).closest("a, input, textarea, [contenteditable]");
+
+  if (!onField) {
+    event.preventDefault();
+    menu.value = { show: true, x: event.clientX, y: event.clientY };
+  }
 }
 
 function onMenuSelect(key: string) {
   menu.value.show = false;
-  if (key === "edit") toggleEditing();
-  if (key === "wallpaper") showWallpaper.value = true;
+
+  if (key === "edit") {
+    toggleEditing();
+  }
+
+  if (key === "wallpaper") {
+    showWallpaper.value = true;
+  }
 }
 
 const toolbarVisible = computed(
@@ -154,6 +174,20 @@ const toolbarVisible = computed(
     showWallpaper.value ||
     menu.value.show
 );
+
+onMounted(() => {
+  mobileQuery.addEventListener("change", onMobileChange);
+
+  wake();
+  ACTIVITY_EVENTS.forEach(event => window.addEventListener(event, wake, { passive: true }));
+});
+
+onBeforeUnmount(() => {
+  mobileQuery.removeEventListener("change", onMobileChange);
+
+  clearTimeout(idleTimer);
+  ACTIVITY_EVENTS.forEach(event => window.removeEventListener(event, wake));
+});
 </script>
 
 <template>
@@ -164,7 +198,6 @@ const toolbarVisible = computed(
     class="buroh"
     @contextmenu="onContextMenu">
     <buroh-wallpaper @appearance="appearance = $event" />
-
     <widget-grid
       :key="isMobile ? 'mobile' : 'desktop'"
       :class="{ mobile: isMobile }"
@@ -190,7 +223,6 @@ const toolbarVisible = computed(
         </widget-frame>
       </template>
     </widget-grid>
-
     <div class="dock">
       <transition name="slide-up">
         <widget-gallery v-if="showGallery" @add="addWidget" />
@@ -209,13 +241,13 @@ const toolbarVisible = computed(
           type="button"
           @click="galleryOpen = !galleryOpen">
           <font-awesome-icon :icon="galleryOpen ? 'xmark' : 'plus'" />
-          <span class="label">{{ galleryOpen ? "Fermer la galerie" : "Ajouter un widget" }}</span>
+          <span class="label">{{ galleryLabel }}</span>
         </button>
         <button class="glass-button" type="button" @click="showWallpaper = true">
           <font-awesome-icon icon="image" />
           <span class="label">Fond d'écran</span>
         </button>
-        <n-popconfirm
+        <h-popconfirm
           v-if="editing"
           negative-text="Annuler"
           positive-text="Réinitialiser"
@@ -227,7 +259,7 @@ const toolbarVisible = computed(
             </button>
           </template>
           Remplacer vos widgets par ceux d'origine ?
-        </n-popconfirm>
+        </h-popconfirm>
         <button
           :class="{ primary: editing }"
           class="glass-button"
@@ -238,10 +270,9 @@ const toolbarVisible = computed(
         </button>
       </div>
     </div>
-
     <widget-settings-modal :widget-id="configuredId" @close="closeSettings" />
     <wallpaper-modal v-model:show="showWallpaper" />
-    <n-dropdown
+    <h-dropdown
       :options="menuOptions"
       :show="menu.show"
       :x="menu.x"

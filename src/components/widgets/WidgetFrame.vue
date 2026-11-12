@@ -1,13 +1,21 @@
 <script lang="ts" setup>
-// Cadre commun des widgets : verre Liquid Glass et, en mode édition, boutons Supprimer et Réglages
-const props = defineProps<{
-  label: string;
-  editing: boolean;
-}>();
+// Cadre commun des widgets : verre Liquid Glass et, en mode édition, boutons Supprimer et Réglages.
+// Boutons en verre (glass.scss) plutôt que ceux de Naive UI, pour rester dans le style Liquid Glass.
+
+const props = defineProps({
+  label: {
+    type: String,
+    required: true,
+  },
+  editing: {
+    type: Boolean,
+    default: false,
+  },
+});
 
 const emit = defineEmits<{
-  remove: [];
-  configure: [];
+  (e: "remove"): void;
+  (e: "configure"): void;
 }>();
 </script>
 
@@ -19,7 +27,6 @@ const emit = defineEmits<{
     <div class="content">
       <slot />
     </div>
-
     <transition name="pop">
       <button
         v-if="props.editing"
@@ -30,7 +37,6 @@ const emit = defineEmits<{
         <font-awesome-icon icon="minus" />
       </button>
     </transition>
-
     <transition name="pop">
       <button
         v-if="props.editing"

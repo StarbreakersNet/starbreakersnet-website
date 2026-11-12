@@ -84,3 +84,15 @@ export interface WidgetsDocument {
   widgets: Widget[];
   wallpaper?: Wallpaper;
 }
+
+// Widget placé sur la grille (components/widgets/WidgetGrid.vue), en cases
+export interface GridItem {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+// Position d'un widget après un glisser-déposer
+export type GridPosition = Pick<GridItem, "id" | "x" | "y">;

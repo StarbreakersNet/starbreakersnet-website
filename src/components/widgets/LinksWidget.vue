@@ -1,35 +1,57 @@
 <script lang="ts" setup>
-import { computed, reactive, ref } from "vue";
+import { computed, type PropType, reactive, ref } from "vue";
+import HFlex from "@/components/c/hFlex.vue";
+import HGrid from "@/components/c/hGrid.vue";
+import HGridItem from "@/components/c/hGridItem.vue";
 import { type FitState, useFitContent } from "@/composables/useFitContent";
 import type { LinksSettings } from "@/types/Widget";
 
-const props = defineProps<{
-  settings: LinksSettings;
-}>();
+const props = defineProps({
+  settings: {
+    type: Object as PropType<LinksSettings>,
+    required: true,
+  },
+});
 
 const emit = defineEmits<{
-  fit: [state: FitState];
+  (e: "fit", state: FitState): void;
 }>();
+
+// Colonnes selon la largeur du widget : petit, moyen et grand
+const COLUMNS = "2 160:3 260:4 340:5";
 
 // Icônes servies par DuckDuckGo (seul le nom de domaine lui est transmis), lettre à défaut
 const failedIcons = reactive(new Set<string>());
+
+// Teinte stable par site, pour la lettre affichée sans icône
+function hueOf(host: string) {
+  const sum = [...host].reduce((total, char) => total + char.charCodeAt(0), 0);
+
+  return sum % 360;
+}
 
 const links = computed(() =>
   props.settings.links.map(link => {
     const host = new URL(link.url).hostname;
     const title = link.title || host.replace(/^www\./, "");
+
     return {
       ...link,
       title,
       icon: `https://icons.duckduckgo.com/ip3/${host}.ico`,
       initial: title.charAt(0).toUpperCase(),
-      hue: [...host].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 360,
+      hue: hueOf(host),
     };
   })
 );
 
+const target = computed(() => (props.settings.newTab ? "_blank" : undefined));
+
+const rel = computed(() => (props.settings.newTab ? "noopener noreferrer" : undefined));
+
 // Pas d'ascenseur : icônes réduites pour que tous les liens tiennent (voir useFitContent)
 const root = ref<HTMLElement | null>(null);
+
 const { overflowing } = useFitContent(root, [links], {
   onFit: state => emit("fit", state),
 });
@@ -37,17 +59,12 @@ const { overflowing } = useFitContent(root, [links], {
 
 <template>
   <div ref="root" :class="{ clipped: overflowing }" class="links">
-    <p v-if="links.length === 0" class="empty">
+    <h-flex v-if="links.length === 0" class="empty" justify="center">
       Aucun lien pour l'instant. Ajoutez-en dans les réglages du widget.
-    </p>
-    <ul v-else class="grid">
-      <li v-for="link in links" :key="link.id">
-        <a
-          :href="link.url"
-          :rel="props.settings.newTab ? 'noopener noreferrer' : undefined"
-          :target="props.settings.newTab ? '_blank' : undefined"
-          :title="link.url"
-          class="link">
+    </h-flex>
+    <h-grid v-else :cols="COLUMNS" :x-gap="6" :y-gap="8" responsive="self" role="list">
+      <h-grid-item v-for="link in links" :key="link.id" role="listitem">
+        <a :href="link.url" :rel="rel" :target="target" :title="link.url" class="link">
           <span class="icon">
             <img
               v-if="!failedIcons.has(link.id)"
@@ -62,8 +79,8 @@ const { overflowing } = useFitContent(root, [links], {
           </span>
           <span class="title">{{ link.title }}</span>
         </a>
-      </li>
-    </ul>
+      </h-grid-item>
+    </h-grid>
   </div>
 </template>
 
@@ -82,21 +99,11 @@ const { overflowing } = useFitContent(root, [links], {
 }
 
 .empty {
-  display: grid;
-  place-items: center;
   height: 100%;
   padding: 0 0.5rem;
   text-align: center;
   font-size: 0.9rem;
   color: var(--glass-text-soft);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(4.8em, 1fr));
-  gap: 0.6em 0.4em;
-  padding: 0;
-  list-style: none;
 }
 
 .link {

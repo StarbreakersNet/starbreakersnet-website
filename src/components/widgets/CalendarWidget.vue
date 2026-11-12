@@ -1,53 +1,89 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, ref } from "vue";
+import { computed, onBeforeUnmount, type PropType, ref } from "vue";
 import { DateTime } from "luxon";
 import type { CalendarSettings, WidgetSize } from "@/types/Widget";
 
-const props = defineProps<{
-  settings: CalendarSettings;
-  size: WidgetSize;
-}>();
-
-// Date du jour, vérifiée chaque minute (passage à minuit)
-const today = ref(DateTime.now().setLocale("fr").startOf("day"));
-const timer = setInterval(() => {
-  const now = DateTime.now().setLocale("fr").startOf("day");
-  if (!now.equals(today.value)) today.value = now;
-}, 60000);
-onBeforeUnmount(() => clearInterval(timer));
+const props = defineProps({
+  settings: {
+    type: Object as PropType<CalendarSettings>,
+    required: true,
+  },
+  size: {
+    type: String as PropType<WidgetSize>,
+    required: true,
+  },
+});
 
 const WEEKDAYS = ["L", "M", "M", "J", "V", "S", "D"];
+
+interface CalendarDay {
+  key: string;
+  // Numéro du jour, null hors du mois affiché
+  day: number | null;
+  isToday: boolean;
+  weekend: boolean;
+}
+
+interface CalendarWeek {
+  number: number;
+  days: CalendarDay[];
+}
+
+function startOfToday() {
+  return DateTime.now().setLocale("fr").startOf("day");
+}
+
+const today = ref(startOfToday());
+
+// Date du jour vérifiée chaque minute, pour passer au lendemain à minuit
+function refreshToday() {
+  const now = startOfToday();
+
+  if (!now.equals(today.value)) {
+    today.value = now;
+  }
+}
+
+function buildWeek(monday: DateTime, month: number): CalendarWeek {
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const date = monday.plus({ days: index });
+    const inMonth = date.month === month;
+
+    return {
+      key: date.toISODate()!,
+      day: inMonth ? date.day : null,
+      isToday: date.equals(today.value),
+      weekend: index >= 5,
+    };
+  });
+
+  return { number: monday.weekNumber, days };
+}
 
 // Semaines du mois, du lundi au dimanche ; jours hors du mois laissés vides
 const weeks = computed(() => {
   const first = today.value.startOf("month");
-  const start = first.minus({ days: first.weekday - 1 });
-  const end = first.endOf("month");
-  const result: {
-    number: number;
-    days: { key: string; day: number | null; isToday: boolean; weekend: boolean }[];
-  }[] = [];
+  const firstMonday = first.minus({ days: first.weekday - 1 });
+  const last = first.endOf("month");
 
-  for (let monday = start; monday <= end; monday = monday.plus({ weeks: 1 })) {
-    result.push({
-      number: monday.weekNumber,
-      days: Array.from({ length: 7 }, (_, index) => {
-        const date = monday.plus({ days: index });
-        const inMonth = date.month === first.month;
-        return {
-          key: date.toISODate()!,
-          day: inMonth ? date.day : null,
-          isToday: date.equals(today.value),
-          weekend: index >= 5,
-        };
-      }),
-    });
+  const result: CalendarWeek[] = [];
+
+  for (let monday = firstMonday; monday <= last; monday = monday.plus({ weeks: 1 })) {
+    result.push(buildWeek(monday, first.month));
   }
+
   return result;
 });
 
 const monthName = computed(() => today.value.toFormat("LLLL"));
+
+const monthAndYear = computed(() => today.value.toFormat("LLLL yyyy"));
+
 const weekdayName = computed(() => today.value.toFormat("cccc"));
+
+const timer = setInterval(refreshToday, 60000);
+
+onBeforeUnmount(() => clearInterval(timer));
 </script>
 
 <template>
@@ -55,12 +91,11 @@ const weekdayName = computed(() => today.value.toFormat("cccc"));
     <section v-if="props.size === 'medium'" class="today">
       <span class="weekday">{{ weekdayName }}</span>
       <span class="day-number">{{ today.day }}</span>
-      <span class="month-year">{{ today.toFormat("LLLL yyyy") }}</span>
+      <span class="month-year">{{ monthAndYear }}</span>
     </section>
-
     <section class="month">
       <header class="month-name">{{ monthName }}</header>
-      <table :aria-label="today.toFormat('LLLL yyyy')" class="grid">
+      <table :aria-label="monthAndYear" class="grid">
         <thead>
           <tr>
             <th v-if="props.settings.weekNumbers" class="week" scope="col" />

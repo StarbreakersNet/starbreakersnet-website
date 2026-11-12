@@ -1,53 +1,82 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, ref } from "vue";
+import { computed, onBeforeUnmount, type PropType, ref } from "vue";
 import { DateTime } from "luxon";
 import type { CountdownSettings, WidgetSize } from "@/types/Widget";
 
-const props = defineProps<{
-  settings: CountdownSettings;
-  size: WidgetSize;
-}>();
+const props = defineProps({
+  settings: {
+    type: Object as PropType<CountdownSettings>,
+    required: true,
+  },
+  size: {
+    type: String as PropType<WidgetSize>,
+    required: true,
+  },
+});
 
 const now = ref(DateTime.now());
-const timer = setInterval(() => (now.value = DateTime.now()), 1000);
-onBeforeUnmount(() => clearInterval(timer));
 
 const target = computed(() => DateTime.fromISO(props.settings.target).setLocale("fr"));
+
 const past = computed(() => target.value <= now.value);
 
-const remaining = computed(() =>
-  target.value.diff(now.value, ["days", "hours", "minutes", "seconds"]).toObject()
-);
+const remaining = computed(() => {
+  const difference = target.value.diff(now.value, ["days", "hours", "minutes", "seconds"]);
+
+  return difference.toObject();
+});
+
+function plural(value: number, singular: string, several: string) {
+  return value > 1 ? several : singular;
+}
 
 const units = computed(() => {
   const { days = 0, hours = 0, minutes = 0, seconds = 0 } = remaining.value;
-  return [
-    { value: days, label: days > 1 ? "jours" : "jour" },
-    { value: hours, label: hours > 1 ? "heures" : "heure" },
+
+  const list = [
+    { value: days, label: plural(days, "jour", "jours") },
+    { value: hours, label: plural(hours, "heure", "heures") },
     { value: minutes, label: "min" },
-    { value: Math.floor(seconds), label: "s" },
-  ].map(unit => ({ ...unit, value: Math.max(0, Math.floor(unit.value)) }));
+    { value: seconds, label: "s" },
+  ];
+
+  return list.map(unit => ({ ...unit, value: Math.max(0, Math.floor(unit.value)) }));
 });
+
+function pad(value: number) {
+  return String(value).padStart(2, "0");
+}
 
 // Petit format : le nombre de jours, ou l'heure exacte le dernier jour
 const headline = computed(() => {
   const [days, hours, minutes, seconds] = units.value;
-  if (days!.value > 0) return { value: String(days!.value), label: days!.label };
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return { value: `${pad(hours!.value)}:${pad(minutes!.value)}:${pad(seconds!.value)}`, label: "" };
+
+  let result = { value: String(days!.value), label: days!.label };
+
+  if (days!.value === 0) {
+    const clock = `${pad(hours!.value)}:${pad(minutes!.value)}:${pad(seconds!.value)}`;
+
+    result = { value: clock, label: "" };
+  }
+
+  return result;
 });
 
-const date = computed(() =>
-  target.value.toFormat(
-    target.value.hour || target.value.minute ? "d LLLL yyyy, HH:mm" : "d LLLL yyyy"
-  )
-);
+const date = computed(() => {
+  const hasTime = target.value.hour !== 0 || target.value.minute !== 0;
+  const format = hasTime ? "d LLLL yyyy, HH:mm" : "d LLLL yyyy";
+
+  return target.value.toFormat(format);
+});
+
+const timer = setInterval(() => (now.value = DateTime.now()), 1000);
+
+onBeforeUnmount(() => clearInterval(timer));
 </script>
 
 <template>
   <div :class="props.size" class="countdown">
     <header class="title">{{ props.settings.title || "Évènement" }}</header>
-
     <p v-if="past" class="done">
       <font-awesome-icon class="done-icon" icon="check" />
       C'est arrivé !
@@ -62,7 +91,6 @@ const date = computed(() =>
         <span class="unit">{{ unit.label }}</span>
       </li>
     </ol>
-
     <footer class="date">{{ date }}</footer>
   </div>
 </template>

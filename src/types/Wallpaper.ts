@@ -20,25 +20,51 @@ export interface UnsplashPhoto {
   fetchedAt: string;
 }
 
+export interface PresetWallpaper {
+  source: "preset";
+  // Identifiant dans WALLPAPER_PRESETS
+  preset: string;
+}
+
+export interface UnsplashWallpaper {
+  source: "unsplash";
+  topic: string;
+  // Identifiant d'une collection Unsplash (vide : le thème s'applique)
+  collection: string;
+  frequency: RotationFrequency;
+  photo: UnsplashPhoto | null;
+}
+
+export interface VideosWallpaper {
+  source: "videos";
+  frequency: RotationFrequency;
+  // Vidéo affichée (identifiant dans WALLPAPER_VIDEOS) et date de son choix (ISO)
+  video: { id: string; pickedAt: string } | null;
+}
+
+export interface UrlWallpaper {
+  source: "url";
+  kind: MediaKind;
+  url: string;
+}
+
+export interface FileWallpaper {
+  source: "file";
+  kind: MediaKind;
+  name: string;
+  // Date d'ajout (ISO), pour relire le fichier quand on en choisit un autre
+  addedAt: string;
+}
+
 export type Wallpaper =
-  | { source: "preset"; preset: string }
-  | {
-      source: "unsplash";
-      topic: string;
-      // Identifiant d'une collection Unsplash (vide : le thème s'applique)
-      collection: string;
-      frequency: RotationFrequency;
-      photo: UnsplashPhoto | null;
-    }
-  | {
-      source: "videos";
-      frequency: RotationFrequency;
-      // Vidéo affichée (identifiant dans WALLPAPER_VIDEOS) et date de son choix (ISO)
-      video: { id: string; pickedAt: string } | null;
-    }
-  | { source: "url"; kind: MediaKind; url: string }
-  // addedAt : date d'ajout (ISO), pour relire le fichier quand on en choisit un autre
-  | { source: "file"; kind: MediaKind; name: string; addedAt: string };
+  | PresetWallpaper
+  | UnsplashWallpaper
+  | VideosWallpaper
+  | UrlWallpaper
+  | FileWallpaper;
+
+// « preset » | « unsplash » | « videos » | « url » | « file »
+export type WallpaperSource = Wallpaper["source"];
 
 // Apparence du fond, transmise au verre des widgets
 export interface WallpaperAppearance {

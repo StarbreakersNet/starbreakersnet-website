@@ -1,60 +1,78 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, type PropType } from "vue";
+import HForm from "@/components/c/hForm.vue";
+import HFormItem from "@/components/c/hFormItem.vue";
+import HInput from "@/components/c/hInput.vue";
+import HRadioButton from "@/components/c/hRadioButton.vue";
+import HRadioGroup from "@/components/c/hRadioGroup.vue";
+import HSelect from "@/components/c/hSelect.vue";
+import HSwitch from "@/components/c/hSwitch.vue";
 import { localTimezone, timezoneCity } from "@/models/widgets";
 import type { ClockSettings } from "@/types/Widget";
 
-const settings = defineModel<ClockSettings>("settings", { required: true });
+const settings = defineModel("settings", {
+  type: Object as PropType<ClockSettings>,
+  required: true,
+});
 
-const LOCAL = "local";
+// Valeur de la liste pour « Heure de l'appareil », enregistrée comme fuseau null
+const DEVICE_TIMEZONE = "device";
 
 // Intl.supportedValuesOf (ES2022) absent des types du projet, ciblés ES2020
-const timezones: string[] =
-  (Intl as unknown as { supportedValuesOf?: (key: string) => string[] }).supportedValuesOf?.(
-    "timeZone"
-  ) ?? [];
+const intl = Intl as unknown as { supportedValuesOf?: (key: string) => string[] };
+const timezones = intl.supportedValuesOf?.("timeZone") ?? [];
 
 const timezoneOptions = [
-  { label: "Heure de l'appareil", value: LOCAL },
+  { label: "Heure de l'appareil", value: DEVICE_TIMEZONE },
   ...timezones.map(zone => ({ label: zone.replace(/_/g, " "), value: zone })),
 ];
+
+const labelPlaceholder = computed(() => {
+  const timezone = settings.value.timezone ?? localTimezone();
+
+  return timezoneCity(timezone);
+});
 
 function update(patch: Partial<ClockSettings>) {
   settings.value = { ...settings.value, ...patch };
 }
 
-const timezone = computed({
-  get: () => settings.value.timezone ?? LOCAL,
-  set: value => update({ timezone: value === LOCAL ? null : value }),
-});
+function updateTimezone(value: string) {
+  const timezone = value === DEVICE_TIMEZONE ? null : value;
 
-const labelPlaceholder = computed(() => timezoneCity(settings.value.timezone ?? localTimezone()));
+  update({ timezone });
+}
 </script>
 
 <template>
-  <n-form label-placement="top">
-    <n-form-item label="Style">
-      <n-radio-group
+  <h-form :model="settings" label-placement="top">
+    <h-form-item label="Style">
+      <h-radio-group
         :value="settings.style"
         @update:value="(style: ClockSettings['style']) => update({ style })">
-        <n-radio-button value="analog">À aiguilles</n-radio-button>
-        <n-radio-button value="digital">En chiffres</n-radio-button>
-      </n-radio-group>
-    </n-form-item>
-    <n-form-item label="Secondes">
-      <n-switch
+        <h-radio-button value="analog">À aiguilles</h-radio-button>
+        <h-radio-button value="digital">En chiffres</h-radio-button>
+      </h-radio-group>
+    </h-form-item>
+    <h-form-item label="Secondes">
+      <h-switch
         :value="settings.seconds"
         @update:value="(seconds: boolean) => update({ seconds })" />
-    </n-form-item>
-    <n-form-item label="Fuseau horaire">
-      <n-select v-model:value="timezone" :options="timezoneOptions" filterable />
-    </n-form-item>
-    <n-form-item label="Nom affiché">
-      <n-input
+    </h-form-item>
+    <h-form-item label="Fuseau horaire">
+      <h-select
+        :options="timezoneOptions"
+        :value="settings.timezone ?? DEVICE_TIMEZONE"
+        filterable
+        @update:value="updateTimezone" />
+    </h-form-item>
+    <h-form-item label="Nom affiché">
+      <h-input
         :maxlength="40"
         :placeholder="labelPlaceholder"
         :value="settings.label"
         clearable
         @update:value="(label: string) => update({ label })" />
-    </n-form-item>
-  </n-form>
+    </h-form-item>
+  </h-form>
 </template>

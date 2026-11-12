@@ -1,13 +1,19 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, type PropType, ref, watch } from "vue";
 import { DateTime } from "luxon";
 import { describeWeather, fetchForecast, type Forecast } from "@/lib/weather";
 import type { WeatherSettings, WidgetSize } from "@/types/Widget";
 
-const props = defineProps<{
-  settings: WeatherSettings;
-  size: WidgetSize;
-}>();
+const props = defineProps({
+  settings: {
+    type: Object as PropType<WeatherSettings>,
+    required: true,
+  },
+  size: {
+    type: String as PropType<WidgetSize>,
+    required: true,
+  },
+});
 
 const REFRESH_INTERVAL = 15 * 60 * 1000;
 
@@ -23,40 +29,62 @@ async function load() {
   }
 }
 
-watch(
-  () => [props.settings.location.latitude, props.settings.location.longitude, props.settings.unit],
-  () => {
-    forecast.value = null;
-    load();
-  },
-  { immediate: true }
-);
-const timer = setInterval(load, REFRESH_INTERVAL);
-onBeforeUnmount(() => clearInterval(timer));
+// Autre ville ou autre unité : prévisions effacées puis rechargées
+function reload() {
+  forecast.value = null;
+  load();
+}
 
-const round = (value: number) => `${Math.round(value)}°`;
+function degrees(value: number) {
+  return `${Math.round(value)}°`;
+}
 
 const current = computed(() => {
-  if (!forecast.value) return null;
-  const today = forecast.value.days[0];
-  return {
-    temperature: round(forecast.value.temperature),
-    ...describeWeather(forecast.value.code, forecast.value.isDay),
-    max: today ? round(today.max) : "",
-    min: today ? round(today.min) : "",
-  };
+  const value = forecast.value;
+  const today = value?.days[0];
+
+  return value
+    ? {
+        temperature: degrees(value.temperature),
+        ...describeWeather(value.code, value.isDay),
+        max: today ? degrees(today.max) : "",
+        min: today ? degrees(today.min) : "",
+      }
+    : null;
 });
 
+const status = computed(() => (failed.value ? "Météo indisponible" : "Chargement…"));
+
+function dayLabel(isoDate: string) {
+  const weekday = DateTime.fromISO(isoDate).setLocale("fr").toFormat("ccc");
+
+  return weekday.replace(".", "");
+}
+
 // Jours suivants (5), pour la taille moyenne
-const days = computed(() =>
-  (forecast.value?.days ?? []).slice(1, 6).map(day => ({
+const days = computed(() => {
+  const next = forecast.value?.days.slice(1, 6) ?? [];
+
+  return next.map(day => ({
     ...day,
-    label: DateTime.fromISO(day.date).setLocale("fr").toFormat("ccc").replace(".", ""),
+    label: dayLabel(day.date),
     icon: describeWeather(day.code).icon,
-    max: round(day.max),
-    min: round(day.min),
-  }))
-);
+    max: degrees(day.max),
+    min: degrees(day.min),
+  }));
+});
+
+const location = computed(() => {
+  const { latitude, longitude } = props.settings.location;
+
+  return [latitude, longitude, props.settings.unit];
+});
+
+watch(location, reload, { immediate: true });
+
+const timer = setInterval(load, REFRESH_INTERVAL);
+
+onBeforeUnmount(() => clearInterval(timer));
 </script>
 
 <template>
@@ -74,9 +102,8 @@ const days = computed(() =>
           <span class="range">H : {{ current.max }} B : {{ current.min }}</span>
         </footer>
       </template>
-      <p v-else class="status">{{ failed ? "Météo indisponible" : "Chargement…" }}</p>
+      <p v-else class="status">{{ status }}</p>
     </section>
-
     <ol v-if="props.size === 'medium' && days.length" class="days">
       <li v-for="day in days" :key="day.date" class="day">
         <span class="day-label">{{ day.label }}</span>

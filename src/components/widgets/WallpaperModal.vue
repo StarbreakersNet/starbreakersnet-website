@@ -1,5 +1,21 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, reactive, ref, useTemplateRef, watch } from "vue";
+import HAlert from "@/components/c/hAlert.vue";
+import HButton from "@/components/c/hButton.vue";
+import HFlex from "@/components/c/hFlex.vue";
+import HForm from "@/components/c/hForm.vue";
+import HFormItem from "@/components/c/hFormItem.vue";
+import HGrid from "@/components/c/hGrid.vue";
+import HGridItem from "@/components/c/hGridItem.vue";
+import HInput from "@/components/c/hInput.vue";
+import HInputGroup from "@/components/c/hInputGroup.vue";
+import HModal from "@/components/c/hModal.vue";
+import HRadioButton from "@/components/c/hRadioButton.vue";
+import HRadioGroup from "@/components/c/hRadioGroup.vue";
+import HSelect from "@/components/c/hSelect.vue";
+import HTabPane from "@/components/c/hTabPane.vue";
+import HTabs from "@/components/c/hTabs.vue";
+import HText from "@/components/c/hText.vue";
 import { fetchRandomPhoto, hasUnsplashKey, withReferral } from "@/lib/unsplash";
 import { saveWallpaperFile } from "@/lib/wallpaperFile";
 import {
@@ -16,106 +32,160 @@ import { normalizeUrl } from "@/models/widgets";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import { useWidgetsStore } from "@/stores/widgets";
-import type { MediaKind, RotationFrequency } from "@/types/Wallpaper";
+import type {
+  MediaKind,
+  RotationFrequency,
+  UnsplashWallpaper,
+  WallpaperSource,
+} from "@/types/Wallpaper";
 
-const show = defineModel<boolean>("show", { required: true });
+const show = defineModel("show", {
+  type: Boolean,
+  required: true,
+});
 
 const store = useWidgetsStore();
 const user = useUserStore();
 const message = useMessage();
 
+// Vignettes des dégradés et des vidéos : deux par ligne sur mobile, jusqu'à quatre
+const PREVIEW_COLUMNS = "2 420:3 560:4";
+
+const FREQUENCY_OPTIONS = ROTATION_FREQUENCIES.map(({ value, label }) => ({ value, label }));
+
+const KIND_OPTIONS = [
+  { value: "image", label: "Image" },
+  { value: "video", label: "Vidéo" },
+];
+
+// Onglet ouvert pour chaque source de fond d'écran
+const TAB_BY_SOURCE: Record<WallpaperSource, string> = {
+  preset: "presets",
+  unsplash: "rotation",
+  videos: "rotation",
+  url: "custom",
+  file: "custom",
+};
+
 const wallpaper = computed(() => store.wallpaper);
 
 const tab = ref("presets");
+
 // Onglet « Photos et vidéos » : photos Unsplash ou vidéos de la sélection, mêmes options
 const rotationKind = ref<"photos" | "videos">("photos");
 
-watch(show, visible => {
-  if (!visible) return;
+// À l'ouverture, onglet et options du fond d'écran actuel
+function onOpen(visible: boolean) {
   const source = wallpaper.value.source;
-  tab.value =
-    source === "preset"
-      ? "presets"
-      : source === "unsplash" || source === "videos"
-        ? "rotation"
-        : "custom";
-  if (source === "videos") rotationKind.value = "videos";
-  if (source === "unsplash") rotationKind.value = "photos";
-});
 
-// --- Préréglages
+  if (visible) {
+    tab.value = TAB_BY_SOURCE[source];
+  }
+
+  if (visible && source === "videos") {
+    rotationKind.value = "videos";
+  }
+
+  if (visible && source === "unsplash") {
+    rotationKind.value = "photos";
+  }
+}
+
+// --- Dégradés
 
 function presetPreview(id: string) {
   const preset = WALLPAPER_PRESETS.find(item => item.id === id)!;
-  return user.settings.theme === "light"
-    ? (preset.gradient.light ?? preset.gradient.dark)
-    : preset.gradient.dark;
+  const { dark, light } = preset.gradient;
+
+  return user.settings.theme === "light" ? (light ?? dark) : dark;
 }
 
-const isPresetSelected = (id: string) =>
-  wallpaper.value.source === "preset" && wallpaper.value.preset === id;
+function isPresetSelected(id: string) {
+  return wallpaper.value.source === "preset" && wallpaper.value.preset === id;
+}
 
-// --- Unsplash
+function choosePreset(id: string) {
+  store.setWallpaper({ source: "preset", preset: id });
+}
+
+// --- Photos Unsplash
 
 const unsplash = computed(() => (wallpaper.value.source === "unsplash" ? wallpaper.value : null));
-const topic = ref(UNSPLASH_TOPICS[0]!.value);
-const frequency = ref<RotationFrequency>("day");
-const fetching = ref(false);
-// Photos d'un thème proposé, ou d'une collection Unsplash (adresse ou identifiant)
-const selection = ref<"topic" | "collection">("topic");
-const collectionInput = ref("");
-const collectionError = ref("");
 
-watch(
-  unsplash,
-  current => {
-    if (current) {
-      topic.value = current.topic;
-      frequency.value = current.frequency;
-      if (current.collection) {
-        selection.value = "collection";
-        collectionInput.value = current.collection;
-      }
-    }
-  },
-  { immediate: true }
-);
+// Photos d'un thème proposé, ou d'une collection Unsplash (adresse ou identifiant)
+const unsplashForm = reactive({
+  selection: "topic" as "topic" | "collection",
+  topic: UNSPLASH_TOPICS[0]!.value,
+  collection: "",
+  frequency: "day" as RotationFrequency,
+});
+
+const collectionError = ref("");
+const fetching = ref(false);
+
+const photoCredit = computed(() => unsplash.value?.photo ?? null);
+
+function readUnsplash(current: UnsplashWallpaper | null) {
+  if (current) {
+    unsplashForm.topic = current.topic;
+    unsplashForm.frequency = current.frequency;
+  }
+
+  if (current?.collection) {
+    unsplashForm.selection = "collection";
+    unsplashForm.collection = current.collection;
+  }
+}
 
 function useUnsplash() {
   store.setWallpaper({
     source: "unsplash",
-    topic: topic.value,
+    topic: unsplashForm.topic,
     collection: "",
-    frequency: frequency.value,
+    frequency: unsplashForm.frequency,
     photo: null,
   });
 }
 
-function updateUnsplash(patch: {
-  topic?: string;
-  collection?: string;
-  frequency?: RotationFrequency;
-}) {
+function updateUnsplash(
+  patch: Partial<Pick<UnsplashWallpaper, "topic" | "collection" | "frequency">>
+) {
   const current = unsplash.value;
-  if (!current) return;
-  // Autre thème ou autre collection : nouvelle photo (récupérée par BurohWallpaper)
-  const newSource = patch.topic !== undefined || patch.collection !== undefined;
-  store.setWallpaper({ ...current, ...patch, photo: newSource ? null : current.photo });
+
+  if (current) {
+    // Autre thème ou autre collection : nouvelle photo (récupérée par BurohWallpaper)
+    const newSource = patch.topic !== undefined || patch.collection !== undefined;
+    const photo = newSource ? null : current.photo;
+
+    store.setWallpaper({ ...current, ...patch, photo });
+  }
+}
+
+function updateTopic(topic: string) {
+  unsplashForm.topic = topic;
+  updateUnsplash({ topic });
+}
+
+function updatePhotoFrequency(frequency: RotationFrequency) {
+  unsplashForm.frequency = frequency;
+  updateUnsplash({ frequency });
 }
 
 function applyCollection() {
-  const id = parseUnsplashCollection(collectionInput.value);
-  if (!id) {
+  const id = parseUnsplashCollection(unsplashForm.collection);
+
+  if (id) {
+    collectionError.value = "";
+    unsplashForm.collection = id;
+    updateUnsplash({ collection: id });
+  } else {
     collectionError.value = "Adresse ou identifiant de collection invalide";
-    return;
   }
-  collectionError.value = "";
-  collectionInput.value = id;
-  updateUnsplash({ collection: id });
 }
 
 function chooseSelection(value: "topic" | "collection") {
-  selection.value = value;
+  unsplashForm.selection = value;
+
   // Retour aux thèmes : la collection n'est plus utilisée
   if (value === "topic" && unsplash.value?.collection) {
     updateUnsplash({ collection: "" });
@@ -125,41 +195,44 @@ function chooseSelection(value: "topic" | "collection") {
 // Nouvelle photo tout de suite, en gardant l'actuelle affichée pendant la requête
 async function nextPhoto() {
   const current = unsplash.value;
-  if (!current) return;
 
-  fetching.value = true;
-  try {
-    const photo = await fetchRandomPhoto(current);
-    store.setWallpaper({ ...current, photo });
-  } catch {
-    message.error("Impossible de récupérer une photo Unsplash pour le moment");
-  } finally {
-    fetching.value = false;
+  if (current) {
+    fetching.value = true;
+
+    try {
+      const photo = await fetchRandomPhoto(current);
+
+      store.setWallpaper({ ...current, photo });
+    } catch {
+      message.error("Impossible de récupérer une photo Unsplash pour le moment");
+    } finally {
+      fetching.value = false;
+    }
   }
 }
 
 // --- Vidéos de la sélection
 
 const videos = computed(() => (wallpaper.value.source === "videos" ? wallpaper.value : null));
-const videoFrequency = ref<RotationFrequency>("day");
 
-watch(
-  videos,
-  current => {
-    if (current) videoFrequency.value = current.frequency;
-  },
-  { immediate: true }
-);
+const videoForm = reactive({
+  frequency: "day" as RotationFrequency,
+});
 
-const isVideoSelected = (id: string) => videos.value?.video?.id === id;
-const currentVideo = computed(() =>
-  WALLPAPER_VIDEOS.find(video => video.id === videos.value?.video?.id)
-);
+const currentVideo = computed(() => {
+  const id = videos.value?.video?.id;
+
+  return WALLPAPER_VIDEOS.find(video => video.id === id);
+});
+
+function isVideoSelected(id: string) {
+  return videos.value?.video?.id === id;
+}
 
 function chooseVideo(id: string) {
   store.setWallpaper({
     source: "videos",
-    frequency: videoFrequency.value,
+    frequency: videoForm.frequency,
     video: { id, pickedAt: new Date().toISOString() },
   });
 }
@@ -173,55 +246,65 @@ function nextVideo() {
 }
 
 function updateVideoFrequency(frequency: RotationFrequency) {
-  if (videos.value) store.setWallpaper({ ...videos.value, frequency });
+  videoForm.frequency = frequency;
+
+  if (videos.value) {
+    store.setWallpaper({ ...videos.value, frequency });
+  }
 }
 
 // --- Personnalisé : adresse ou fichier
 
-const url = ref(wallpaper.value.source === "url" ? wallpaper.value.url : "");
-const urlKind = ref<MediaKind>(wallpaper.value.source === "url" ? wallpaper.value.kind : "image");
-const urlError = ref("");
-
-watch(url, value => {
-  urlError.value = "";
-  if (value.trim()) urlKind.value = guessMediaKind(value);
+const customForm = reactive({
+  url: wallpaper.value.source === "url" ? wallpaper.value.url : "",
+  kind: (wallpaper.value.source === "url" ? wallpaper.value.kind : "image") as MediaKind,
 });
 
-function applyUrl() {
-  const normalized = normalizeUrl(url.value);
-  if (!normalized) {
-    urlError.value = "Adresse invalide (http ou https uniquement)";
-    return;
+const urlError = ref("");
+const saving = ref(false);
+const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
+
+const fileName = computed(() => (wallpaper.value.source === "file" ? wallpaper.value.name : ""));
+
+function updateUrl(url: string) {
+  customForm.url = url;
+  urlError.value = "";
+
+  if (url.trim()) {
+    customForm.kind = guessMediaKind(url);
   }
-  store.setWallpaper({ source: "url", kind: urlKind.value, url: normalized });
 }
 
-const fileInput = ref<HTMLInputElement | null>(null);
-const saving = ref(false);
+function applyUrl() {
+  const url = normalizeUrl(customForm.url);
 
-async function onFileChosen(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  input.value = "";
-  if (!file) return;
-
-  const kind: MediaKind | null = file.type.startsWith("video/")
-    ? "video"
-    : file.type.startsWith("image/")
-      ? "image"
-      : null;
-  if (!kind) {
-    message.error("Choisissez une image ou une vidéo");
-    return;
+  if (url) {
+    store.setWallpaper({ source: "url", kind: customForm.kind, url });
+  } else {
+    urlError.value = "Adresse invalide (http ou https uniquement)";
   }
-  if (file.size > WALLPAPER_FILE_MAX_SIZE) {
-    message.error("Fichier trop lourd (100 Mo au maximum)");
-    return;
+}
+
+function fileKind(file: File): MediaKind | null {
+  let kind: MediaKind | null = null;
+
+  if (file.type.startsWith("image/")) {
+    kind = "image";
   }
 
+  if (file.type.startsWith("video/")) {
+    kind = "video";
+  }
+
+  return kind;
+}
+
+async function saveFile(file: File, kind: MediaKind) {
   saving.value = true;
+
   try {
     await saveWallpaperFile(file);
+
     store.setWallpaper({
       source: "file",
       kind,
@@ -234,109 +317,139 @@ async function onFileChosen(event: Event) {
     saving.value = false;
   }
 }
+
+function onFileChosen(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  const kind = file ? fileKind(file) : null;
+
+  input.value = "";
+
+  if (file && !kind) {
+    message.error("Choisissez une image ou une vidéo");
+  }
+
+  if (file && kind && file.size > WALLPAPER_FILE_MAX_SIZE) {
+    message.error("Fichier trop lourd (100 Mo au maximum)");
+  }
+
+  if (file && kind && file.size <= WALLPAPER_FILE_MAX_SIZE) {
+    saveFile(file, kind);
+  }
+}
+
+watch(show, onOpen);
+
+watch(unsplash, readUnsplash, { immediate: true });
+
+watch(
+  videos,
+  current => {
+    if (current) {
+      videoForm.frequency = current.frequency;
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
-  <n-modal
+  <h-modal
     v-model:show="show"
-    class="apple-menu"
+    class="wallpaper-modal apple-menu"
     preset="card"
-    style="width: min(640px, calc(100vw - 32px))"
     title="Fond d'écran">
-    <n-tabs v-model:value="tab" animated type="segment">
-      <n-tab-pane name="presets" tab="Dégradés">
-        <ul class="presets">
-          <li v-for="preset in WALLPAPER_PRESETS" :key="preset.id">
+    <h-tabs v-model:value="tab" animated type="segment">
+      <h-tab-pane name="presets" tab="Dégradés">
+        <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
+          <h-grid-item v-for="preset in WALLPAPER_PRESETS" :key="preset.id" role="listitem">
             <button
               :aria-pressed="isPresetSelected(preset.id)"
               :class="{ selected: isPresetSelected(preset.id) }"
               class="preset"
               type="button"
-              @click="store.setWallpaper({ source: 'preset', preset: preset.id })">
+              @click="choosePreset(preset.id)">
               <span :style="{ background: presetPreview(preset.id) }" class="preview" />
               <span class="label">{{ preset.label }}</span>
             </button>
-          </li>
-        </ul>
-      </n-tab-pane>
-
-      <n-tab-pane name="rotation" tab="Photos et vidéos">
-        <n-radio-group v-model:value="rotationKind" class="kind">
-          <n-radio-button value="photos">Photos Unsplash</n-radio-button>
-          <n-radio-button value="videos">Vidéos</n-radio-button>
-        </n-radio-group>
-
+          </h-grid-item>
+        </h-grid>
+      </h-tab-pane>
+      <h-tab-pane name="rotation" tab="Photos et vidéos">
+        <h-radio-group v-model:value="rotationKind" class="kind">
+          <h-radio-button value="photos">Photos Unsplash</h-radio-button>
+          <h-radio-button value="videos">Vidéos</h-radio-button>
+        </h-radio-group>
         <template v-if="rotationKind === 'photos'">
-          <n-form label-placement="top">
+          <h-form :model="unsplashForm" label-placement="top">
             <template v-if="hasUnsplashKey">
-              <n-form-item label="Photos">
-                <n-radio-group :value="selection" @update:value="chooseSelection">
-                  <n-radio-button value="topic">D'un thème</n-radio-button>
-                  <n-radio-button value="collection">D'une collection</n-radio-button>
-                </n-radio-group>
-              </n-form-item>
-              <n-form-item v-if="selection === 'topic'" label="Thème">
-                <n-select
-                  v-model:value="topic"
+              <h-form-item label="Photos">
+                <h-radio-group :value="unsplashForm.selection" @update:value="chooseSelection">
+                  <h-radio-button value="topic">D'un thème</h-radio-button>
+                  <h-radio-button value="collection">D'une collection</h-radio-button>
+                </h-radio-group>
+              </h-form-item>
+              <h-form-item v-if="unsplashForm.selection === 'topic'" label="Thème">
+                <h-select
                   :options="UNSPLASH_TOPICS"
-                  @update:value="(value: string) => updateUnsplash({ topic: value })" />
-              </n-form-item>
-              <n-form-item
+                  :value="unsplashForm.topic"
+                  @update:value="updateTopic" />
+              </h-form-item>
+              <h-form-item
                 v-else
                 :feedback="collectionError"
                 :validation-status="collectionError ? 'error' : undefined"
                 label="Collection">
-                <n-input-group>
-                  <n-input
-                    v-model:value="collectionInput"
+                <h-input-group>
+                  <h-input
+                    v-model:value="unsplashForm.collection"
                     placeholder="https://unsplash.com/collections/…"
                     @keydown.enter.prevent="applyCollection" />
-                  <n-button
-                    :disabled="!unsplash || !collectionInput.trim()"
+                  <h-button
+                    :disabled="!unsplash || !unsplashForm.collection.trim()"
                     type="primary"
                     @click="applyCollection">
                     Appliquer
-                  </n-button>
-                </n-input-group>
-              </n-form-item>
+                  </h-button>
+                </h-input-group>
+              </h-form-item>
             </template>
-            <n-alert v-else :bordered="false" class="note" type="info">
+            <h-alert v-else :bordered="false" class="note" type="info">
               Photos au hasard parmi celles d'Unsplash proposées par Lorem Picsum. Choisir un thème
               ou une collection demande une clé d'API Unsplash (voir le README).
-            </n-alert>
-            <n-form-item label="Nouvelle photo">
-              <n-select
-                v-model:value="frequency"
-                :options="ROTATION_FREQUENCIES.map(({ value, label }) => ({ value, label }))"
-                @update:value="
-                  (value: RotationFrequency) => updateUnsplash({ frequency: value })
-                " />
-            </n-form-item>
-          </n-form>
-          <n-flex align="center" justify="space-between">
-            <n-text v-if="unsplash?.photo" depth="3">
+            </h-alert>
+            <h-form-item label="Nouvelle photo">
+              <h-select
+                :options="FREQUENCY_OPTIONS"
+                :value="unsplashForm.frequency"
+                @update:value="updatePhotoFrequency" />
+            </h-form-item>
+          </h-form>
+          <h-flex justify="space-between">
+            <h-text v-if="photoCredit" depth="3">
               Photo :
               <a
-                :href="withReferral(unsplash.photo.authorUrl ?? unsplash.photo.photoUrl)"
+                :href="withReferral(photoCredit.authorUrl ?? photoCredit.photoUrl)"
                 rel="noopener"
                 target="_blank">
-                {{ unsplash.photo.author }}
+                {{ photoCredit.author }}
               </a>
-            </n-text>
+            </h-text>
             <span v-else />
-            <n-button v-if="!unsplash" type="primary" @click="useUnsplash">
+            <h-button v-if="!unsplash" type="primary" @click="useUnsplash">
               Utiliser Unsplash
-            </n-button>
-            <n-button v-else :loading="fetching" @click="nextPhoto">
-              <template #icon><font-awesome-icon icon="rotate" /></template>
+            </h-button>
+            <h-button v-else :loading="fetching" @click="nextPhoto">
+              <template #icon>
+                <font-awesome-icon icon="rotate" />
+              </template>
               Autre photo
-            </n-button>
-          </n-flex>
+            </h-button>
+          </h-flex>
         </template>
-
         <template v-else>
-          <ul class="presets">
-            <li v-for="video in WALLPAPER_VIDEOS" :key="video.id">
+          <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
+            <h-grid-item v-for="video in WALLPAPER_VIDEOS" :key="video.id" role="listitem">
               <button
                 :aria-pressed="isVideoSelected(video.id)"
                 :class="{ selected: isVideoSelected(video.id) }"
@@ -349,84 +462,79 @@ async function onFileChosen(event: Event) {
                 </span>
                 <span class="label">{{ video.label }}</span>
               </button>
-            </li>
-          </ul>
-          <n-form class="rotation-form" label-placement="top">
-            <n-form-item label="Nouvelle vidéo">
-              <n-select
-                v-model:value="videoFrequency"
-                :options="ROTATION_FREQUENCIES.map(({ value, label }) => ({ value, label }))"
+            </h-grid-item>
+          </h-grid>
+          <h-form :model="videoForm" class="rotation-form" label-placement="top">
+            <h-form-item label="Nouvelle vidéo">
+              <h-select
+                :options="FREQUENCY_OPTIONS"
+                :value="videoForm.frequency"
                 @update:value="updateVideoFrequency" />
-            </n-form-item>
-          </n-form>
-          <n-flex align="center" justify="space-between">
-            <n-text v-if="currentVideo" depth="3">Vidéo : {{ currentVideo.credit }}</n-text>
+            </h-form-item>
+          </h-form>
+          <h-flex justify="space-between">
+            <h-text v-if="currentVideo" depth="3">Vidéo : {{ currentVideo.credit }}</h-text>
             <span v-else />
-            <n-button v-if="!videos" type="primary" @click="useVideos">
+            <h-button v-if="!videos" type="primary" @click="useVideos">
               Utiliser les vidéos
-            </n-button>
-            <n-button v-else :disabled="WALLPAPER_VIDEOS.length < 2" @click="nextVideo">
-              <template #icon><font-awesome-icon icon="rotate" /></template>
+            </h-button>
+            <h-button v-else :disabled="WALLPAPER_VIDEOS.length < 2" @click="nextVideo">
+              <template #icon>
+                <font-awesome-icon icon="rotate" />
+              </template>
               Autre vidéo
-            </n-button>
-          </n-flex>
+            </h-button>
+          </h-flex>
         </template>
-      </n-tab-pane>
-
-      <n-tab-pane name="custom" tab="Personnalisé">
-        <n-form label-placement="top" @submit.prevent="applyUrl">
-          <n-form-item
+      </h-tab-pane>
+      <h-tab-pane name="custom" tab="Personnalisé">
+        <h-form :model="customForm" label-placement="top" @submit="applyUrl">
+          <h-form-item
             :feedback="urlError"
             :validation-status="urlError ? 'error' : undefined"
             label="Image ou vidéo depuis une adresse">
-            <n-input-group>
-              <n-input v-model:value="url" placeholder="https://exemple.fr/fond.jpg" />
-              <n-select
-                v-model:value="urlKind"
-                :options="[
-                  { value: 'image', label: 'Image' },
-                  { value: 'video', label: 'Vidéo' },
-                ]"
-                style="width: 7.5rem" />
-              <n-button :disabled="!url.trim()" type="primary" @click="applyUrl">
+            <h-input-group>
+              <h-input
+                :value="customForm.url"
+                placeholder="https://exemple.fr/fond.jpg"
+                @update:value="updateUrl" />
+              <h-select
+                v-model:value="customForm.kind"
+                :options="KIND_OPTIONS"
+                class="kind-select" />
+              <h-button :disabled="!customForm.url.trim()" type="primary" @click="applyUrl">
                 Appliquer
-              </n-button>
-            </n-input-group>
-          </n-form-item>
-          <n-form-item label="Depuis votre ordinateur">
-            <n-flex align="center">
-              <n-button :loading="saving" @click="fileInput?.click()">
-                <template #icon><font-awesome-icon icon="upload" /></template>
+              </h-button>
+            </h-input-group>
+          </h-form-item>
+          <h-form-item label="Depuis votre ordinateur">
+            <h-flex>
+              <h-button :loading="saving" @click="fileInput?.click()">
+                <template #icon>
+                  <font-awesome-icon icon="upload" />
+                </template>
                 Choisir une image ou une vidéo
-              </n-button>
-              <n-text v-if="wallpaper.source === 'file'" depth="3">{{ wallpaper.name }}</n-text>
-            </n-flex>
+              </h-button>
+              <h-text v-if="fileName" depth="3">{{ fileName }}</h-text>
+            </h-flex>
             <input
               ref="fileInput"
               accept="image/*,video/*"
               class="file-input"
               type="file"
               @change="onFileChosen" />
-          </n-form-item>
-        </n-form>
-        <n-text depth="3">
+          </h-form-item>
+        </h-form>
+        <h-text depth="3">
           Un fichier de l'ordinateur reste dans ce navigateur (100 Mo au maximum) : sur un autre
           appareil, Buroh affiche le fond par défaut. Les vidéos sont lues en boucle, sans son.
-        </n-text>
-      </n-tab-pane>
-    </n-tabs>
-  </n-modal>
+        </h-text>
+      </h-tab-pane>
+    </h-tabs>
+  </h-modal>
 </template>
 
 <style lang="scss" scoped>
-.presets {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-  padding: 4px 0 0;
-  list-style: none;
-}
-
 .preset {
   display: flex;
   flex-direction: column;
@@ -489,7 +597,18 @@ async function onFileChosen(event: Event) {
   margin-top: 16px;
 }
 
+.kind-select {
+  flex: none;
+  width: 7.5rem;
+}
+
 .file-input {
   display: none;
+}
+</style>
+
+<style lang="scss">
+.wallpaper-modal {
+  width: min(640px, calc(100vw - 32px));
 }
 </style>

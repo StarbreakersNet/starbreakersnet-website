@@ -1,60 +1,74 @@
 <script lang="ts" setup>
 import { reactive } from "vue";
+import HFlex from "@/components/c/hFlex.vue";
+import HGrid from "@/components/c/hGrid.vue";
+import HGridItem from "@/components/c/hGridItem.vue";
 import { WIDGET_DEFINITIONS, WIDGET_SIZES, WIDGET_TYPES } from "@/models/widgets";
 import type { WidgetSize, WidgetType } from "@/types/Widget";
 
-// Galerie du mode édition, comme celle des widgets de macOS : un type, une taille, Ajouter
+// Galerie du mode édition, comme celle des widgets de macOS : un type, une taille, Ajouter.
+// Boutons en verre (glass.scss) plutôt que ceux de Naive UI, pour rester dans le style Liquid Glass.
+
 const emit = defineEmits<{
-  add: [type: WidgetType, size: WidgetSize];
+  (e: "add", type: WidgetType, size: WidgetSize): void;
 }>();
 
-const selectedSizes = reactive(
-  Object.fromEntries(
-    WIDGET_TYPES.map(type => [type, WIDGET_DEFINITIONS[type].defaultSize])
-  ) as Record<WidgetType, WidgetSize>
-);
+// Une carte par colonne sur mobile, jusqu'à trois sur un grand écran
+const COLUMNS = "1 500:2 760:3";
+
+// Taille choisie pour chaque type, la taille par défaut au départ
+const defaultSizes = WIDGET_TYPES.map(type => [type, WIDGET_DEFINITIONS[type].defaultSize]);
+
+const selectedSizes = reactive(Object.fromEntries(defaultSizes) as Record<WidgetType, WidgetSize>);
+
+function shapeStyle(size: WidgetSize) {
+  const { w, h } = WIDGET_SIZES[size];
+
+  return { width: `${w * 5}px`, height: `${h * 5}px` };
+}
 </script>
 
 <template>
   <section aria-label="Ajouter un widget" class="gallery liquid-glass liquid-glass--overlay">
     <h2 class="title">Ajouter un widget</h2>
-    <ul class="items">
-      <li v-for="type in WIDGET_TYPES" :key="type" class="item">
-        <div class="icon">
-          <font-awesome-icon :icon="WIDGET_DEFINITIONS[type].icon" />
-        </div>
-        <div class="text">
-          <span class="label">{{ WIDGET_DEFINITIONS[type].label }}</span>
-          <span class="description">{{ WIDGET_DEFINITIONS[type].description }}</span>
-        </div>
-        <div aria-label="Taille" class="sizes" role="radiogroup">
-          <button
-            v-for="size in WIDGET_DEFINITIONS[type].sizes"
-            :key="size"
-            :aria-checked="selectedSizes[type] === size"
-            :class="{ selected: selectedSizes[type] === size }"
-            :title="WIDGET_SIZES[size].label"
-            class="size"
-            role="radio"
-            type="button"
-            @click="selectedSizes[type] = size">
-            <span
-              :style="{
-                width: `${WIDGET_SIZES[size].w * 5}px`,
-                height: `${WIDGET_SIZES[size].h * 5}px`,
-              }"
-              class="shape" />
-          </button>
-        </div>
-        <button
-          class="glass-button add"
-          type="button"
-          @click="emit('add', type, selectedSizes[type])">
-          <font-awesome-icon icon="plus" />
-          Ajouter
-        </button>
-      </li>
-    </ul>
+    <h-grid :cols="COLUMNS" :x-gap="10" :y-gap="10" responsive="self" role="list">
+      <h-grid-item v-for="type in WIDGET_TYPES" :key="type" role="listitem">
+        <h-flex :size="10" class="item" vertical>
+          <h-flex :size="12" :wrap="false">
+            <div class="icon">
+              <font-awesome-icon :icon="WIDGET_DEFINITIONS[type].icon" />
+            </div>
+            <div class="text">
+              <span class="label">{{ WIDGET_DEFINITIONS[type].label }}</span>
+              <span class="description">{{ WIDGET_DEFINITIONS[type].description }}</span>
+            </div>
+          </h-flex>
+          <h-flex justify="space-between">
+            <h-flex :size="6" aria-label="Taille" role="radiogroup">
+              <button
+                v-for="size in WIDGET_DEFINITIONS[type].sizes"
+                :key="size"
+                :aria-checked="selectedSizes[type] === size"
+                :class="{ selected: selectedSizes[type] === size }"
+                :title="WIDGET_SIZES[size].label"
+                class="size"
+                role="radio"
+                type="button"
+                @click="selectedSizes[type] = size">
+                <span :style="shapeStyle(size)" class="shape" />
+              </button>
+            </h-flex>
+            <button
+              class="glass-button"
+              type="button"
+              @click="emit('add', type, selectedSizes[type])">
+              <font-awesome-icon icon="plus" />
+              Ajouter
+            </button>
+          </h-flex>
+        </h-flex>
+      </h-grid-item>
+    </h-grid>
   </section>
 </template>
 
@@ -73,29 +87,15 @@ const selectedSizes = reactive(
   letter-spacing: 0.05em;
 }
 
-.items {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 10px;
-  padding: 0;
-  list-style: none;
-}
-
 .item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas:
-    "icon text text"
-    "sizes sizes add";
-  align-items: center;
-  gap: 10px 12px;
+  height: 100%;
   padding: 12px;
   border-radius: 16px;
   background: var(--glass-control);
 }
 
 .icon {
-  grid-area: icon;
+  flex: none;
   display: grid;
   place-items: center;
   width: 40px;
@@ -107,7 +107,6 @@ const selectedSizes = reactive(
 }
 
 .text {
-  grid-area: text;
   display: flex;
   flex-direction: column;
   line-height: 1.25;
@@ -121,12 +120,6 @@ const selectedSizes = reactive(
     font-size: 0.82rem;
     color: var(--glass-text-soft);
   }
-}
-
-.sizes {
-  grid-area: sizes;
-  display: flex;
-  gap: 6px;
 }
 
 .size {
@@ -152,10 +145,5 @@ const selectedSizes = reactive(
       background: var(--glass-text);
     }
   }
-}
-
-.add {
-  grid-area: add;
-  justify-self: end;
 }
 </style>

@@ -1,21 +1,31 @@
 <script lang="ts" setup>
-import { computed, nextTick, onBeforeUnmount, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef } from "vue";
 import { EditorContent, useEditor, type Editor } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "@tiptap/markdown";
+import HButton from "@/components/c/hButton.vue";
+import HFlex from "@/components/c/hFlex.vue";
+import HInput from "@/components/c/hInput.vue";
 import { normalizeUrl } from "@/models/widgets";
 
 // Éditeur du widget Note, sans Markdown à écrire (TipTap). Le texte reste enregistré en Markdown,
 // comme avant : les notes existantes s'ouvrent telles quelles, et l'affichage du widget ne change
-// pas (lib/markdown.ts). Chargé seulement à l'ouverture des réglages d'une note.
+// pas (directives/vMarkdown.ts). Chargé seulement à l'ouverture des réglages d'une note.
 
-const props = defineProps<{
-  maxLength: number;
-}>();
+const props = defineProps({
+  maxLength: {
+    type: Number,
+    required: true,
+  },
+});
 
-const markdown = defineModel<string>({ required: true });
+const markdown = defineModel({
+  type: String,
+  required: true,
+});
 
 const length = ref(markdown.value.length);
+
 const tooLong = computed(() => length.value > props.maxLength);
 
 const editor = useEditor({
@@ -32,17 +42,23 @@ const editor = useEditor({
     Markdown.configure({ markedOptions: { breaks: true, gfm: true } }),
   ],
   editorProps: {
-    attributes: { "aria-label": "Texte de la note", "aria-multiline": "true", "role": "textbox" },
+    attributes: {
+      "aria-label": "Texte de la note",
+      "aria-multiline": "true",
+      "role": "textbox",
+    },
   },
   onUpdate: ({ editor }) => {
     const next = editor.getMarkdown();
+
     length.value = next.length;
+
     // Au-delà de la limite, le texte n'est plus enregistré tant qu'il n'est pas raccourci
-    if (next.length <= props.maxLength) markdown.value = next;
+    if (next.length <= props.maxLength) {
+      markdown.value = next;
+    }
   },
 });
-
-onBeforeUnmount(() => editor.value?.destroy());
 
 interface Action {
   label: string;
@@ -106,74 +122,85 @@ const ACTIONS: Action[] = [
 
 const linkOpen = ref(false);
 const linkUrl = ref("");
-const linkInput = ref<{ focus: () => void } | null>(null);
-const linkInvalid = computed(() => linkUrl.value.trim() !== "" && !normalizeUrl(linkUrl.value));
+const linkInput = useTemplateRef<InstanceType<typeof HInput>>("linkInput");
+
+const linkHref = computed(() => normalizeUrl(linkUrl.value));
+
+const linkInvalid = computed(() => linkUrl.value.trim() !== "" && !linkHref.value);
+
+const onLink = computed(() => editor.value?.isActive("link") ?? false);
+
+const linkLabel = computed(() => (onLink.value ? "Retirer le lien" : "Lien"));
 
 async function toggleLink() {
-  const current = editor.value;
-  if (!current) return;
+  if (onLink.value) {
+    editor.value?.chain().focus().extendMarkRange("link").unsetLink().run();
+  } else {
+    linkUrl.value = "";
+    linkOpen.value = true;
 
-  if (current.isActive("link")) {
-    current.chain().focus().extendMarkRange("link").unsetLink().run();
-    return;
+    await nextTick();
+    linkInput.value?.focus();
   }
-  linkUrl.value = "";
-  linkOpen.value = true;
-  await nextTick();
-  linkInput.value?.focus();
 }
 
 function applyLink() {
-  const href = normalizeUrl(linkUrl.value);
+  const href = linkHref.value;
   const current = editor.value;
-  if (!href || !current) return;
 
-  const chain = current.chain().focus();
-  if (current.state.selection.empty) {
-    // Sans texte sélectionné, l'adresse devient le texte du lien
-    chain.insertContent({ type: "text", text: href, marks: [{ type: "link", attrs: { href } }] });
-  } else {
-    chain.extendMarkRange("link").setLink({ href });
+  if (href && current) {
+    const chain = current.chain().focus();
+
+    if (current.state.selection.empty) {
+      // Sans texte sélectionné, l'adresse devient le texte du lien
+      const mark = { type: "link", attrs: { href } };
+
+      chain.insertContent({ type: "text", text: href, marks: [mark] });
+    } else {
+      chain.extendMarkRange("link").setLink({ href });
+    }
+
+    chain.run();
+    linkOpen.value = false;
   }
-  chain.run();
-  linkOpen.value = false;
 }
 
 function cancelLink() {
   linkOpen.value = false;
   editor.value?.commands.focus();
 }
+
+onBeforeUnmount(() => editor.value?.destroy());
 </script>
 
 <template>
   <div :class="{ invalid: tooLong }" class="note-editor">
-    <div v-if="editor" aria-label="Mise en forme" class="toolbar" role="toolbar">
-      <button
+    <h-flex v-if="editor" :size="2" aria-label="Mise en forme" class="toolbar" role="toolbar">
+      <h-button
         v-for="action in ACTIONS"
         :key="action.label"
         :aria-label="action.label"
         :aria-pressed="action.active(editor)"
-        :class="{ active: action.active(editor) }"
-        :title="action.label"
-        class="tool"
-        type="button"
+        :tooltip="action.label"
+        :type="action.active(editor) ? 'primary' : 'default'"
+        quaternary
+        size="small"
         @click="action.run(editor)">
         <font-awesome-icon :icon="action.icon" />
-      </button>
-      <button
-        :aria-label="editor.isActive('link') ? 'Retirer le lien' : 'Lien'"
-        :aria-pressed="editor.isActive('link')"
-        :class="{ active: editor.isActive('link') || linkOpen }"
-        :title="editor.isActive('link') ? 'Retirer le lien' : 'Lien'"
-        class="tool"
-        type="button"
+      </h-button>
+      <h-button
+        :aria-label="linkLabel"
+        :aria-pressed="onLink"
+        :tooltip="linkLabel"
+        :type="onLink || linkOpen ? 'primary' : 'default'"
+        quaternary
+        size="small"
         @click="toggleLink">
-        <font-awesome-icon :icon="editor.isActive('link') ? 'link-slash' : 'link'" />
-      </button>
-    </div>
-
-    <div v-if="linkOpen" class="link-row">
-      <n-input
+        <font-awesome-icon :icon="onLink ? 'link-slash' : 'link'" />
+      </h-button>
+    </h-flex>
+    <h-flex v-if="linkOpen" :size="6" :wrap="false" class="link-row">
+      <h-input
         ref="linkInput"
         v-model:value="linkUrl"
         :status="linkInvalid ? 'error' : undefined"
@@ -181,14 +208,12 @@ function cancelLink() {
         size="small"
         @keydown.enter.prevent="applyLink"
         @keydown.esc.prevent.stop="cancelLink" />
-      <n-button :disabled="!normalizeUrl(linkUrl)" size="small" type="primary" @click="applyLink">
+      <h-button :disabled="!linkHref" size="small" type="primary" @click="applyLink">
         Ajouter
-      </n-button>
-      <n-button quaternary size="small" @click="cancelLink">Annuler</n-button>
-    </div>
-
+      </h-button>
+      <h-button quaternary size="small" @click="cancelLink">Annuler</h-button>
+    </h-flex>
     <editor-content :editor="editor" class="content" />
-
     <p :class="{ error: tooLong }" class="count">
       <template v-if="tooLong">Texte trop long : il n'est plus enregistré.</template>
       {{ length }} / {{ props.maxLength }}
@@ -216,46 +241,8 @@ function cancelLink() {
   }
 }
 
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  padding: 6px;
-  border-bottom: 1px solid var(--glass-separator);
-}
-
-.tool {
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 8px;
-  color: inherit;
-  opacity: 0.75;
-  transition:
-    background 0.15s ease,
-    opacity 0.15s ease;
-
-  &:hover {
-    background: var(--glass-control-hover);
-    opacity: 1;
-  }
-
-  &.active {
-    background: var(--glass-control-hover);
-    color: rgb(10 132 255);
-    opacity: 1;
-  }
-
-  &:focus-visible {
-    outline: 2px solid rgb(10 132 255);
-    outline-offset: 1px;
-  }
-}
-
+.toolbar,
 .link-row {
-  display: flex;
-  gap: 6px;
   padding: 6px;
   border-bottom: 1px solid var(--glass-separator);
 }

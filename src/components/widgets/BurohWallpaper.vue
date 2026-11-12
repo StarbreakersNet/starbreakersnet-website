@@ -7,13 +7,18 @@ import { isStale, pickVideo, presetById, videoById, WALLPAPER_PRESETS } from "@/
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import { useWidgetsStore } from "@/stores/widgets";
-import type { MediaKind, WallpaperAppearance } from "@/types/Wallpaper";
+import type {
+  MediaKind,
+  UnsplashWallpaper,
+  VideosWallpaper,
+  WallpaperAppearance,
+} from "@/types/Wallpaper";
 
 // Fond d'écran de Buroh, en plein écran derrière les widgets. Le dégradé par défaut reste dessous
 // pendant le chargement d'une photo ou d'une vidéo, et en cas d'échec.
 
 const emit = defineEmits<{
-  appearance: [appearance: WallpaperAppearance];
+  (e: "appearance", appearance: WallpaperAppearance): void;
 }>();
 
 const store = useWidgetsStore();
@@ -21,6 +26,8 @@ const user = useUserStore();
 const message = useMessage();
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const GRADIENT_APPEARANCE: WallpaperAppearance = { kind: "gradient", backdrop: null };
 
 const wallpaper = computed(() => store.wallpaper);
 
@@ -30,6 +37,7 @@ const gradient = computed(() => {
   const current = wallpaper.value;
   const preset = current.source === "preset" ? presetById(current.preset) : WALLPAPER_PRESETS[0]!;
   const { dark, light } = preset.gradient;
+
   return user.settings.theme === "light" ? (light ?? dark) : dark;
 });
 
@@ -41,76 +49,85 @@ const failed = ref(false);
 
 const media = computed<{ kind: MediaKind; src: string } | null>(() => {
   const current = wallpaper.value;
-  switch (current.source) {
-    case "videos": {
-      const video = videoById(current.video?.id);
-      return video ? { kind: "video", src: video.src } : null;
-    }
-    case "unsplash":
-      return current.photo ? { kind: "image", src: current.photo.url } : null;
-    case "url":
-      return { kind: current.kind, src: current.url };
-    case "file":
-      return fileUrl.value ? { kind: current.kind, src: fileUrl.value } : null;
+  let result: { kind: MediaKind; src: string } | null = null;
+
+  if (current.source === "videos") {
+    const video = videoById(current.video?.id);
+
+    result = video ? { kind: "video", src: video.src } : null;
   }
-  return null;
+
+  if (current.source === "unsplash" && current.photo) {
+    result = { kind: "image", src: current.photo.url };
+  }
+
+  if (current.source === "url") {
+    result = { kind: current.kind, src: current.url };
+  }
+
+  if (current.source === "file" && fileUrl.value) {
+    result = { kind: current.kind, src: fileUrl.value };
+  }
+
+  return result;
 });
 
 const credit = computed(() => {
   const current = wallpaper.value;
-  return current.source === "unsplash" && current.photo ? current.photo : null;
+
+  return current.source === "unsplash" ? current.photo : null;
 });
 
 const videoCredit = computed(() => {
   const current = wallpaper.value;
+
   return current.source === "videos" ? (videoById(current.video?.id)?.credit ?? null) : null;
 });
 
 // Fichier de l'ordinateur, relu depuis le navigateur à chaque nouveau fichier choisi
-watch(
-  () => (wallpaper.value.source === "file" ? wallpaper.value.addedAt : null),
-  async addedAt => {
-    if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
-    fileUrl.value = null;
-    if (addedAt === null) return;
+async function readFile(addedAt: string | null) {
+  if (fileUrl.value) {
+    URL.revokeObjectURL(fileUrl.value);
+  }
 
+  fileUrl.value = null;
+
+  if (addedAt !== null) {
     const file = await loadWallpaperFile();
+
     if (file) {
       fileUrl.value = URL.createObjectURL(file);
     } else {
       // Fichier absent de ce navigateur (autre appareil) : dégradé par défaut
-      emit("appearance", { kind: "gradient", backdrop: null });
+      emit("appearance", GRADIENT_APPEARANCE);
     }
-  },
-  { immediate: true }
-);
-onBeforeUnmount(() => {
-  if (fileUrl.value) URL.revokeObjectURL(fileUrl.value);
-});
-
-watch(
-  () => media.value?.src,
-  () => {
-    loaded.value = false;
-    failed.value = false;
-    emit("appearance", { kind: "gradient", backdrop: null });
   }
-);
+}
+
+function onMediaChange() {
+  loaded.value = false;
+  failed.value = false;
+  emit("appearance", GRADIENT_APPEARANCE);
+}
 
 async function onLoaded() {
-  loaded.value = true;
   const current = media.value;
-  if (!current) return;
 
-  const backdrop = current.kind === "image" ? await createBackdrop(current.src) : null;
-  // Média changé entre-temps
-  if (media.value?.src !== current.src) return;
-  emit("appearance", { kind: current.kind, backdrop });
+  loaded.value = true;
+
+  if (current) {
+    const backdrop = current.kind === "image" ? await createBackdrop(current.src) : null;
+
+    // Média inchangé pendant le calcul de la miniature
+    if (media.value?.src === current.src) {
+      emit("appearance", { kind: current.kind, backdrop });
+    }
+  }
 }
 
 function onError() {
   failed.value = true;
-  emit("appearance", { kind: "gradient", backdrop: null });
+  emit("appearance", GRADIENT_APPEARANCE);
   message.error("Impossible d'afficher ce fond d'écran : retour au dégradé");
 }
 
@@ -123,41 +140,81 @@ function onVideoMetadata(event: Event) {
 
 // --- Photo Unsplash ou vidéo de la sélection, renouvelée selon le rythme choisi
 
-async function refresh() {
-  const current = wallpaper.value;
-
-  if (current.source === "videos" && isStale(current.video?.pickedAt, current.frequency)) {
+function refreshVideo(current: VideosWallpaper) {
+  if (isStale(current.video?.pickedAt, current.frequency)) {
     const video = pickVideo(current.video?.id);
-    store.setWallpaper({ ...current, video: { id: video.id, pickedAt: new Date().toISOString() } });
-    return;
+
+    store.setWallpaper({
+      ...current,
+      video: { id: video.id, pickedAt: new Date().toISOString() },
+    });
   }
+}
 
-  if (current.source !== "unsplash" || !isStale(current.photo?.fetchedAt, current.frequency))
-    return;
+async function refreshPhoto(current: UnsplashWallpaper) {
+  if (isStale(current.photo?.fetchedAt, current.frequency)) {
+    try {
+      const photo = await fetchRandomPhoto(current);
 
-  try {
-    const photo = await fetchRandomPhoto(current);
-    // Fond changé pendant la requête
-    if (store.wallpaper !== current) return;
-    store.setWallpaper({ ...current, photo });
-  } catch {
-    if (!current.photo) {
-      message.error("Impossible de récupérer une photo Unsplash pour le moment");
+      // Fond inchangé pendant la requête
+      if (store.wallpaper === current) {
+        store.setWallpaper({ ...current, photo });
+      }
+    } catch {
+      if (!current.photo) {
+        message.error("Impossible de récupérer une photo Unsplash pour le moment");
+      }
     }
   }
 }
 
+function refresh() {
+  const current = wallpaper.value;
+
+  if (current.source === "videos") {
+    refreshVideo(current);
+  }
+
+  if (current.source === "unsplash") {
+    refreshPhoto(current);
+  }
+}
+
+// Clé qui change avec le thème, la collection ou le média choisi
+const rotationKey = computed(() => {
+  const current = wallpaper.value;
+  let key: string | null = null;
+
+  if (current.source === "unsplash") {
+    key = `${current.topic}|${current.collection}|${current.photo?.id ?? ""}`;
+  }
+
+  if (current.source === "videos") {
+    key = `videos|${current.video?.id ?? ""}`;
+  }
+
+  return key;
+});
+
+watch(() => (wallpaper.value.source === "file" ? wallpaper.value.addedAt : null), readFile, {
+  immediate: true,
+});
+
+watch(() => media.value?.src, onMediaChange);
+
+watch(rotationKey, key => {
+  if (key) {
+    refresh();
+  }
+});
+
 onMounted(refresh);
-watch(
-  () => {
-    const current = wallpaper.value;
-    if (current.source === "unsplash") {
-      return `${current.topic}|${current.collection}|${current.photo?.id ?? ""}`;
-    }
-    return current.source === "videos" ? `videos|${current.video?.id ?? ""}` : null;
-  },
-  key => key && refresh()
-);
+
+onBeforeUnmount(() => {
+  if (fileUrl.value) {
+    URL.revokeObjectURL(fileUrl.value);
+  }
+});
 </script>
 
 <template>
@@ -190,7 +247,6 @@ watch(
         @loadedmetadata="onVideoMetadata" />
     </template>
   </div>
-
   <p v-if="credit" class="credit">
     Photo :
     <a :href="withReferral(credit.authorUrl ?? credit.photoUrl)" rel="noopener" target="_blank">

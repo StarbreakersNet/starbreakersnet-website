@@ -1,63 +1,88 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, ref, watch } from "vue";
+import { computed, onBeforeUnmount, type PropType, ref, watch } from "vue";
 import { DateTime } from "luxon";
 import { localTimezone, timezoneCity } from "@/models/widgets";
 import type { ClockSettings, WidgetSize } from "@/types/Widget";
 
-const props = defineProps<{
-  settings: ClockSettings;
-  size: WidgetSize;
-}>();
+const props = defineProps({
+  settings: {
+    type: Object as PropType<ClockSettings>,
+    required: true,
+  },
+  size: {
+    type: String as PropType<WidgetSize>,
+    required: true,
+  },
+});
 
-// Heure courante, rafraîchie chaque seconde (ou chaque minute sans trotteuse)
+// Heure courante, rafraîchie chaque seconde (ou chaque minute sans trotteuse), calée sur le début
+// de la seconde ou de la minute
 const now = ref(DateTime.now());
 let timer: ReturnType<typeof setTimeout> | undefined;
 
 function tick() {
+  clearTimeout(timer);
   now.value = DateTime.now();
-  const step = props.settings.seconds ? 1000 : 60000;
-  timer = setTimeout(tick, step - (Date.now() % step));
-}
 
-tick();
-watch(
-  () => props.settings.seconds,
-  () => {
-    clearTimeout(timer);
-    tick();
-  }
-);
-onBeforeUnmount(() => clearTimeout(timer));
+  const step = props.settings.seconds ? 1000 : 60000;
+  const untilNextStep = step - (Date.now() % step);
+
+  timer = setTimeout(tick, untilNextStep);
+}
 
 const zoned = computed(() => {
   const time = now.value.setLocale("fr");
+
   return props.settings.timezone ? time.setZone(props.settings.timezone) : time;
 });
 
-const label = computed(
-  () => props.settings.label.trim() || timezoneCity(props.settings.timezone ?? localTimezone())
-);
+const label = computed(() => {
+  const custom = props.settings.label.trim();
 
-const time = computed(() => zoned.value.toFormat(props.settings.seconds ? "HH:mm:ss" : "HH:mm"));
+  return custom || timezoneCity(props.settings.timezone ?? localTimezone());
+});
+
+const time = computed(() => {
+  const format = props.settings.seconds ? "HH:mm:ss" : "HH:mm";
+
+  return zoned.value.toFormat(format);
+});
+
 const date = computed(() => zoned.value.toFormat("cccc d LLLL"));
 
 // Décalage avec l'heure de l'appareil, affiché pour un autre fuseau : « +6 h », « −9 h 30 »
+function formatOffset(difference: number) {
+  const sign = difference > 0 ? "+" : "−";
+  const hours = Math.floor(Math.abs(difference) / 60);
+  const minutes = Math.abs(difference) % 60;
+
+  let text = `${sign}${hours} h`;
+
+  if (minutes > 0) {
+    text += ` ${minutes}`;
+  }
+
+  if (difference === 0) {
+    text = "Même heure";
+  }
+
+  return text;
+}
+
 const offset = computed(() => {
-  if (!props.settings.timezone) return "";
-  const minutes = zoned.value.offset - now.value.offset;
-  if (minutes === 0) return "Même heure";
-  const sign = minutes > 0 ? "+" : "−";
-  const hours = Math.floor(Math.abs(minutes) / 60);
-  const rest = Math.abs(minutes) % 60;
-  return `${sign}${hours} h${rest ? ` ${rest}` : ""}`;
+  const difference = zoned.value.offset - now.value.offset;
+
+  return props.settings.timezone ? formatOffset(difference) : "";
 });
 
 // Angles des aiguilles, en degrés depuis midi
 const angles = computed(() => {
   const { hour, minute, second } = zoned.value;
+  const secondsShift = props.settings.seconds ? second * 0.1 : 0;
+
   return {
     hour: (hour % 12) * 30 + minute * 0.5,
-    minute: minute * 6 + (props.settings.seconds ? second * 0.1 : 0),
+    minute: minute * 6 + secondsShift,
     second: second * 6,
   };
 });
@@ -65,10 +90,20 @@ const angles = computed(() => {
 const numerals = Array.from({ length: 12 }, (_, index) => {
   const value = index + 1;
   const angle = (value * 30 * Math.PI) / 180;
-  return { value, x: 50 + 36 * Math.sin(angle), y: 50 - 36 * Math.cos(angle) };
+
+  return {
+    value,
+    x: 50 + 36 * Math.sin(angle),
+    y: 50 - 36 * Math.cos(angle),
+  };
 });
 
 const ticks = Array.from({ length: 60 }, (_, index) => index * 6);
+
+// Premier tic au montage, puis à chaque changement de rythme (avec ou sans trotteuse)
+watch(() => props.settings.seconds, tick, { immediate: true });
+
+onBeforeUnmount(() => clearTimeout(timer));
 </script>
 
 <template>
@@ -115,7 +150,6 @@ const ticks = Array.from({ length: 60 }, (_, index) => index * 6);
       <circle class="pin" cx="50" cy="50" r="1.8" />
       <circle class="pin-center" cx="50" cy="50" r="0.8" />
     </svg>
-
     <div v-if="props.settings.style === 'digital' || props.size !== 'small'" class="details">
       <span class="label">{{ label }}</span>
       <span class="time">{{ time }}</span>
