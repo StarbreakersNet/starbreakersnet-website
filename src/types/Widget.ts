@@ -70,6 +70,9 @@ interface WidgetOf<T extends WidgetType> {
   // Position sur la grille, en cases
   x: number;
   y: number;
+  // Position sur la grille du mobile (MOBILE_COLUMNS colonnes), une fois le widget déplacé sur
+  // mobile. Absente : le widget suit l'ordre de lecture de la grille de l'ordinateur.
+  mobile?: { x: number; y: number };
   settings: WidgetSettingsMap[T];
 }
 

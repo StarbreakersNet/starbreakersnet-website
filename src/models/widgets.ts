@@ -18,6 +18,9 @@ import type {
 
 // Grille du Buroh : colonnes de cases carrées
 export const GRID_COLUMNS = 12;
+// Grille du mobile : un petit widget prend la moitié de la largeur, un moyen ou un grand toute la
+// largeur
+export const MOBILE_COLUMNS = 4;
 
 export const WIDGET_SIZES: Record<WidgetSize, { w: number; h: number; label: string }> = {
   small: { w: 2, h: 2, label: "Petit" },
@@ -230,26 +233,55 @@ function overlaps(a: Rect, b: Rect) {
   return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 }
 
-export function fits(rect: Rect, others: Rect[]) {
+export function fits(rect: Rect, others: Rect[], columns = GRID_COLUMNS) {
   return (
     rect.x >= 0 &&
     rect.y >= 0 &&
-    rect.x + rect.w <= GRID_COLUMNS &&
+    rect.x + rect.w <= columns &&
     !others.some(other => overlaps(rect, other))
   );
 }
 
 // Première place libre, de gauche à droite puis de haut en bas
-export function findFreeSpot(size: WidgetSize, others: Rect[]) {
+export function findFreeSpot(size: WidgetSize, others: Rect[], columns = GRID_COLUMNS) {
   const { w, h } = WIDGET_SIZES[size];
 
   for (let y = 0; ; y++) {
-    for (let x = 0; x + w <= GRID_COLUMNS; x++) {
-      if (fits({ x, y, w, h }, others)) {
+    for (let x = 0; x + w <= columns; x++) {
+      if (fits({ x, y, w, h }, others, columns)) {
         return { x, y };
       }
     }
   }
+}
+
+// Positions sur la grille du mobile : celles choisies sur mobile quand elles tiennent encore, puis
+// les autres widgets dans l'ordre de lecture de l'ordinateur (de haut en bas, de gauche à droite)
+export function mobileLayout(widgets: Widget[]): Map<string, { x: number; y: number }> {
+  const positions = new Map<string, { x: number; y: number }>();
+  const placed: Rect[] = [];
+  const place = (widget: Widget, position: { x: number; y: number }) => {
+    positions.set(widget.id, position);
+    placed.push({ ...position, ...WIDGET_SIZES[widget.size] });
+  };
+
+  for (const widget of widgets) {
+    if (
+      widget.mobile &&
+      fits({ ...widget.mobile, ...WIDGET_SIZES[widget.size] }, placed, MOBILE_COLUMNS)
+    ) {
+      place(widget, widget.mobile);
+    }
+  }
+
+  const rest = widgets
+    .filter(widget => !positions.has(widget.id))
+    .sort((a, b) => a.y - b.y || a.x - b.x);
+  for (const widget of rest) {
+    place(widget, findFreeSpot(widget.size, placed, MOBILE_COLUMNS));
+  }
+
+  return positions;
 }
 
 // --- Lecture du stockage (navigateur ou compte)
@@ -287,11 +319,16 @@ export function normalizeDocument(raw: unknown): Widget[] | null {
       position = findFreeSpot(size, placed);
     }
 
+    const mobile = entry.mobile as Record<string, unknown> | undefined;
     const widget = {
       id: typeof entry.id === "string" ? entry.id : createId(),
       type,
       size,
       ...position,
+      // Vérifiée à l'affichage par mobileLayout, comme les chevauchements
+      ...(Number.isInteger(mobile?.x) && Number.isInteger(mobile?.y)
+        ? { mobile: { x: mobile!.x as number, y: mobile!.y as number } }
+        : {}),
       settings,
     } as Widget;
 

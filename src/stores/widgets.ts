@@ -195,13 +195,21 @@ export const useWidgetsStore = defineStore("widgets", () => {
     growingId.value = null;
   }
 
-  // Positions après un glisser-déposer sur la grille
-  function move(positions: { id: string; x: number; y: number }[]) {
+  // Positions après un glisser-déposer, sur la grille de l'ordinateur ou sur celle du mobile (qui ne
+  // change pas la disposition de l'ordinateur)
+  function move(positions: { id: string; x: number; y: number }[], grid: "desktop" | "mobile") {
     let changed = false;
 
     for (const { id, x, y } of positions) {
       const widget = widgets.value.find(item => item.id === id);
-      if (widget && (widget.x !== x || widget.y !== y)) {
+      if (!widget) continue;
+
+      if (grid === "mobile") {
+        if (widget.mobile?.x !== x || widget.mobile?.y !== y) {
+          widget.mobile = { x, y };
+          changed = true;
+        }
+      } else if (widget.x !== x || widget.y !== y) {
         widget.x = x;
         widget.y = y;
         changed = true;

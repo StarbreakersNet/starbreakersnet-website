@@ -27,6 +27,8 @@ const { overflowing } = useFitContent(root, [html], {
 </template>
 
 <style lang="scss" scoped>
+@use "@/assets/markdown" as *;
+
 .markdown {
   width: 100%;
   height: 100%;
@@ -42,93 +44,7 @@ const { overflowing } = useFitContent(root, [html], {
     mask-image: linear-gradient(to bottom, #000 80%, transparent);
   }
 
-  :deep(h1),
-  :deep(h2),
-  :deep(h3) {
-    margin: 0 0 0.4em;
-    font-weight: 700;
-    line-height: 1.2;
-    color: var(--glass-text);
-  }
-
-  :deep(h1) {
-    font-size: 1.45em;
-  }
-
-  :deep(h2) {
-    font-size: 1.2em;
-  }
-
-  :deep(h3) {
-    font-size: 1.05em;
-  }
-
-  :deep(p),
-  :deep(ul),
-  :deep(ol),
-  :deep(blockquote),
-  :deep(pre) {
-    margin: 0 0 0.6em;
-  }
-
-  :deep(ul),
-  :deep(ol) {
-    padding-left: 1.3em;
-  }
-
-  :deep(ul) {
-    list-style: disc;
-  }
-
-  :deep(ol) {
-    list-style: decimal;
-  }
-
-  :deep(strong) {
-    font-weight: 700;
-  }
-
-  :deep(em) {
-    font-style: italic;
-  }
-
-  :deep(a) {
-    color: rgb(10 132 255);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-
-  :deep(code) {
-    padding: 0.1em 0.35em;
-    border-radius: 6px;
-    background: var(--glass-control);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.88em;
-  }
-
-  :deep(pre) {
-    padding: 0.6em 0.8em;
-    border-radius: 10px;
-    background: var(--glass-control);
-    white-space: pre-wrap;
-
-    code {
-      padding: 0;
-      background: none;
-    }
-  }
-
-  :deep(blockquote) {
-    padding-left: 0.8em;
-    border-left: 3px solid var(--glass-separator);
-    color: var(--glass-text-soft);
-  }
-
-  :deep(hr) {
-    margin: 0.8em 0;
-    border: none;
-    border-top: 1px solid var(--glass-separator);
-  }
+  @include markdown-content;
 
   :deep(> :last-child) {
     margin-bottom: 0;

@@ -1,23 +1,31 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { GridLayout } from "grid-layout-plus";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import BurohWallpaper from "@/components/widgets/BurohWallpaper.vue";
 import WallpaperModal from "@/components/widgets/WallpaperModal.vue";
 import WidgetFrame from "@/components/widgets/WidgetFrame.vue";
 import WidgetGallery from "@/components/widgets/WidgetGallery.vue";
+import WidgetGrid, { type GridItem } from "@/components/widgets/WidgetGrid.vue";
 import WidgetSettingsModal from "@/components/widgets/WidgetSettingsModal.vue";
 import { WIDGET_COMPONENTS } from "@/components/widgets/registry";
-import { GRID_COLUMNS, WIDGET_DEFINITIONS, WIDGET_SIZES } from "@/models/widgets";
+import {
+  GRID_COLUMNS,
+  MOBILE_COLUMNS,
+  mobileLayout,
+  WIDGET_DEFINITIONS,
+  WIDGET_SIZES,
+} from "@/models/widgets";
 import { useWidgetsStore } from "@/stores/widgets";
 import type { FitState } from "@/composables/useFitContent";
 import type { WallpaperAppearance } from "@/types/Wallpaper";
-import type { Widget, WidgetSize, WidgetType } from "@/types/Widget";
+import type { WidgetSize, WidgetType } from "@/types/Widget";
 
 // Buroh, page d'accueil à widgets à la manière du bureau de macOS : grille libre où l'on place
 // et règle ses widgets.
-// Sur petit écran, les widgets s'empilent sur deux colonnes, sans glisser-déposer.
+// Sur petit écran, grille de 4 colonnes (deux petits widgets par ligne), avec sa propre disposition :
+// déplacer un widget sur mobile ne change pas la disposition de l'ordinateur.
 
 const GAP = 16;
+const MOBILE_GAP = 14;
 const MOBILE_QUERY = "(max-width: 720px)";
 // Barre d'outils masquée après ce délai sans activité (souris, clavier, toucher)
 const TOOLBAR_IDLE_DELAY = 1500;
@@ -35,66 +43,32 @@ const onMobileChange = (event: MediaQueryListEvent) => (isMobile.value = event.m
 onMounted(() => mobileQuery.addEventListener("change", onMobileChange));
 onBeforeUnmount(() => mobileQuery.removeEventListener("change", onMobileChange));
 
-// Ordre de lecture : de haut en bas, puis de gauche à droite
-const stacked = computed(() => [...store.widgets].sort((a, b) => a.y - b.y || a.x - b.x));
+// --- Grille (voir components/widgets/WidgetGrid.vue)
 
-// --- Grille : cases carrées, dont la taille suit la largeur de la page
-
-const gridWrapper = ref<HTMLElement | null>(null);
-const cellSize = ref(80);
-const resizeObserver = new ResizeObserver(([entry]) => {
-  const width = entry?.contentRect.width ?? 0;
-  if (width > 0) {
-    cellSize.value = (width - GAP * (GRID_COLUMNS + 1)) / GRID_COLUMNS;
-  }
-});
-watch(gridWrapper, (element, previous) => {
-  if (previous) resizeObserver.unobserve(previous);
-  if (element) resizeObserver.observe(element);
-});
-onBeforeUnmount(() => resizeObserver.disconnect());
-
-interface LayoutItem {
-  i: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-function toLayout(widgets: Widget[]): LayoutItem[] {
-  return widgets.map(widget => ({
-    i: widget.id,
-    x: widget.x,
-    y: widget.y,
+const gridItems = computed<GridItem[]>(() => {
+  const mobile = isMobile.value ? mobileLayout(store.widgets) : null;
+  return store.widgets.map(widget => ({
+    id: widget.id,
+    ...(mobile?.get(widget.id) ?? { x: widget.x, y: widget.y }),
     ...WIDGET_SIZES[widget.size],
   }));
-}
-
-// Copie modifiée par la grille pendant le glisser-déposer, reconstruite quand le store change
-const layout = ref<LayoutItem[]>(toLayout(store.widgets));
-const signature = (items: LayoutItem[]) =>
-  items.map(({ i, x, y, w, h }) => `${i}:${x},${y},${w}x${h}`).join("|");
-
-watch(
-  () => toLayout(store.widgets),
-  next => {
-    if (signature(next) !== signature(layout.value)) {
-      layout.value = next;
-    }
-  },
-  { deep: true }
-);
+});
 
 const widgetsById = computed(() => new Map(store.widgets.map(widget => [widget.id, widget])));
 
-function onLayoutUpdated(items: LayoutItem[]) {
-  store.move(items.map(({ i, x, y }) => ({ id: i, x, y })));
+function onMoved(positions: { id: string; x: number; y: number }[]) {
+  store.move(positions, isMobile.value ? "mobile" : "desktop");
 }
 
 // --- Édition
 
+// Sur mobile, la galerie couvrirait les widgets à déplacer : elle s'ouvre avec le bouton « + »,
+// comme sur iPhone, et se referme après un ajout
+const galleryOpen = ref(false);
+const showGallery = computed(() => editing.value && (!isMobile.value || galleryOpen.value));
+
 function addWidget(type: WidgetType, size: WidgetSize) {
+  galleryOpen.value = false;
   const widget = store.add(type, size);
   // Un widget sans contenu par défaut s'ouvre directement sur ses réglages
   if (type === "links") {
@@ -109,6 +83,7 @@ function closeSettings() {
 
 function toggleEditing() {
   editing.value = !editing.value;
+  galleryOpen.value = false;
   if (!editing.value) {
     configuredId.value = null;
   }
@@ -190,58 +165,35 @@ const toolbarVisible = computed(
     @contextmenu="onContextMenu">
     <buroh-wallpaper @appearance="appearance = $event" />
 
-    <div v-if="isMobile" class="stack">
-      <div
-        v-for="widget in stacked"
-        :key="widget.id"
-        :class="`size-${widget.size}`"
-        class="stack-item">
+    <widget-grid
+      :key="isMobile ? 'mobile' : 'desktop'"
+      :class="{ mobile: isMobile }"
+      :columns="isMobile ? MOBILE_COLUMNS : GRID_COLUMNS"
+      :list="isMobile"
+      :editable="editing"
+      :gap="isMobile ? MOBILE_GAP : GAP"
+      :items="gridItems"
+      class="grid"
+      @moved="onMoved">
+      <template #item="{ id }">
         <widget-frame
+          v-if="widgetsById.get(id)"
           :editing="editing"
-          :label="WIDGET_DEFINITIONS[widget.type].label"
-          @configure="configuredId = widget.id"
-          @remove="store.remove(widget.id)">
+          :label="WIDGET_DEFINITIONS[widgetsById.get(id)!.type].label"
+          @configure="configuredId = id"
+          @remove="store.remove(id)">
           <component
-            :is="WIDGET_COMPONENTS[widget.type].view"
-            :settings="widget.settings"
-            :size="widget.size"
-            @fit="(state: FitState) => store.growIfCramped(widget.id, state)" />
+            :is="WIDGET_COMPONENTS[widgetsById.get(id)!.type].view"
+            :settings="widgetsById.get(id)!.settings"
+            :size="widgetsById.get(id)!.size"
+            @fit="(state: FitState) => store.growIfCramped(id, state)" />
         </widget-frame>
-      </div>
-    </div>
-
-    <div v-else ref="gridWrapper" class="grid">
-      <grid-layout
-        v-model:layout="layout"
-        :col-num="GRID_COLUMNS"
-        :is-draggable="editing"
-        :is-resizable="false"
-        :margin="[GAP, GAP]"
-        :prevent-collision="true"
-        :row-height="cellSize"
-        :use-css-transforms="false"
-        :vertical-compact="false"
-        @layout-updated="onLayoutUpdated">
-        <template #item="{ item }">
-          <widget-frame
-            v-if="widgetsById.get(String(item.i))"
-            :editing="editing"
-            :label="WIDGET_DEFINITIONS[widgetsById.get(String(item.i))!.type].label"
-            @configure="configuredId = String(item.i)"
-            @remove="store.remove(String(item.i))">
-            <component
-              :is="WIDGET_COMPONENTS[widgetsById.get(String(item.i))!.type].view"
-              :settings="widgetsById.get(String(item.i))!.settings"
-              :size="widgetsById.get(String(item.i))!.size"
-              @fit="(state: FitState) => store.growIfCramped(String(item.i), state)" />
-          </widget-frame>
-        </template>
-      </grid-layout>
-    </div>
+      </template>
+    </widget-grid>
 
     <div class="dock">
       <transition name="slide-up">
-        <widget-gallery v-if="editing" @add="addWidget" />
+        <widget-gallery v-if="showGallery" @add="addWidget" />
       </transition>
       <div
         :class="{ hidden: !toolbarVisible }"
@@ -250,6 +202,15 @@ const toolbarVisible = computed(
         @focusout="toolbarFocused = false"
         @pointerenter="toolbarHovered = true"
         @pointerleave="toolbarHovered = false">
+        <button
+          v-if="editing && isMobile"
+          :aria-expanded="galleryOpen"
+          class="glass-button"
+          type="button"
+          @click="galleryOpen = !galleryOpen">
+          <font-awesome-icon :icon="galleryOpen ? 'xmark' : 'plus'" />
+          <span class="label">{{ galleryOpen ? "Fermer la galerie" : "Ajouter un widget" }}</span>
+        </button>
         <button class="glass-button" type="button" @click="showWallpaper = true">
           <font-awesome-icon icon="image" />
           <span class="label">Fond d'écran</span>
@@ -333,42 +294,13 @@ const toolbarVisible = computed(
 
 .grid {
   flex: 1;
-  // La grille ajoute un espace autour des widgets : on le reprend sur les marges de la page (1em)
-  margin: -16px -1em 0;
+  // Demi-espace de la grille autour des widgets : on le reprend pour les aligner sur la page
+  margin: calc(-1 * var(--grid-gap) / 2);
+  margin-bottom: 0;
+  --grid-gap: 16px;
 
-  :deep(.vgl-layout) {
-    --vgl-placeholder-bg: rgb(255 255 255);
-    --vgl-placeholder-opacity: 18%;
-  }
-
-  :deep(.vgl-item--placeholder) {
-    border-radius: var(--glass-radius);
-  }
-
-  // Pas de transform : il décalerait la miniature floue du fond (background-attachment: fixed)
-  :deep(.vgl-item--dragging) {
-    .widget {
-      box-shadow: 0 24px 48px rgb(0 0 0 / 0.35);
-    }
-  }
-}
-
-.stack {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-
-  .stack-item {
-    aspect-ratio: 1;
-
-    &.size-medium {
-      grid-column: span 2;
-      aspect-ratio: 2.1;
-    }
-
-    &.size-large {
-      grid-column: span 2;
-    }
+  &.mobile {
+    --grid-gap: 14px;
   }
 }
 
