@@ -363,15 +363,16 @@ watch(
       <h-tab-pane name="presets" tab="Dégradés">
         <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
           <h-grid-item v-for="preset in WALLPAPER_PRESETS" :key="preset.id" role="listitem">
-            <button
+            <h-button
               :aria-pressed="isPresetSelected(preset.id)"
               :class="{ selected: isPresetSelected(preset.id) }"
               class="preset"
-              type="button"
+              native-focus-behavior
+              text
               @click="choosePreset(preset.id)">
               <span :style="{ background: presetPreview(preset.id) }" class="preview" />
               <span class="label">{{ preset.label }}</span>
-            </button>
+            </h-button>
           </h-grid-item>
         </h-grid>
       </h-tab-pane>
@@ -450,18 +451,19 @@ watch(
         <template v-else>
           <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
             <h-grid-item v-for="video in WALLPAPER_VIDEOS" :key="video.id" role="listitem">
-              <button
+              <h-button
                 :aria-pressed="isVideoSelected(video.id)"
                 :class="{ selected: isVideoSelected(video.id) }"
                 class="preset"
-                type="button"
+                native-focus-behavior
+                text
                 @click="chooseVideo(video.id)">
                 <span class="preview">
                   <video :src="`${video.src}#t=8`" muted playsinline preload="metadata" />
                   <font-awesome-icon class="play" icon="play" />
                 </span>
                 <span class="label">{{ video.label }}</span>
-              </button>
+              </h-button>
             </h-grid-item>
           </h-grid>
           <h-form :model="videoForm" class="rotation-form" label-placement="top">
@@ -535,17 +537,20 @@ watch(
 </template>
 
 <style lang="scss" scoped>
+// Vignette : bouton texte de Naive (sans fond), aperçu au-dessus du nom
 .preset {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
   width: 100%;
-  padding: 0;
-  border: none;
-  background: none;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
+  height: auto;
+  white-space: normal;
+
+  :deep(.n-button__content) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    width: 100%;
+  }
 
   .preview {
     position: relative;
@@ -574,9 +579,15 @@ watch(
     }
   }
 
+  // Nom toujours de la couleur du texte : la vignette choisie se repère à son contour
   .label {
     font-size: 0.85rem;
     text-align: center;
+    color: var(--n-text-color);
+  }
+
+  &:hover .preview {
+    outline-color: rgb(10 132 255 / 0.4);
   }
 
   &.selected .preview,
