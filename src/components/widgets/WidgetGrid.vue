@@ -40,6 +40,10 @@ const emit = defineEmits<{
   (e: "moved", positions: GridPosition[]): void;
 }>();
 
+defineSlots<{
+  item(props: { id: string }): unknown;
+}>();
+
 const root = ref<HTMLElement | null>(null);
 const elements = new Map<string, HTMLElement>();
 

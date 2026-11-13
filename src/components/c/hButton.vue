@@ -79,6 +79,12 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    // Bouton en verre Liquid Glass, en pilule (Buroh) : couleurs de glass.scss, qui suivent le
+    // thème et les réglages d'accessibilité du système
+    glass: {
+        type: Boolean,
+        default: false,
+    },
     tooltip: {
         type: String,
         default: "",
@@ -105,22 +111,53 @@ const themeOverridesAccent = computed<ButtonProps["themeOverrides"]>(() => {
     };
 });
 
+// Variables CSS de glass.scss passées telles quelles à Naive UI (types « default » et « primary »)
+const GLASS_FILL = "var(--glass-control)";
+const GLASS_FILL_HOVER = "var(--glass-control-hover)";
+const GLASS_TEXT = "var(--glass-text)";
+const GLASS_BLUE = "rgb(10 132 255)";
+const GLASS_BLUE_HOVER = "rgb(64 156 255)";
+
+const themeOverridesGlass: ButtonProps["themeOverrides"] = {
+    heightSmall: "2rem",
+    heightMedium: "2.25rem",
+    paddingMedium: "0 1rem",
+    fontWeight: "500",
+
+    color: GLASS_FILL,
+    colorHover: GLASS_FILL_HOVER,
+    colorPressed: GLASS_FILL_HOVER,
+    colorFocus: GLASS_FILL_HOVER,
+    textColor: GLASS_TEXT,
+    textColorHover: GLASS_TEXT,
+    textColorPressed: GLASS_TEXT,
+    textColorFocus: GLASS_TEXT,
+    rippleColor: GLASS_TEXT,
+
+    colorPrimary: GLASS_BLUE,
+    colorHoverPrimary: GLASS_BLUE_HOVER,
+    colorPressedPrimary: GLASS_BLUE,
+    colorFocusPrimary: GLASS_BLUE_HOVER,
+    rippleColorPrimary: GLASS_BLUE,
+};
+
 const buttonThemeOverrides = computed(() => {
     return {
         ...(props.accent && themeOverridesAccent.value),
+        ...(props.glass && themeOverridesGlass),
     };
 });
 
 const buttonProps = computed(() => {
     return {
-        bordered: props.bordered,
+        bordered: props.bordered && !props.glass,
         circle: props.circle,
         dashed: props.dashed,
         disabled: props.disabled,
         ghost: props.ghost,
         loading: props.loading,
         quaternary: props.quaternary,
-        round: props.round,
+        round: props.round || props.glass,
         secondary: props.secondary,
         size: props.size,
         strong: props.strong,
@@ -131,6 +168,9 @@ const buttonProps = computed(() => {
         type: props.type,
         href: props.disabled ? undefined : props.href,
         target: props.target,
+        // Verre : pas de focus forcé au clic (Naive le force sous Safari), sinon le contour
+        // clavier de glass.scss resterait affiché après un clic à la souris
+        ...(props.glass && { nativeFocusBehavior: true }),
         ...attrs,
     };
 });
@@ -145,7 +185,7 @@ const handleClick = (event: Event) => {
 <template>
     <h-tooltip v-if="tooltip" :placement="tooltipPosition">
         <template #trigger>
-            <n-button v-bind="buttonProps" @click="handleClick">
+            <n-button :class="{ 'h-button--glass': glass }" v-bind="buttonProps" @click="handleClick">
                 <template #default>
                     <slot name="default" />
                 </template>
@@ -156,7 +196,11 @@ const handleClick = (event: Event) => {
         </template>
         {{ tooltip }}
     </h-tooltip>
-    <n-button v-else v-bind="buttonProps" @click="handleClick">
+    <n-button
+        v-else
+        :class="{ 'h-button--glass': glass }"
+        v-bind="buttonProps"
+        @click="handleClick">
         <template #default>
             <slot name="default" />
         </template>

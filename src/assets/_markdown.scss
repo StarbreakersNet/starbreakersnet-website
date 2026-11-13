@@ -1,6 +1,10 @@
-// Mise en forme du texte Markdown, commune à l'affichage du widget Note (MarkdownWidget.vue) et à
-// son éditeur (NoteEditor.vue). À inclure dans un composant scoped : le contenu est du HTML généré.
-@mixin markdown-content {
+// Mise en forme du texte d'une note, commune à son affichage (MarkdownWidget.vue) et à son éditeur
+// (NoteEditor.vue). TipTap ne fournit aucun style (éditeur « headless ») et la remise à zéro de
+// Tailwind efface celle du navigateur : titres, listes, citations et code la retrouvent ici.
+// À inclure dans un composant scoped, le HTML étant produit par TipTap :
+//   @use "@/assets/markdown";
+//   .note { @include markdown.content; }
+@mixin content {
   :deep(h1),
   :deep(h2),
   :deep(h3) {

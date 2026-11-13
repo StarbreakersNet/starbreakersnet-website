@@ -2435,13 +2435,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/trusted-types@npm:^2.0.7":
-  version: 2.0.7
-  resolution: "@types/trusted-types@npm:2.0.7"
-  checksum: 10c0/4c4855f10de7c6c135e0d32ce462419d8abbbc33713b31d294596c0cc34ae1fa6112a2f9da729c8f7a20707782b0d69da3b1f8df6645b0366d08825ca1522e0c
-  languageName: node
-  linkType: hard
-
 "@typescript-eslint/eslint-plugin@npm:8.46.2":
   version: 8.46.2
   resolution: "@typescript-eslint/eslint-plugin@npm:8.46.2"
@@ -3308,18 +3301,6 @@ __metadata:
   version: 2.1.2
   resolution: "detect-libc@npm:2.1.2"
   checksum: 10c0/acc675c29a5649fa1fb6e255f993b8ee829e510b6b56b0910666949c80c364738833417d0edb5f90e4e46be17228b0f2b66a010513984e18b15deeeac49369c4
-  languageName: node
-  linkType: hard
-
-"dompurify@npm:^3.4.17":
-  version: 3.4.17
-  resolution: "dompurify@npm:3.4.17"
-  dependencies:
-    "@types/trusted-types": "npm:^2.0.7"
-  dependenciesMeta:
-    "@types/trusted-types":
-      optional: true
-  checksum: 10c0/6a12251ef5e700fc91b6d96d33e9f8b5fd590c55276f632cf42d182c5808e9f48d5bef435ab26eac235dfcc05ed8fe95e1c8308dcc502bf1050e561f14d0361a
   languageName: node
   linkType: hard
 
@@ -4441,15 +4422,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"marked@npm:^18.2.0":
-  version: 18.2.0
-  resolution: "marked@npm:18.2.0"
-  bin:
-    marked: bin/marked.js
-  checksum: 10c0/7766e5564cc6dbe3e8d6ee0091f3a4656002dd993817e68c5510e2ff1fa1d6456c9bcd18af1a4a5e8ea87382832a07026c109ab333913f125d51c93f29ba9017
-  languageName: node
-  linkType: hard
-
 "memorystream@npm:^0.3.1":
   version: 0.3.1
   resolution: "memorystream@npm:0.3.1"
@@ -5548,7 +5520,6 @@ __metadata:
     "@vue/eslint-config-prettier": "npm:^10.2.0"
     "@vue/eslint-config-typescript": "npm:^14.6.0"
     "@vue/tsconfig": "npm:^0.8.1"
-    dompurify: "npm:^3.4.17"
     eslint: "npm:^9.37.0"
     eslint-plugin-oxlint: "npm:~1.23.0"
     eslint-plugin-vue: "npm:~10.5.0"
@@ -5556,7 +5527,6 @@ __metadata:
     jiti: "npm:^2.6.1"
     lodash: "npm:^4.17.21"
     luxon: "npm:^3.7.2"
-    marked: "npm:^18.2.0"
     naive-ui: "npm:^2.39.0"
     npm-run-all2: "npm:^8.0.4"
     oxlint: "npm:~1.23.0"

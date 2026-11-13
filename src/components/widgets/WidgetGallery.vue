@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { reactive } from "vue";
+import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HGrid from "@/components/c/hGrid.vue";
 import HGridItem from "@/components/c/hGridItem.vue";
@@ -7,7 +8,6 @@ import { WIDGET_DEFINITIONS, WIDGET_SIZES, WIDGET_TYPES } from "@/models/widgets
 import type { WidgetSize, WidgetType } from "@/types/Widget";
 
 // Galerie du mode édition, comme celle des widgets de macOS : un type, une taille, Ajouter.
-// Boutons en verre (glass.scss) plutôt que ceux de Naive UI, pour rester dans le style Liquid Glass.
 
 const emit = defineEmits<{
   (e: "add", type: WidgetType, size: WidgetSize): void;
@@ -58,13 +58,12 @@ function shapeStyle(size: WidgetSize) {
                 <span :style="shapeStyle(size)" class="shape" />
               </button>
             </h-flex>
-            <button
-              class="glass-button"
-              type="button"
-              @click="emit('add', type, selectedSizes[type])">
-              <font-awesome-icon icon="plus" />
+            <h-button glass @click="emit('add', type, selectedSizes[type])">
+              <template #icon>
+                <font-awesome-icon icon="plus" />
+              </template>
               Ajouter
-            </button>
+            </h-button>
           </h-flex>
         </h-flex>
       </h-grid-item>

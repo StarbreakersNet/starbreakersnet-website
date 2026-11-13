@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import { defineAsyncComponent, type PropType } from "vue";
+import { type PropType } from "vue";
 import HForm from "@/components/c/hForm.vue";
 import HFormItem from "@/components/c/hFormItem.vue";
+import NoteEditor from "@/components/widgets/NoteEditor.vue";
 import { MARKDOWN_MAX_LENGTH } from "@/models/widgets";
 import type { MarkdownSettings } from "@/types/Widget";
-
-// Éditeur chargé à la demande : TipTap ne pèse que sur l'ouverture des réglages d'une note
-const NoteEditor = defineAsyncComponent(() => import("@/components/widgets/NoteEditor.vue"));
 
 const settings = defineModel("settings", {
   type: Object as PropType<MarkdownSettings>,

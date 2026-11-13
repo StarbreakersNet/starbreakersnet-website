@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import HButton from "@/components/c/hButton.vue";
 import HDropdown from "@/components/c/hDropdown.vue";
 import HPopconfirm from "@/components/c/hPopconfirm.vue";
 import BurohWallpaper from "@/components/widgets/BurohWallpaper.vue";
@@ -234,40 +235,43 @@ onBeforeUnmount(() => {
         @focusout="toolbarFocused = false"
         @pointerenter="toolbarHovered = true"
         @pointerleave="toolbarHovered = false">
-        <button
+        <h-button
           v-if="editing && isMobile"
           :aria-expanded="galleryOpen"
-          class="glass-button"
-          type="button"
+          glass
           @click="galleryOpen = !galleryOpen">
-          <font-awesome-icon :icon="galleryOpen ? 'xmark' : 'plus'" />
+          <template #icon>
+            <font-awesome-icon :icon="galleryOpen ? 'xmark' : 'plus'" />
+          </template>
           <span class="label">{{ galleryLabel }}</span>
-        </button>
-        <button class="glass-button" type="button" @click="showWallpaper = true">
-          <font-awesome-icon icon="image" />
+        </h-button>
+        <h-button glass @click="showWallpaper = true">
+          <template #icon>
+            <font-awesome-icon icon="image" />
+          </template>
           <span class="label">Fond d'écran</span>
-        </button>
+        </h-button>
         <h-popconfirm
           v-if="editing"
           negative-text="Annuler"
           positive-text="Réinitialiser"
           @positive-click="store.reset()">
           <template #trigger>
-            <button class="glass-button" type="button">
-              <font-awesome-icon icon="rotate-left" />
+            <h-button glass>
+              <template #icon>
+                <font-awesome-icon icon="rotate-left" />
+              </template>
               <span class="label">Réinitialiser</span>
-            </button>
+            </h-button>
           </template>
           Remplacer vos widgets par ceux d'origine ?
         </h-popconfirm>
-        <button
-          :class="{ primary: editing }"
-          class="glass-button"
-          type="button"
-          @click="toggleEditing">
-          <font-awesome-icon :icon="editing ? 'check' : 'pen'" />
+        <h-button :type="editing ? 'primary' : 'default'" glass @click="toggleEditing">
+          <template #icon>
+            <font-awesome-icon :icon="editing ? 'check' : 'pen'" />
+          </template>
           <span class="label">{{ editing ? "Terminé" : "Modifier les widgets" }}</span>
-        </button>
+        </h-button>
       </div>
     </div>
     <widget-settings-modal :widget-id="configuredId" @close="closeSettings" />
@@ -370,15 +374,15 @@ onBeforeUnmount(() => {
     pointer-events: none;
   }
 
-  .glass-button {
-    white-space: nowrap;
-  }
-
   // Petit écran : icônes seules (libellés gardés pour les lecteurs d'écran), sauf « Terminé »
   @media (max-width: 720px) {
-    .glass-button:not(.primary) {
+    .h-button--glass:not(.n-button--primary-type) {
       width: 2.25rem;
       padding: 0;
+
+      :deep(.n-button__icon) {
+        margin: 0;
+      }
 
       .label {
         position: absolute;
@@ -388,15 +392,6 @@ onBeforeUnmount(() => {
         clip-path: inset(50%);
         white-space: nowrap;
       }
-    }
-  }
-
-  .glass-button.primary {
-    color: white;
-    background: rgb(10 132 255);
-
-    &:hover {
-      background: rgb(64 156 255);
     }
   }
 }

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { type PropType, ref } from "vue";
-import { vMarkdown } from "@/directives/vMarkdown";
+import { type PropType, ref, watch } from "vue";
+import { EditorContent, useEditor } from "@tiptap/vue-3";
+import { markdownExtensions } from "@/lib/markdown";
 import { type FitState, useFitContent } from "@/composables/useFitContent";
 import type { MarkdownSettings } from "@/types/Widget";
 
@@ -15,24 +16,39 @@ const emit = defineEmits<{
   (e: "fit", state: FitState): void;
 }>();
 
+// Note affichée par TipTap en lecture seule, avec les mêmes extensions que son éditeur
+// (lib/markdown.ts) : même rendu, et pas d'injection de HTML possible.
+const editor = useEditor({
+  content: props.settings.content,
+  contentType: "markdown",
+  editable: false,
+  extensions: markdownExtensions(),
+  // Texte en place dans la page : on peut vérifier qu'il tient
+  onCreate: () => fit(),
+});
+
 // Pas d'ascenseur : texte réduit pour tenir (voir useFitContent)
 const root = ref<HTMLElement | null>(null);
 
-const { overflowing } = useFitContent(root, [() => props.settings.content], {
+const { overflowing, fit } = useFitContent(root, [() => props.settings.content], {
   onFit: state => emit("fit", state),
 });
+
+function showContent(content: string) {
+  editor.value?.commands.setContent(content, { contentType: "markdown", emitUpdate: false });
+}
+
+watch(() => props.settings.content, showContent);
 </script>
 
 <template>
-  <div
-    ref="root"
-    v-markdown="props.settings.content"
-    :class="{ clipped: overflowing }"
-    class="markdown" />
+  <div ref="root" :class="{ clipped: overflowing }" class="markdown">
+    <editor-content :editor="editor" />
+  </div>
 </template>
 
 <style lang="scss" scoped>
-@use "@/assets/markdown" as *;
+@use "@/assets/markdown";
 
 .markdown {
   width: 100%;
@@ -49,9 +65,9 @@ const { overflowing } = useFitContent(root, [() => props.settings.content], {
     mask-image: linear-gradient(to bottom, #000 80%, transparent);
   }
 
-  @include markdown-content;
+  @include markdown.content;
 
-  :deep(> :last-child) {
+  :deep(.ProseMirror > :last-child) {
     margin-bottom: 0;
   }
 }

@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, type PropType, ref } from "vue";
 import { DateTime } from "luxon";
+import type { TableProps } from "naive-ui";
+import HTable from "@/components/c/hTable.vue";
 import type { CalendarSettings, WidgetSize } from "@/types/Widget";
 
 const props = defineProps({
@@ -15,6 +17,21 @@ const props = defineProps({
 });
 
 const WEEKDAYS = ["L", "M", "M", "J", "V", "S", "D"];
+
+// Tableau sans fond ni bordure, posé sur le verre du widget ; tailles en cqh dans le style
+const TABLE_THEME: TableProps["themeOverrides"] = {
+  borderColor: "transparent",
+  borderColorModal: "transparent",
+  thColor: "transparent",
+  thColorModal: "transparent",
+  tdColor: "transparent",
+  tdColorModal: "transparent",
+  thTextColor: "var(--glass-text-soft)",
+  tdTextColor: "inherit",
+  thFontWeight: "600",
+  thPaddingMedium: "0",
+  tdPaddingMedium: "0",
+};
 
 interface CalendarDay {
   key: string;
@@ -95,7 +112,13 @@ onBeforeUnmount(() => clearInterval(timer));
     </section>
     <section class="month">
       <header class="month-name">{{ monthName }}</header>
-      <table :aria-label="monthAndYear" class="grid">
+      <h-table
+        :aria-label="monthAndYear"
+        :bordered="false"
+        :bottom-bordered="false"
+        :theme-overrides="TABLE_THEME"
+        class="grid"
+        single-column>
         <thead>
           <tr>
             <th v-if="props.settings.weekNumbers" class="week" scope="col" />
@@ -114,7 +137,7 @@ onBeforeUnmount(() => clearInterval(timer));
             </td>
           </tr>
         </tbody>
-      </table>
+      </h-table>
     </section>
   </div>
 </template>
@@ -180,22 +203,17 @@ onBeforeUnmount(() => clearInterval(timer));
 
 .grid {
   flex: 1;
-  width: 100%;
-  border-collapse: collapse;
+  border-radius: 0;
   table-layout: fixed;
   // Six semaines + en-têtes : 6 × 1.6em à 6.4cqh, plus les titres, tiennent dans 100cqh
   font-size: 6.4cqh;
   font-weight: 600;
+  line-height: 1;
   text-align: center;
 
   th {
     padding-bottom: 1.5cqh;
     font-size: 0.9em;
-    color: var(--glass-text-soft);
-  }
-
-  td {
-    padding: 0;
   }
 
   .weekend {

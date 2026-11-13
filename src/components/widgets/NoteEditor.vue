@@ -1,16 +1,15 @@
 <script lang="ts" setup>
 import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef } from "vue";
 import { EditorContent, useEditor, type Editor } from "@tiptap/vue-3";
-import StarterKit from "@tiptap/starter-kit";
-import { Markdown } from "@tiptap/markdown";
 import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HInput from "@/components/c/hInput.vue";
+import { markdownExtensions } from "@/lib/markdown";
 import { normalizeUrl } from "@/models/widgets";
 
 // Éditeur du widget Note, sans Markdown à écrire (TipTap). Le texte reste enregistré en Markdown,
-// comme avant : les notes existantes s'ouvrent telles quelles, et l'affichage du widget ne change
-// pas (directives/vMarkdown.ts). Chargé seulement à l'ouverture des réglages d'une note.
+// comme avant : les notes existantes s'ouvrent telles quelles. Mêmes extensions que l'affichage
+// du widget (lib/markdown.ts), pour que la note s'affiche comme on l'a écrite.
 
 const props = defineProps({
   maxLength: {
@@ -31,16 +30,7 @@ const tooLong = computed(() => length.value > props.maxLength);
 const editor = useEditor({
   content: markdown.value,
   contentType: "markdown",
-  extensions: [
-    StarterKit.configure({
-      heading: { levels: [1, 2, 3] },
-      // Pas de soulignement en Markdown
-      underline: false,
-      link: { openOnClick: false, autolink: true, defaultProtocol: "https" },
-    }),
-    // Retour à la ligne simple = saut de ligne, comme à l'affichage du widget
-    Markdown.configure({ markedOptions: { breaks: true, gfm: true } }),
-  ],
+  extensions: markdownExtensions(),
   editorProps: {
     attributes: {
       "aria-label": "Texte de la note",
@@ -222,7 +212,7 @@ onBeforeUnmount(() => editor.value?.destroy());
 </template>
 
 <style lang="scss" scoped>
-@use "@/assets/markdown" as *;
+@use "@/assets/markdown";
 
 .note-editor {
   display: flex;
@@ -261,7 +251,7 @@ onBeforeUnmount(() => editor.value?.destroy());
     outline: none;
   }
 
-  @include markdown-content;
+  @include markdown.content;
 }
 
 .count {

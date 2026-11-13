@@ -1,6 +1,7 @@
 <script lang="ts" setup>
+import HButton from "@/components/c/hButton.vue";
+
 // Cadre commun des widgets : verre Liquid Glass et, en mode édition, boutons Supprimer et Réglages.
-// Boutons en verre (glass.scss) plutôt que ceux de Naive UI, pour rester dans le style Liquid Glass.
 
 const props = defineProps({
   label: {
@@ -28,24 +29,30 @@ const emit = defineEmits<{
       <slot />
     </div>
     <transition name="pop">
-      <button
+      <h-button
         v-if="props.editing"
         :aria-label="`Supprimer le widget ${props.label}`"
+        :bordered="false"
+        circle
         class="remove no-drag"
-        type="button"
+        color="#f5f5f7"
+        size="tiny"
+        text-color="#1d1d1f"
         @click="emit('remove')">
         <font-awesome-icon icon="minus" />
-      </button>
+      </h-button>
     </transition>
     <transition name="pop">
-      <button
+      <h-button
         v-if="props.editing"
         :aria-label="`Régler le widget ${props.label}`"
-        class="configure no-drag glass-button"
-        type="button"
+        circle
+        class="configure no-drag"
+        glass
+        size="small"
         @click="emit('configure')">
         <font-awesome-icon icon="sliders" />
-      </button>
+      </h-button>
     </transition>
   </article>
 </template>
@@ -82,26 +89,16 @@ const emit = defineEmits<{
   }
 }
 
+// Pastille grise de macOS, la même dans les deux thèmes (couleurs données au bouton)
 .remove {
   position: absolute;
   top: -8px;
   left: -8px;
   z-index: 1;
-  display: grid;
-  place-items: center;
   width: 24px;
   height: 24px;
-  border: none;
-  border-radius: 50%;
-  color: rgb(29 29 31);
-  background: rgb(245 245 247 / 0.9);
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.3);
   font-size: 12px;
-  cursor: pointer;
-
-  &:hover {
-    background: rgb(255 255 255);
-  }
 }
 
 .configure {
@@ -109,10 +106,7 @@ const emit = defineEmits<{
   right: 8px;
   bottom: 8px;
   z-index: 1;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  background: var(--glass-bg-strong);
+  background-color: var(--glass-bg-strong);
 }
 
 .pop-enter-active,
