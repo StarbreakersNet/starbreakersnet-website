@@ -1,5 +1,5 @@
 import { type AuthError, isAuthRetryableFetchError } from "@supabase/supabase-js";
-import { PASSWORD_HINT } from "@/lib/validation";
+import { PASSWORD_HINT } from "@/utils/validation";
 
 // Traduit les erreurs GoTrue en messages compréhensibles.
 // Codes : https://supabase.com/docs/guides/auth/debugging/error-codes

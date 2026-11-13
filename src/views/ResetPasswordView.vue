@@ -11,7 +11,7 @@ import HFlex from "@/components/c/hFlex.vue";
 import HButton from "@/components/c/hButton.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useMessage } from "@/composables/useMessage";
-import { passwordConfirmationRule, passwordRule } from "@/lib/validation";
+import { passwordConfirmationRule, passwordRule } from "@/utils/validation";
 
 const auth = useAuthStore();
 const message = useMessage();

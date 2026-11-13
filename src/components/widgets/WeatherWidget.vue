@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, type PropType, ref, watch } from "vue";
 import { DateTime } from "luxon";
-import { describeWeather, fetchForecast, type Forecast } from "@/lib/weather";
+import { describeWeather, fetchForecast, type Forecast } from "@/utils/weather";
 import type { WeatherSettings, WidgetSize } from "@/types/Widget";
 
 const props = defineProps({

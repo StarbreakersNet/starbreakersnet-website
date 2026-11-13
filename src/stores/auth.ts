@@ -6,9 +6,9 @@ import {
   type Session,
   type User,
 } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabaseClient";
-import { getAuthErrorMessage } from "@/lib/authErrors";
-import { APP_LOCALE } from "@/lib/locale";
+import { supabase } from "@/utils/supabaseClient";
+import { getAuthErrorMessage } from "@/utils/authErrors";
+import { APP_LOCALE } from "@/utils/locale";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";

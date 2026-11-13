@@ -7,7 +7,7 @@ import HRadioButton from "@/components/c/hRadioButton.vue";
 import HRadioGroup from "@/components/c/hRadioGroup.vue";
 import HSelect from "@/components/c/hSelect.vue";
 import HText from "@/components/c/hText.vue";
-import { searchCities } from "@/lib/weather";
+import { searchCities } from "@/utils/weather";
 import type { WeatherLocation, WeatherSettings } from "@/types/Widget";
 
 const settings = defineModel("settings", {

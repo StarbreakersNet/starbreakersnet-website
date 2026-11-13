@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { createBackdrop } from "@/lib/backdrop";
-import { fetchRandomPhoto, withReferral } from "@/lib/unsplash";
-import { loadWallpaperFile } from "@/lib/wallpaperFile";
+import { createBackdrop } from "@/utils/backdrop";
+import { fetchRandomPhoto, withReferral } from "@/utils/unsplash";
+import { loadWallpaperFile } from "@/utils/wallpaperFile";
 import { isStale, pickVideo, presetById, videoById, WALLPAPER_PRESETS } from "@/models/wallpapers";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";

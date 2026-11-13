@@ -4,12 +4,12 @@ import { EditorContent, useEditor, type Editor } from "@tiptap/vue-3";
 import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HInput from "@/components/c/hInput.vue";
-import { markdownExtensions } from "@/lib/markdown";
+import { markdownExtensions } from "@/utils/markdown";
 import { normalizeUrl } from "@/models/widgets";
 
 // Éditeur du widget Note, sans Markdown à écrire (TipTap). Le texte reste enregistré en Markdown,
 // comme avant : les notes existantes s'ouvrent telles quelles. Mêmes extensions que l'affichage
-// du widget (lib/markdown.ts), pour que la note s'affiche comme on l'a écrite.
+// du widget (utils/markdown.ts), pour que la note s'affiche comme on l'a écrite.
 
 const props = defineProps({
   maxLength: {

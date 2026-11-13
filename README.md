@@ -38,7 +38,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
 - **pas de `container_name` fixe** : beta et live tournent sur le même serveur ;
 - **données dans des volumes nommés** (`db-data`, `storage-data`, `studio-snippets`) : Dokploy vide le dossier du code à chaque déploiement ;
 - **Edge Functions et Supavisor désactivés** : réactivables en retirant leurs lignes ;
-- **règles de mot de passe** de GoTrue : 8 caractères minimum, avec minuscule, majuscule et chiffre, alignées avec `src/lib/validation.ts` ;
+- **règles de mot de passe** de GoTrue : 8 caractères minimum, avec minuscule, majuscule et chiffre, alignées avec `src/utils/validation.ts` ;
 - **mails d'authentification en français** (ou en anglais selon `user_metadata.locale`) : modèles de `supabase/templates`, servis à GoTrue par le service interne `mail-templates` (image nginx reconstruite à chaque `up`), et objets des mails ;
 - **service `migrations`** : vérifie les secrets, puis applique `supabase/migrations`. La passerelle (et donc l'API et Studio) ne démarre que s'il réussit.
 
@@ -322,6 +322,6 @@ Buroh est la page d'accueil personnelle à widgets du site, dans l'esprit des wi
   - photos Unsplash : avec `VITE_UNSPLASH_ACCESS_KEY` (clé d'accès gratuite, [unsplash.com/developers](https://unsplash.com/developers)), choix d'un thème ou d'une collection Unsplash (adresse ou identifiant) par l'API officielle ; sans clé, photos Unsplash au hasard via [Lorem Picsum](https://picsum.photos) ;
   - image ou vidéo par son adresse, ou fichier de l'ordinateur (100 Mo au maximum), gardé dans le navigateur (IndexedDB) sans être envoyé au serveur ;
   - vidéos lues en boucle et sans son ; avec « Réduire les animations », seule la première image s'affiche.
-- **Verre sur une photo** : une miniature floue du fond est calculée une seule fois (`src/lib/backdrop.ts`) et affichée derrière chaque widget, alignée sur le fond (`background-attachment: fixed`) : effet de verre dépoli sans `backdrop-filter`. Sur une vidéo, ou une image d'un site qui en interdit la lecture (CORS), le verre est simplement plus couvrant.
+- **Verre sur une photo** : une miniature floue du fond est calculée une seule fois (`src/utils/backdrop.ts`) et affichée derrière chaque widget, alignée sur le fond (`background-attachment: fixed`) : effet de verre dépoli sans `backdrop-filter`. Sur une vidéo, ou une image d'un site qui en interdit la lecture (CORS), le verre est simplement plus couvrant.
 - **Enregistrement** : dans le navigateur pour les visiteurs, et sur le compte pour les membres connectés (colonne `user_settings.widgets`, fond d'écran compris), comme le thème. Voir `src/stores/widgets.ts`.
 - **Ajouter un type de widget** : le déclarer dans `src/types/Widget.ts` et `src/models/widgets.ts` (métadonnées, tailles, réglages par défaut, validation), puis ajouter son affichage et son formulaire de réglages dans `src/components/widgets/registry.ts`. Son contenu doit tenir sans ascenseur : tailles en `cqh`, ou `useFitContent`.

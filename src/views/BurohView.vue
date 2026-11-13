@@ -112,7 +112,7 @@ function toggleEditing() {
 const showWallpaper = ref(false);
 const appearance = ref<WallpaperAppearance>({ kind: "gradient", backdrop: null });
 
-// Miniature floue du fond pour le verre des widgets (voir lib/backdrop.ts)
+// Miniature floue du fond pour le verre des widgets (voir utils/backdrop.ts)
 const burohStyle = computed(() => {
   const backdrop = appearance.value.backdrop;
 

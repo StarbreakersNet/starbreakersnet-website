@@ -1,6 +1,6 @@
 // Fond d'écran de Buroh : dégradé, photo Unsplash ou vidéo de la sélection du site (avec
 // renouvellement), image ou vidéo par adresse, ou fichier de l'ordinateur (gardé dans le navigateur,
-// voir lib/wallpaperFile.ts)
+// voir utils/wallpaperFile.ts)
 
 export type MediaKind = "image" | "video";
 
@@ -69,6 +69,6 @@ export type WallpaperSource = Wallpaper["source"];
 // Apparence du fond, transmise au verre des widgets
 export interface WallpaperAppearance {
   kind: "gradient" | MediaKind;
-  // Miniature floue pour le verre (photos uniquement, voir lib/backdrop.ts)
+  // Miniature floue pour le verre (photos uniquement, voir utils/backdrop.ts)
   backdrop: string | null;
 }

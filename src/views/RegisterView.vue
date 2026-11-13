@@ -14,7 +14,7 @@ import {
   passwordRule,
   USERNAME_MAX_LENGTH,
   usernameRule,
-} from "@/lib/validation";
+} from "@/utils/validation";
 
 const auth = useAuthStore();
 

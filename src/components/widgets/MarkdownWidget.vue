@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { type PropType, ref, watch } from "vue";
 import { EditorContent, useEditor } from "@tiptap/vue-3";
-import { markdownExtensions } from "@/lib/markdown";
+import { markdownExtensions } from "@/utils/markdown";
 import { type FitState, useFitContent } from "@/composables/useFitContent";
 import type { MarkdownSettings } from "@/types/Widget";
 
@@ -17,7 +17,7 @@ const emit = defineEmits<{
 }>();
 
 // Note affichée par TipTap en lecture seule, avec les mêmes extensions que son éditeur
-// (lib/markdown.ts) : même rendu, et pas d'injection de HTML possible.
+// (utils/markdown.ts) : même rendu, et pas d'injection de HTML possible.
 const editor = useEditor({
   content: props.settings.content,
   contentType: "markdown",

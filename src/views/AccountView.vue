@@ -25,8 +25,8 @@ import {
   passwordRule,
   USERNAME_MAX_LENGTH,
   usernameRule,
-} from "@/lib/validation";
-import { formatUserTag } from "@/lib/userTag";
+} from "@/utils/validation";
+import { formatUserTag } from "@/utils/userTag";
 
 const EMAIL_CHANGE_TEXT =
   "Un lien de confirmation a été envoyé à votre adresse actuelle et à la nouvelle. " +

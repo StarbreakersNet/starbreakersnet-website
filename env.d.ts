@@ -18,7 +18,7 @@ declare module "naive-ui" {
 interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL: string;
   readonly VITE_SUPABASE_PUBLISHABLE_KEY: string;
-  // Facultatif : thèmes des photos Unsplash de Buroh (lib/unsplash.ts)
+  // Facultatif : thèmes des photos Unsplash de Buroh (utils/unsplash.ts)
   readonly VITE_UNSPLASH_ACCESS_KEY?: string;
 }
 

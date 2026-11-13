@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import _ from "lodash";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "@/utils/supabaseClient";
 import { useMessage } from "@/composables/useMessage";
 import {
   createId,
@@ -15,7 +15,7 @@ import {
   widgetRect,
 } from "@/models/widgets";
 import { DEFAULT_WALLPAPER, normalizeWallpaper } from "@/models/wallpapers";
-import { deleteWallpaperFile } from "@/lib/wallpaperFile";
+import { deleteWallpaperFile } from "@/utils/wallpaperFile";
 import type { FitState } from "@/composables/useFitContent";
 import type { Wallpaper } from "@/types/Wallpaper";
 import type {

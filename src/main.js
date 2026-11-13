@@ -5,7 +5,7 @@ import App from "@/App.vue";
 import router from "@/router";
 import VueParticles from "@tsparticles/vue3";
 import { loadSlim } from "@tsparticles/slim";
-import "@/lib/icons";
+import "@/utils/icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import "@/assets/main.scss";
 import "@/assets/tailwind.css";

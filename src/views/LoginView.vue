@@ -14,7 +14,7 @@ import HAlert from "@/components/c/hAlert.vue";
 import type { HFormInst } from "@/types/components/c/hForm.ts";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { emailRule } from "@/lib/validation";
+import { emailRule } from "@/utils/validation";
 import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
 
 const auth = useAuthStore();

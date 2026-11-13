@@ -16,8 +16,8 @@ import HSelect from "@/components/c/hSelect.vue";
 import HTabPane from "@/components/c/hTabPane.vue";
 import HTabs from "@/components/c/hTabs.vue";
 import HText from "@/components/c/hText.vue";
-import { fetchRandomPhoto, hasUnsplashKey, withReferral } from "@/lib/unsplash";
-import { saveWallpaperFile } from "@/lib/wallpaperFile";
+import { fetchRandomPhoto, hasUnsplashKey, withReferral } from "@/utils/unsplash";
+import { saveWallpaperFile } from "@/utils/wallpaperFile";
 import {
   guessMediaKind,
   parseUnsplashCollection,
