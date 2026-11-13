@@ -45,18 +45,20 @@ function shapeStyle(size: WidgetSize) {
           </h-flex>
           <h-flex justify="space-between">
             <h-flex :size="6" aria-label="Taille" role="radiogroup">
-              <button
+              <h-button
                 v-for="size in WIDGET_DEFINITIONS[type].sizes"
                 :key="size"
                 :aria-checked="selectedSizes[type] === size"
+                :aria-label="WIDGET_SIZES[size].label"
                 :class="{ selected: selectedSizes[type] === size }"
+                :quaternary="selectedSizes[type] !== size"
                 :title="WIDGET_SIZES[size].label"
                 class="size"
+                glass
                 role="radio"
-                type="button"
                 @click="selectedSizes[type] = size">
                 <span :style="shapeStyle(size)" class="shape" />
-              </button>
+              </h-button>
             </h-flex>
             <h-button glass @click="emit('add', type, selectedSizes[type])">
               <template #icon>
@@ -121,28 +123,19 @@ function shapeStyle(size: WidgetSize) {
   }
 }
 
+// Taille choisie : bouton rempli ; les autres, transparents (quaternary)
 .size {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid transparent;
+  width: 2.25rem;
+  padding: 0;
   border-radius: 9px;
-  background: none;
-  cursor: pointer;
 
   .shape {
     border-radius: 3px;
     background: var(--glass-text-soft);
   }
 
-  &.selected {
-    border-color: var(--glass-separator);
-    background: var(--glass-control-hover);
-
-    .shape {
-      background: var(--glass-text);
-    }
+  &.selected .shape {
+    background: var(--glass-text);
   }
 }
 </style>

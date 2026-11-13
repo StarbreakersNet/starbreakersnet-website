@@ -111,7 +111,8 @@ const themeOverridesAccent = computed<ButtonProps["themeOverrides"]>(() => {
     };
 });
 
-// Variables CSS de glass.scss passées telles quelles à Naive UI (types « default » et « primary »)
+// Variables CSS de glass.scss passées telles quelles à Naive UI (types « default » et « primary »,
+// et variante transparente « quaternary »)
 const GLASS_FILL = "var(--glass-control)";
 const GLASS_FILL_HOVER = "var(--glass-control-hover)";
 const GLASS_TEXT = "var(--glass-text)";
@@ -133,6 +134,8 @@ const themeOverridesGlass: ButtonProps["themeOverrides"] = {
     textColorPressed: GLASS_TEXT,
     textColorFocus: GLASS_TEXT,
     rippleColor: GLASS_TEXT,
+    colorQuaternaryHover: GLASS_FILL_HOVER,
+    colorQuaternaryPressed: GLASS_FILL_HOVER,
 
     colorPrimary: GLASS_BLUE,
     colorHoverPrimary: GLASS_BLUE_HOVER,
