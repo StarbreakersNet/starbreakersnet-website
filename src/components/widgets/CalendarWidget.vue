@@ -153,8 +153,6 @@ onBeforeUnmount(() => clearInterval(timer));
   line-height: 1;
 }
 
-// Date du jour en grand, à gauche du mois (taille moyenne). Pas de classe « today » ici : elle
-// s'appliquerait aussi à la cellule du jour dans la grille, qui ne serait plus une case de tableau.
 .summary {
   display: flex;
   flex: none;
