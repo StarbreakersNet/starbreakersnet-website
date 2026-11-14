@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { roundCoordinates } from "@/utils/weather";
 import type { Wallpaper } from "@/types/Wallpaper";
 import type {
   CalendarSettings,
@@ -93,11 +94,26 @@ export const WIDGET_DEFINITIONS: { [T in WidgetType]: WidgetDefinition<T> } = {
     icon: "cloud-sun",
     sizes: ["small", "medium"],
     defaultSize: "small",
-    defaultSettings: (): WeatherSettings => ({ location: DEFAULT_LOCATION, unit: "celsius" }),
-    normalize: raw => ({
-      location: normalizeLocation(raw.location) ?? DEFAULT_LOCATION,
-      unit: raw.unit === "fahrenheit" ? "fahrenheit" : "celsius",
+    defaultSettings: (): WeatherSettings => ({
+      mode: "city",
+      location: DEFAULT_LOCATION,
+      unit: "celsius",
     }),
+    normalize: raw => {
+      const location = normalizeLocation(raw.location);
+      // Réglages d'avant « Ma position » : pas de mode, donc une ville
+      const mode = location && raw.mode === "device" ? "device" : "city";
+
+      return {
+        mode,
+        location: location
+          ? mode === "device"
+            ? { ...location, ...roundCoordinates(location) }
+            : location
+          : DEFAULT_LOCATION,
+        unit: raw.unit === "fahrenheit" ? "fahrenheit" : "celsius",
+      };
+    },
   },
   countdown: {
     label: "Compte à rebours",
