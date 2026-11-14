@@ -5,8 +5,6 @@ import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HForm from "@/components/c/hForm.vue";
 import HFormItem from "@/components/c/hFormItem.vue";
-import HGrid from "@/components/c/hGrid.vue";
-import HGridItem from "@/components/c/hGridItem.vue";
 import HInput from "@/components/c/hInput.vue";
 import HInputGroup from "@/components/c/hInputGroup.vue";
 import HModal from "@/components/c/hModal.vue";
@@ -49,9 +47,6 @@ const show = defineModel("show", {
 const store = useWidgetsStore();
 const user = useUserStore();
 const message = useMessage();
-
-// Vignettes des dégradés et des vidéos : deux par ligne sur mobile, jusqu'à quatre
-const PREVIEW_COLUMNS = "2 420:3 560:4";
 
 const FREQUENCY_OPTIONS = ROTATION_FREQUENCIES.map(({ value, label }) => ({ value, label }));
 
@@ -444,12 +439,12 @@ watch(
     class="wallpaper-modal apple-menu"
     preset="card"
     title="Fond d'écran">
-    <h-tabs v-model:value="tab" animated type="segment">
+    <h-tabs v-model:value="tab" animated class="tabs" type="segment">
       <h-tab-pane name="presets" tab="Fonds maison">
         <section v-for="group in PRESET_GROUPS" :key="group.label" class="preset-group">
           <h-text class="group-title" depth="3" strong tag="h3">{{ group.label }}</h-text>
-          <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
-            <h-grid-item v-for="preset in group.presets" :key="preset.id" role="listitem">
+          <div class="previews" role="list">
+            <div v-for="preset in group.presets" :key="preset.id" role="listitem">
               <h-button
                 :aria-pressed="isPresetSelected(preset.id)"
                 :class="{ selected: isPresetSelected(preset.id) }"
@@ -465,8 +460,8 @@ watch(
                 </span>
                 <span class="label">{{ preset.label }}</span>
               </h-button>
-            </h-grid-item>
-          </h-grid>
+            </div>
+          </div>
         </section>
       </h-tab-pane>
       <h-tab-pane name="rotation" tab="Photos et vidéos">
@@ -568,8 +563,8 @@ watch(
           </h-flex>
         </template>
         <template v-else>
-          <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
-            <h-grid-item v-for="video in WALLPAPER_VIDEOS" :key="video.id" role="listitem">
+          <div class="previews" role="list">
+            <div v-for="video in WALLPAPER_VIDEOS" :key="video.id" role="listitem">
               <h-button
                 :aria-pressed="isVideoSelected(video.id)"
                 :class="{ selected: isVideoSelected(video.id) }"
@@ -583,8 +578,8 @@ watch(
                 </span>
                 <span class="label">{{ video.label }}</span>
               </h-button>
-            </h-grid-item>
-          </h-grid>
+            </div>
+          </div>
           <h-form :model="videoForm" class="rotation-form" label-placement="top">
             <h-form-item label="Nouvelle vidéo">
               <h-select
@@ -656,6 +651,15 @@ watch(
 </template>
 
 <style lang="scss" scoped>
+// Vignettes : au moins deux par ligne sur mobile, jusqu'à quatre. Colonnes calculées en CSS et non
+// par h-grid, qui mesure sa largeur après coup : l'animation des onglets prenait alors la hauteur
+// d'une grille à deux colonnes et la fenêtre grandissait le temps de la transition
+.previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(max(96px, (100% - 36px) / 4), 1fr));
+  gap: 12px;
+}
+
 // Vignette : bouton texte de Naive (sans fond), aperçu au-dessus du nom
 .preset {
   display: flex;
@@ -713,6 +717,23 @@ watch(
   &:focus-visible .preview {
     outline-color: rgb(10 132 255);
   }
+}
+
+// Intitulés sur deux lignes plutôt que superposés quand la fenêtre est étroite, sans couper de mot
+// ni rogner de lettre
+.tabs :deep(.n-tabs-rail .n-tabs-tab-wrapper .n-tabs-tab) {
+  overflow: visible;
+  padding-inline: 4px;
+  white-space: normal;
+  word-break: normal;
+  text-align: center;
+  line-height: 1.25;
+}
+
+// Marge pour le contour de la vignette choisie, que le conteneur animé des onglets rognait
+.tabs :deep(.n-tabs-pane-wrapper) {
+  margin-inline: -4px;
+  padding-inline: 4px;
 }
 
 .preset-group + .preset-group {
