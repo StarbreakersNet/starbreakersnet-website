@@ -211,7 +211,9 @@ function normalizePhoto(raw: unknown): UnsplashPhoto | null {
   const photo = raw as Record<string, unknown>;
   const url = typeof photo.url === "string" ? normalizeUrl(photo.url) : null;
   const photoUrl = typeof photo.photoUrl === "string" ? normalizeUrl(photo.photoUrl) : null;
-  if (!url || !photoUrl || typeof photo.id !== "string") return null;
+  // Seules les photos du CDN d'Unsplash restent (les anciennes de Lorem Picsum sont écartées)
+  const fromUnsplash = url !== null && new URL(url).hostname === "images.unsplash.com";
+  if (!fromUnsplash || !photoUrl || typeof photo.id !== "string") return null;
 
   return {
     id: photo.id,
