@@ -1,11 +1,14 @@
 import { normalizeUrl } from "@/models/widgets";
 import type { MediaKind, RotationFrequency, UnsplashPhoto, Wallpaper } from "@/types/Wallpaper";
 
-// Préréglages : dégradés, avec une variante pour le thème clair au besoin
+export type WallpaperMotion = "aurora" | "stars" | "waves";
+
+// Préréglages : fonds maison, avec une variante pour le thème clair au besoin
 export interface WallpaperPreset {
   id: string;
   label: string;
   gradient: { dark: string; light?: string };
+  motion?: WallpaperMotion;
 }
 
 export const WALLPAPER_PRESETS: WallpaperPreset[] = [
@@ -80,6 +83,40 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
       dark: "radial-gradient(80% 70% at 30% 20%, rgb(90 90 100), transparent 70%), rgb(22 22 26)",
       light:
         "radial-gradient(80% 70% at 30% 20%, rgb(255 255 255), transparent 70%), rgb(220 220 226)",
+    },
+  },
+  {
+    id: "aurore",
+    label: "Aurore",
+    motion: "aurora",
+    gradient: {
+      dark: "radial-gradient(90% 70% at 50% 110%, rgb(20 40 90), transparent 70%), rgb(5 8 24)",
+      light:
+        "radial-gradient(90% 70% at 50% 110%, rgb(255 255 255), transparent 70%), rgb(236 240 250)",
+    },
+  },
+  {
+    id: "nuit-etoilee",
+    label: "Nuit étoilée",
+    motion: "stars",
+    gradient: {
+      dark:
+        "radial-gradient(70% 60% at 80% 10%, rgb(120 40 160 / 0.45), transparent 70%)," +
+        "radial-gradient(80% 60% at 10% 100%, rgb(190 30 45 / 0.4), transparent 70%)," +
+        "linear-gradient(180deg, rgb(6 6 22), rgb(18 10 40))",
+      light:
+        "radial-gradient(70% 60% at 80% 10%, rgb(200 170 255 / 0.7), transparent 70%)," +
+        "radial-gradient(80% 60% at 10% 100%, rgb(255 180 190 / 0.7), transparent 70%)," +
+        "linear-gradient(180deg, rgb(214 222 246), rgb(246 232 244))",
+    },
+  },
+  {
+    id: "vagues",
+    label: "Vagues",
+    motion: "waves",
+    gradient: {
+      dark: "linear-gradient(180deg, rgb(8 18 48), rgb(4 40 70) 70%, rgb(0 70 90))",
+      light: "linear-gradient(180deg, rgb(236 246 255), rgb(200 230 250) 70%, rgb(170 220 240))",
     },
   },
 ];
