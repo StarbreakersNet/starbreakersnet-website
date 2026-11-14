@@ -105,7 +105,7 @@ onBeforeUnmount(() => clearInterval(timer));
 
 <template>
   <div :class="[props.size, { 'week-numbers': props.settings.weekNumbers }]" class="calendar">
-    <section v-if="props.size === 'medium'" class="today">
+    <section v-if="props.size === 'medium'" class="summary">
       <span class="weekday">{{ weekdayName }}</span>
       <span class="day-number">{{ today.day }}</span>
       <span class="month-year">{{ monthAndYear }}</span>
@@ -153,7 +153,9 @@ onBeforeUnmount(() => clearInterval(timer));
   line-height: 1;
 }
 
-.today {
+// Date du jour en grand, à gauche du mois (taille moyenne). Pas de classe « today » ici : elle
+// s'appliquerait aussi à la cellule du jour dans la grille, qui ne serait plus une case de tableau.
+.summary {
   display: flex;
   flex: none;
   flex-direction: column;
