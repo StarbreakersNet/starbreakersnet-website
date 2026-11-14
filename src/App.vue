@@ -3,7 +3,7 @@ import { nextTick, onMounted, ref, watch } from "vue";
 import { getNaiveOverrideTheme, getNaiveTheme } from "@/composables/appUtils";
 import { vKonami } from "vue-konami";
 import AppLayout from "@/AppLayout.vue";
-import { frFR } from "naive-ui";
+import { dateFrFR, frFR } from "naive-ui";
 import { useUserStore } from "@/stores/user.ts";
 
 const user = useUserStore();
@@ -47,7 +47,7 @@ onMounted(async () => {
 <template>
   <n-config-provider
     v-konami="maintenanceConfig"
-    :date-locale="frFR"
+    :date-locale="dateFrFR"
     :locale="frFR"
     :theme="theme"
     :theme-overrides="themeOverride"
