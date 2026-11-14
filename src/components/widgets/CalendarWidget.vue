@@ -105,7 +105,7 @@ onBeforeUnmount(() => clearInterval(timer));
 
 <template>
   <div :class="[props.size, { 'week-numbers': props.settings.weekNumbers }]" class="calendar">
-    <section v-if="props.size === 'medium'" class="today">
+    <section v-if="props.size === 'medium'" class="summary">
       <span class="weekday">{{ weekdayName }}</span>
       <span class="day-number">{{ today.day }}</span>
       <span class="month-year">{{ monthAndYear }}</span>
@@ -153,7 +153,7 @@ onBeforeUnmount(() => clearInterval(timer));
   line-height: 1;
 }
 
-.today {
+.summary {
   display: flex;
   flex: none;
   flex-direction: column;
