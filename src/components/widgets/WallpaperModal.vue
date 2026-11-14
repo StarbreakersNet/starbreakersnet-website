@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, ref, useTemplateRef, watch } from "vue";
 import AnimatedWallpaper from "@/components/widgets/AnimatedWallpaper.vue";
-import HAlert from "@/components/c/hAlert.vue";
 import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HForm from "@/components/c/hForm.vue";
@@ -17,14 +16,15 @@ import HSelect from "@/components/c/hSelect.vue";
 import HTabPane from "@/components/c/hTabPane.vue";
 import HTabs from "@/components/c/hTabs.vue";
 import HText from "@/components/c/hText.vue";
-import { fetchRandomPhoto, hasUnsplashKey, withReferral } from "@/utils/unsplash";
+import { checkUnsplashKey, fetchRandomPhoto, fetchTopics, withReferral } from "@/utils/unsplash";
 import { saveWallpaperFile } from "@/utils/wallpaperFile";
 import {
+  DEFAULT_WALLPAPER,
   guessMediaKind,
+  normalizeUnsplashKey,
   parseUnsplashCollection,
   pickVideo,
   ROTATION_FREQUENCIES,
-  UNSPLASH_TOPICS,
   WALLPAPER_FILE_MAX_SIZE,
   WALLPAPER_PRESETS,
   WALLPAPER_VIDEOS,
@@ -36,6 +36,7 @@ import { useWidgetsStore } from "@/stores/widgets";
 import type {
   MediaKind,
   RotationFrequency,
+  UnsplashTopic,
   UnsplashWallpaper,
   WallpaperSource,
 } from "@/types/Wallpaper";
@@ -118,16 +119,26 @@ function choosePreset(id: string) {
 
 const unsplash = computed(() => (wallpaper.value.source === "unsplash" ? wallpaper.value : null));
 
-// Photos d'un thème proposé, ou d'une collection Unsplash (adresse ou identifiant)
 const unsplashForm = reactive({
   selection: "topic" as "topic" | "collection",
-  topic: UNSPLASH_TOPICS[0]!.value,
+  topic: "",
   collection: "",
   frequency: "day" as RotationFrequency,
 });
 
 const collectionError = ref("");
 const fetching = ref(false);
+const topics = ref<UnsplashTopic[]>([]);
+const loadingTopics = ref(false);
+
+const topicOptions = computed(() => [
+  { value: "", label: "Toutes les photos" },
+  ...topics.value.map(({ id, title }) => ({ value: id, label: title })),
+]);
+
+const topicValue = computed(() =>
+  topics.value.some(topic => topic.id === unsplashForm.topic) ? unsplashForm.topic : ""
+);
 
 const photoCredit = computed(() => unsplash.value?.photo ?? null);
 
@@ -159,7 +170,6 @@ function updateUnsplash(
   const current = unsplash.value;
 
   if (current) {
-    // Autre thème ou autre collection : nouvelle photo (récupérée par BurohWallpaper)
     const newSource = patch.topic !== undefined || patch.collection !== undefined;
     const photo = newSource ? null : current.photo;
 
@@ -192,21 +202,19 @@ function applyCollection() {
 function chooseSelection(value: "topic" | "collection") {
   unsplashForm.selection = value;
 
-  // Retour aux thèmes : la collection n'est plus utilisée
   if (value === "topic" && unsplash.value?.collection) {
     updateUnsplash({ collection: "" });
   }
 }
 
-// Nouvelle photo tout de suite, en gardant l'actuelle affichée pendant la requête
 async function nextPhoto() {
   const current = unsplash.value;
 
-  if (current) {
+  if (current && store.unsplashKey) {
     fetching.value = true;
 
     try {
-      const photo = await fetchRandomPhoto(current);
+      const photo = await fetchRandomPhoto(current, store.unsplashKey);
 
       store.setWallpaper({ ...current, photo });
     } catch {
@@ -214,6 +222,71 @@ async function nextPhoto() {
     } finally {
       fetching.value = false;
     }
+  }
+}
+
+// --- Clé d'accès Unsplash de l'utilisateur
+
+const hasKey = computed(() => Boolean(store.unsplashKey));
+
+const keyForm = reactive({
+  key: store.unsplashKey,
+});
+
+const keyError = ref("");
+const checkingKey = ref(false);
+
+async function saveKey() {
+  const key = normalizeUnsplashKey(keyForm.key);
+
+  keyError.value = key ? "" : "Clé d'accès invalide";
+
+  if (key) {
+    checkingKey.value = true;
+    const status = await checkUnsplashKey(key);
+    checkingKey.value = false;
+
+    if (status === "invalid") {
+      keyError.value = "Clé refusée par Unsplash";
+    } else {
+      store.setUnsplashKey(key);
+      keyForm.key = key;
+      loadTopics();
+    }
+
+    if (status === "unavailable") {
+      message.warning("Unsplash ne répond pas : clé enregistrée sans vérification");
+    }
+  }
+}
+
+function removeKey() {
+  store.setUnsplashKey("");
+  keyForm.key = "";
+  keyError.value = "";
+  topics.value = [];
+  unsplashForm.selection = "topic";
+
+  if (unsplash.value) {
+    store.setWallpaper(DEFAULT_WALLPAPER);
+  }
+}
+
+async function loadTopics() {
+  loadingTopics.value = true;
+
+  try {
+    topics.value = await fetchTopics(store.unsplashKey);
+  } catch {
+    message.error("Impossible de récupérer les thèmes Unsplash pour le moment");
+  } finally {
+    loadingTopics.value = false;
+  }
+}
+
+function onPhotosShown(visible: boolean) {
+  if (visible && store.unsplashKey && !topics.value.length) {
+    loadTopics();
   }
 }
 
@@ -346,6 +419,12 @@ function onFileChosen(event: Event) {
 
 watch(show, onOpen);
 
+watch(
+  () => show.value && tab.value === "rotation" && rotationKind.value === "photos",
+  onPhotosShown,
+  { immediate: true }
+);
+
 watch(unsplash, readUnsplash, { immediate: true });
 
 watch(
@@ -397,49 +476,75 @@ watch(
         </h-radio-group>
         <template v-if="rotationKind === 'photos'">
           <h-form :model="unsplashForm" label-placement="top">
-            <template v-if="hasUnsplashKey">
-              <h-form-item label="Photos">
-                <h-radio-group :value="unsplashForm.selection" @update:value="chooseSelection">
-                  <h-radio-button value="topic">D'un thème</h-radio-button>
-                  <h-radio-button value="collection">D'une collection</h-radio-button>
-                </h-radio-group>
-              </h-form-item>
-              <h-form-item v-if="unsplashForm.selection === 'topic'" label="Thème">
-                <h-select
-                  :options="UNSPLASH_TOPICS"
-                  :value="unsplashForm.topic"
-                  @update:value="updateTopic" />
-              </h-form-item>
-              <h-form-item
-                v-else
-                :feedback="collectionError"
-                :validation-status="collectionError ? 'error' : undefined"
-                label="Collection">
-                <h-input-group>
-                  <h-input
-                    v-model:value="unsplashForm.collection"
-                    placeholder="https://unsplash.com/collections/…"
-                    @keydown.enter.prevent="applyCollection" />
-                  <h-button
-                    :disabled="!unsplash || !unsplashForm.collection.trim()"
-                    type="primary"
-                    @click="applyCollection">
-                    Appliquer
-                  </h-button>
-                </h-input-group>
-              </h-form-item>
-            </template>
-            <h-alert v-else :bordered="false" class="note" type="info">
-              Photos au hasard parmi celles d'Unsplash proposées par Lorem Picsum. Choisir un thème
-              ou une collection demande une clé d'API Unsplash (voir le README).
-            </h-alert>
-            <h-form-item label="Nouvelle photo">
+            <h-form-item v-if="hasKey" label="Photos">
+              <h-radio-group :value="unsplashForm.selection" @update:value="chooseSelection">
+                <h-radio-button value="topic">D'un thème Unsplash</h-radio-button>
+                <h-radio-button value="collection">D'une collection</h-radio-button>
+              </h-radio-group>
+            </h-form-item>
+            <h-form-item v-if="hasKey && unsplashForm.selection === 'topic'" label="Thème">
+              <h-select
+                :loading="loadingTopics"
+                :options="topicOptions"
+                :value="topicValue"
+                @update:value="updateTopic" />
+            </h-form-item>
+            <h-form-item
+              v-if="hasKey && unsplashForm.selection === 'collection'"
+              :feedback="collectionError"
+              :validation-status="collectionError ? 'error' : undefined"
+              label="Collection">
+              <h-input-group>
+                <h-input
+                  v-model:value="unsplashForm.collection"
+                  placeholder="https://unsplash.com/collections/…"
+                  @keydown.enter.prevent="applyCollection" />
+                <h-button
+                  :disabled="!unsplash || !unsplashForm.collection.trim()"
+                  type="primary"
+                  @click="applyCollection">
+                  Appliquer
+                </h-button>
+              </h-input-group>
+            </h-form-item>
+            <h-form-item v-if="hasKey" label="Nouvelle photo">
               <h-select
                 :options="FREQUENCY_OPTIONS"
                 :value="unsplashForm.frequency"
                 @update:value="updatePhotoFrequency" />
             </h-form-item>
+            <h-form-item
+              :feedback="keyError"
+              :validation-status="keyError ? 'error' : undefined"
+              label="Clé d'accès Unsplash">
+              <h-input-group>
+                <h-input
+                  v-model:value="keyForm.key"
+                  :disabled="hasKey"
+                  placeholder="Access Key de votre application Unsplash"
+                  show-password-on="click"
+                  type="password"
+                  @keydown.enter.prevent="saveKey" />
+                <h-button v-if="hasKey" @click="removeKey">Retirer</h-button>
+                <h-button
+                  v-else
+                  :disabled="!keyForm.key.trim()"
+                  :loading="checkingKey"
+                  type="primary"
+                  @click="saveKey">
+                  Enregistrer
+                </h-button>
+              </h-input-group>
+            </h-form-item>
           </h-form>
+          <h-text class="key-help" depth="3" tag="p">
+            Les photos Unsplash demandent votre clé d'accès, gratuite sur
+            <a href="https://unsplash.com/developers" rel="noopener" target="_blank">
+              unsplash.com/developers
+            </a>
+            (« Access Key », jamais la « Secret Key »). Elle est enregistrée avec votre Buroh. Vous
+            choisissez ensuite un thème d'Unsplash ou l'une de ses collections.
+          </h-text>
           <h-flex justify="space-between">
             <h-text v-if="photoCredit" depth="3">
               Photo :
@@ -451,10 +556,10 @@ watch(
               </a>
             </h-text>
             <span v-else />
-            <h-button v-if="!unsplash" type="primary" @click="useUnsplash">
+            <h-button v-if="!unsplash" :disabled="!hasKey" type="primary" @click="useUnsplash">
               Utiliser Unsplash
             </h-button>
-            <h-button v-else :loading="fetching" @click="nextPhoto">
+            <h-button v-else :disabled="!hasKey" :loading="fetching" @click="nextPhoto">
               <template #icon>
                 <font-awesome-icon icon="rotate" />
               </template>
@@ -620,8 +725,8 @@ watch(
   font-size: 0.8rem;
 }
 
-.note {
-  margin-bottom: 16px;
+.key-help {
+  margin: 0 0 16px;
 }
 
 .kind {

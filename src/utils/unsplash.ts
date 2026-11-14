@@ -1,45 +1,51 @@
-import type { UnsplashPhoto } from "@/types/Wallpaper";
+import type { UnsplashPhoto, UnsplashTopic } from "@/types/Wallpaper";
 
-// Photos Unsplash pour le fond d'écran de Buroh.
-// - Avec une clé d'API (VITE_UNSPLASH_ACCESS_KEY, gratuite sur unsplash.com/developers) : photo au
-//   hasard dans un thème ou une collection, par l'API officielle, avec le suivi de téléchargement
-//   qu'elle demande.
-// - Sans clé : photo au hasard parmi celles d'Unsplash reprises par Lorem Picsum (picsum.photos),
-//   gratuit et sans clé, mais sans choix de thème.
-// Dans les deux cas, l'image est affichée depuis le CDN d'origine et le photographe est crédité,
-// comme le demandent les conditions d'Unsplash.
+// Photos Unsplash du fond d'écran de Buroh, par l'API officielle avec la clé d'accès de l'utilisateur
 
-const ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
 const API_URL = "https://api.unsplash.com";
-const PICSUM_URL = "https://picsum.photos";
-// Paramètres de suivi demandés par Unsplash sur les liens de crédit
 const REFERRAL = "utm_source=starbreakersnet&utm_medium=referral";
 
-export const hasUnsplashKey = Boolean(ACCESS_KEY);
-
-// Largeur demandée : celle de l'écran en pixels réels, plafonnée
 function screenWidth() {
   return Math.min(3840, Math.round(window.screen.width * (window.devicePixelRatio || 1)));
+}
+
+function apiHeaders(key: string) {
+  return { "Authorization": `Client-ID ${key}`, "Accept-Version": "v1" };
 }
 
 export function withReferral(url: string) {
   return `${url}${url.includes("?") ? "&" : "?"}${REFERRAL}`;
 }
 
-// Photo au hasard d'une collection si elle est donnée, sinon du thème
-async function fromApi({ topic, collection }: PhotoQuery): Promise<UnsplashPhoto> {
+export interface PhotoQuery {
+  topic: string;
+  collection: string;
+}
+
+export async function fetchRandomPhoto(
+  { topic, collection }: PhotoQuery,
+  key: string
+): Promise<UnsplashPhoto> {
   const params = new URLSearchParams({ orientation: "landscape", content_filter: "high" });
+
   if (collection) {
     params.set("collections", collection);
-  } else {
-    params.set("query", topic);
   }
-  const headers = { "Authorization": `Client-ID ${ACCESS_KEY}`, "Accept-Version": "v1" };
+
+  if (topic && !collection) {
+    params.set("topics", topic);
+  }
+
+  const headers = apiHeaders(key);
   const response = await fetch(`${API_URL}/photos/random?${params}`, { headers });
-  if (!response.ok) throw new Error(`Unsplash : ${response.status}`);
+
+  if (!response.ok) {
+    throw new Error(`Unsplash : ${response.status}`);
+  }
 
   const photo = await response.json();
-  // Signalement d'utilisation de la photo, exigé par les conditions de l'API
+
+  // Signalement d'utilisation, exigé par les conditions de l'API
   fetch(photo.links.download_location, { headers }).catch(() => {});
 
   return {
@@ -52,39 +58,37 @@ async function fromApi({ topic, collection }: PhotoQuery): Promise<UnsplashPhoto
   };
 }
 
-async function fromPicsum(): Promise<UnsplashPhoto> {
-  // Une page au hasard de la liste, puis une photo en paysage au hasard dans cette page
-  const page = 1 + Math.floor(Math.random() * 10);
-  const response = await fetch(`${PICSUM_URL}/v2/list?page=${page}&limit=100`);
-  if (!response.ok) throw new Error(`Lorem Picsum : ${response.status}`);
+// Thèmes constitués par Unsplash, dans l'ordre où Unsplash les met en avant
+export async function fetchTopics(key: string): Promise<UnsplashTopic[]> {
+  const params = new URLSearchParams({ per_page: "30", order_by: "featured" });
+  const response = await fetch(`${API_URL}/topics?${params}`, { headers: apiHeaders(key) });
 
-  const list = (await response.json()) as {
-    id: string;
-    author: string;
-    width: number;
-    height: number;
-    url: string;
-  }[];
-  const landscapes = list.filter(item => item.width > item.height);
-  const photo = landscapes[Math.floor(Math.random() * landscapes.length)];
-  if (!photo) throw new Error("Lorem Picsum : aucune photo");
+  if (!response.ok) {
+    throw new Error(`Unsplash : ${response.status}`);
+  }
 
-  const width = screenWidth();
-  return {
-    id: `picsum-${photo.id}`,
-    url: `${PICSUM_URL}/id/${photo.id}/${width}/${Math.round((width * 9) / 16)}`,
-    author: photo.author,
-    photoUrl: photo.url,
-    authorUrl: null,
-    fetchedAt: new Date().toISOString(),
-  };
+  const topics: { id: string; title: string }[] = await response.json();
+
+  return topics.map(({ id, title }) => ({ id, title }));
 }
 
-export interface PhotoQuery {
-  topic: string;
-  collection: string;
-}
+// « invalid » : clé refusée par Unsplash ; « unavailable » : pas de réponse, ou limite atteinte
+export async function checkUnsplashKey(key: string): Promise<"ok" | "invalid" | "unavailable"> {
+  let result: "ok" | "invalid" | "unavailable" = "unavailable";
 
-export function fetchRandomPhoto(query: PhotoQuery): Promise<UnsplashPhoto> {
-  return hasUnsplashKey ? fromApi(query) : fromPicsum();
+  try {
+    const response = await fetch(`${API_URL}/topics?per_page=1`, { headers: apiHeaders(key) });
+
+    if (response.ok) {
+      result = "ok";
+    }
+
+    if (response.status === 401) {
+      result = "invalid";
+    }
+  } catch {
+    result = "unavailable";
+  }
+
+  return result;
 }

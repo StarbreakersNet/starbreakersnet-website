@@ -14,7 +14,7 @@ import {
   WIDGET_SIZES,
   widgetRect,
 } from "@/models/widgets";
-import { DEFAULT_WALLPAPER, normalizeWallpaper } from "@/models/wallpapers";
+import { DEFAULT_WALLPAPER, normalizeUnsplashKey, normalizeWallpaper } from "@/models/wallpapers";
 import { deleteWallpaperFile } from "@/utils/wallpaperFile";
 import type { FitState } from "@/composables/useFitContent";
 import type { Wallpaper } from "@/types/Wallpaper";
@@ -34,7 +34,7 @@ const REMOTE_SAVE_DELAY = 800;
 // En dessous de cette échelle, le texte d'un widget qu'on modifie devient trop petit : taille du dessus
 const GROW_BELOW_SCALE = 0.85;
 
-function readLocal(): { widgets: Widget[] | null; wallpaper: Wallpaper } {
+function readLocal(): { widgets: Widget[] | null; wallpaper: Wallpaper; unsplashKey: string } {
   try {
     const value = localStorage.getItem(STORAGE_KEY);
     const raw = value ? JSON.parse(value) : null;
@@ -42,15 +42,16 @@ function readLocal(): { widgets: Widget[] | null; wallpaper: Wallpaper } {
     return {
       widgets: normalizeDocument(raw),
       wallpaper: normalizeWallpaper(raw?.wallpaper),
+      unsplashKey: normalizeUnsplashKey(raw?.unsplashKey),
     };
   } catch {
-    return { widgets: null, wallpaper: DEFAULT_WALLPAPER };
+    return { widgets: null, wallpaper: DEFAULT_WALLPAPER, unsplashKey: "" };
   }
 }
 
-function writeLocal(widgets: Widget[], wallpaper: Wallpaper) {
+function writeLocal(widgets: Widget[], wallpaper: Wallpaper, unsplashKey: string) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(toDocument(widgets, wallpaper)));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toDocument(widgets, wallpaper, unsplashKey)));
   } catch {
     // Pas de persistance locale possible : les widgets restent valables pour la session
   }
@@ -64,6 +65,7 @@ export const useWidgetsStore = defineStore("widgets", () => {
   const local = readLocal();
   const widgets = ref<Widget[]>(local.widgets ?? defaultWidgets());
   const wallpaper = ref<Wallpaper>(local.wallpaper);
+  const unsplashKey = ref(local.unsplashKey);
 
   // Compte sur lequel enregistrer, connu une fois ses widgets chargés (null pour un visiteur, ou si
   // la colonne user_settings.widgets n'existe pas encore : front déployé avant la migration)
@@ -80,7 +82,7 @@ export const useWidgetsStore = defineStore("widgets", () => {
     if (accountId) {
       const { error } = await supabase
         .from("user_settings")
-        .update({ widgets: toDocument(widgets.value, wallpaper.value) })
+        .update({ widgets: toDocument(widgets.value, wallpaper.value, unsplashKey.value) })
         .eq("user_id", accountId);
 
       if (error) {
@@ -100,7 +102,7 @@ export const useWidgetsStore = defineStore("widgets", () => {
   }
 
   function persist() {
-    writeLocal(widgets.value, wallpaper.value);
+    writeLocal(widgets.value, wallpaper.value, unsplashKey.value);
     scheduleRemoteSave();
   }
 
@@ -126,7 +128,8 @@ export const useWidgetsStore = defineStore("widgets", () => {
       } else {
         widgets.value = remote;
         wallpaper.value = normalizeWallpaper(data.widgets?.wallpaper);
-        writeLocal(remote, wallpaper.value);
+        unsplashKey.value = normalizeUnsplashKey(data.widgets?.unsplashKey);
+        writeLocal(remote, wallpaper.value, unsplashKey.value);
       }
     }
   }
@@ -147,6 +150,11 @@ export const useWidgetsStore = defineStore("widgets", () => {
     }
 
     wallpaper.value = next;
+    persist();
+  }
+
+  function setUnsplashKey(key: string) {
+    unsplashKey.value = normalizeUnsplashKey(key);
     persist();
   }
 
@@ -265,6 +273,8 @@ export const useWidgetsStore = defineStore("widgets", () => {
     widgets,
     wallpaper,
     setWallpaper,
+    unsplashKey,
+    setUnsplashKey,
     load,
     unload,
     add,

@@ -9,7 +9,6 @@ COPY . .
 # Passées par docker-compose.front.yml (build.args) : le .env n'entre pas dans l'image (.dockerignore).
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_PUBLISHABLE_KEY
-ARG VITE_UNSPLASH_ACCESS_KEY
 RUN yarn build
 
 # Stage 2 : Serve with Nginx

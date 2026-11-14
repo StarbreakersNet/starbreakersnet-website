@@ -158,10 +158,11 @@ function refreshVideo(current: VideosWallpaper) {
   }
 }
 
+// Sans clé, ou si Unsplash ne répond pas : la photo actuelle reste, sinon le dégradé par défaut
 async function refreshPhoto(current: UnsplashWallpaper) {
-  if (isStale(current.photo?.fetchedAt, current.frequency)) {
+  if (store.unsplashKey && isStale(current.photo?.fetchedAt, current.frequency)) {
     try {
-      const photo = await fetchRandomPhoto(current);
+      const photo = await fetchRandomPhoto(current, store.unsplashKey);
 
       // Fond inchangé pendant la requête
       if (store.wallpaper === current) {
@@ -214,6 +215,8 @@ watch(rotationKey, key => {
     refresh();
   }
 });
+
+watch(() => store.unsplashKey, refresh);
 
 onMounted(refresh);
 

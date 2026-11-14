@@ -155,18 +155,6 @@ export function pickVideo(currentId?: string) {
 
 export const DEFAULT_WALLPAPER: Wallpaper = { source: "preset", preset: "starbreakers" };
 
-// Thèmes proposés avec une clé d'API Unsplash (requête de recherche envoyée à l'API)
-export const UNSPLASH_TOPICS = [
-  { value: "nature", label: "Nature" },
-  { value: "landscape", label: "Paysages" },
-  { value: "mountains", label: "Montagnes" },
-  { value: "ocean", label: "Océan" },
-  { value: "space", label: "Espace" },
-  { value: "city night", label: "Villes la nuit" },
-  { value: "architecture", label: "Architecture" },
-  { value: "abstract", label: "Abstrait" },
-];
-
 export const ROTATION_FREQUENCIES: { value: RotationFrequency; label: string; hours: number }[] = [
   { value: "visit", label: "À chaque visite", hours: 0 },
   { value: "hour", label: "Toutes les heures", hours: 1 },
@@ -195,6 +183,12 @@ export function parseUnsplashCollection(input: string): string | null {
   return /^[A-Za-z0-9_-]{1,40}$/.test(id) ? id : null;
 }
 
+export function normalizeUnsplashKey(raw: unknown) {
+  const key = typeof raw === "string" ? raw.trim() : "";
+
+  return /^[A-Za-z0-9_-]{20,100}$/.test(key) ? key : "";
+}
+
 const PAGE_LOADED_AT = Date.now();
 
 // Photo ou vidéo à renouveler selon le rythme choisi, d'après la date où elle a été choisie
@@ -217,7 +211,9 @@ function normalizePhoto(raw: unknown): UnsplashPhoto | null {
   const photo = raw as Record<string, unknown>;
   const url = typeof photo.url === "string" ? normalizeUrl(photo.url) : null;
   const photoUrl = typeof photo.photoUrl === "string" ? normalizeUrl(photo.photoUrl) : null;
-  if (!url || !photoUrl || typeof photo.id !== "string") return null;
+  // Seules les photos du CDN d'Unsplash restent (les anciennes de Lorem Picsum sont écartées)
+  const fromUnsplash = url !== null && new URL(url).hostname === "images.unsplash.com";
+  if (!fromUnsplash || !photoUrl || typeof photo.id !== "string") return null;
 
   return {
     id: photo.id,
@@ -266,9 +262,10 @@ export function normalizeWallpaper(raw: unknown): Wallpaper {
     case "unsplash":
       return {
         source: "unsplash",
-        topic: UNSPLASH_TOPICS.some(topic => topic.value === wallpaper.topic)
-          ? String(wallpaper.topic)
-          : UNSPLASH_TOPICS[0]!.value,
+        topic:
+          typeof wallpaper.topic === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(wallpaper.topic)
+            ? wallpaper.topic
+            : "",
         collection:
           typeof wallpaper.collection === "string"
             ? (parseUnsplashCollection(wallpaper.collection) ?? "")

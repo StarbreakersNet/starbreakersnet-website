@@ -354,8 +354,12 @@ export function normalizeDocument(raw: unknown): Widget[] | null {
   return widgets;
 }
 
-export function toDocument(widgets: Widget[], wallpaper: Wallpaper): WidgetsDocument {
-  return { version: 1, widgets, wallpaper };
+export function toDocument(
+  widgets: Widget[],
+  wallpaper: Wallpaper,
+  unsplashKey: string
+): WidgetsDocument {
+  return { version: 1, widgets, wallpaper, unsplashKey };
 }
 
 // --- Buroh par défaut (visiteurs, et membres qui n'ont encore rien changé)

@@ -90,7 +90,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 <n-li>votre prénom et votre nom, seulement si vous les renseignez ;</n-li>
                 <n-li>
                   vos préférences d'affichage (thème clair ou sombre) et les widgets de votre page
-                  Buroh, avec leur contenu (notes, liens) ;
+                  Buroh, avec leur contenu (notes, liens) et votre clé d'accès Unsplash si vous la
+                  renseignez ;
                 </n-li>
                 <n-li>
                   des données techniques de connexion (adresse IP, date, navigateur), conservées
@@ -181,8 +182,9 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                     DuckDuckGo, qui ne reçoit que le nom de domaine de chaque lien, et la météo
                     d'Open-Meteo, qui ne reçoit que les coordonnées de la ville choisie, ou de votre
                     position arrondies à environ 1 km si vous l'utilisez. Les photos de fond d'écran
-                    viennent d'Unsplash (directement ou par Lorem Picsum) ; une image ou une vidéo
-                    donnée par son adresse est chargée depuis le site qui l'héberge.
+                    viennent d'Unsplash, qui reçoit votre clé d'accès si vous en avez renseigné une.
+                    Une image ou une vidéo donnée par son adresse est chargée depuis le site qui
+                    l'héberge.
                   </h-text>
                 </h-flex>
               </template>
