@@ -20,6 +20,12 @@ export interface UnsplashPhoto {
   fetchedAt: string;
 }
 
+// Thème constitué par Unsplash (« Wallpapers », « Nature »…)
+export interface UnsplashTopic {
+  id: string;
+  title: string;
+}
+
 export interface PresetWallpaper {
   source: "preset";
   // Identifiant dans WALLPAPER_PRESETS
@@ -28,6 +34,7 @@ export interface PresetWallpaper {
 
 export interface UnsplashWallpaper {
   source: "unsplash";
+  // Identifiant d'un thème Unsplash (vide : toutes les photos)
   topic: string;
   // Identifiant d'une collection Unsplash (vide : le thème s'applique)
   collection: string;

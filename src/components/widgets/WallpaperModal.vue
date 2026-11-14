@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, ref, useTemplateRef, watch } from "vue";
+import AnimatedWallpaper from "@/components/widgets/AnimatedWallpaper.vue";
 import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HForm from "@/components/c/hForm.vue";
@@ -15,15 +16,15 @@ import HSelect from "@/components/c/hSelect.vue";
 import HTabPane from "@/components/c/hTabPane.vue";
 import HTabs from "@/components/c/hTabs.vue";
 import HText from "@/components/c/hText.vue";
-import { checkUnsplashKey, fetchRandomPhoto, withReferral } from "@/utils/unsplash";
+import { checkUnsplashKey, fetchRandomPhoto, fetchTopics, withReferral } from "@/utils/unsplash";
 import { saveWallpaperFile } from "@/utils/wallpaperFile";
 import {
+  DEFAULT_WALLPAPER,
   guessMediaKind,
   normalizeUnsplashKey,
   parseUnsplashCollection,
   pickVideo,
   ROTATION_FREQUENCIES,
-  UNSPLASH_TOPICS,
   WALLPAPER_FILE_MAX_SIZE,
   WALLPAPER_PRESETS,
   WALLPAPER_VIDEOS,
@@ -35,6 +36,7 @@ import { useWidgetsStore } from "@/stores/widgets";
 import type {
   MediaKind,
   RotationFrequency,
+  UnsplashTopic,
   UnsplashWallpaper,
   WallpaperSource,
 } from "@/types/Wallpaper";
@@ -91,7 +93,12 @@ function onOpen(visible: boolean) {
   }
 }
 
-// --- Dégradés
+// --- Fonds maison
+
+const PRESET_GROUPS = [
+  { label: "Animés", presets: WALLPAPER_PRESETS.filter(preset => preset.motion) },
+  { label: "Dégradés", presets: WALLPAPER_PRESETS.filter(preset => !preset.motion) },
+];
 
 function presetPreview(id: string) {
   const preset = WALLPAPER_PRESETS.find(item => item.id === id)!;
@@ -114,13 +121,24 @@ const unsplash = computed(() => (wallpaper.value.source === "unsplash" ? wallpap
 
 const unsplashForm = reactive({
   selection: "topic" as "topic" | "collection",
-  topic: UNSPLASH_TOPICS[0]!.value,
+  topic: "",
   collection: "",
   frequency: "day" as RotationFrequency,
 });
 
 const collectionError = ref("");
 const fetching = ref(false);
+const topics = ref<UnsplashTopic[]>([]);
+const loadingTopics = ref(false);
+
+const topicOptions = computed(() => [
+  { value: "", label: "Toutes les photos" },
+  ...topics.value.map(({ id, title }) => ({ value: id, label: title })),
+]);
+
+const topicValue = computed(() =>
+  topics.value.some(topic => topic.id === unsplashForm.topic) ? unsplashForm.topic : ""
+);
 
 const photoCredit = computed(() => unsplash.value?.photo ?? null);
 
@@ -192,7 +210,7 @@ function chooseSelection(value: "topic" | "collection") {
 async function nextPhoto() {
   const current = unsplash.value;
 
-  if (current) {
+  if (current && store.unsplashKey) {
     fetching.value = true;
 
     try {
@@ -233,7 +251,7 @@ async function saveKey() {
     } else {
       store.setUnsplashKey(key);
       keyForm.key = key;
-      nextPhoto();
+      loadTopics();
     }
 
     if (status === "unavailable") {
@@ -246,7 +264,30 @@ function removeKey() {
   store.setUnsplashKey("");
   keyForm.key = "";
   keyError.value = "";
-  chooseSelection("topic");
+  topics.value = [];
+  unsplashForm.selection = "topic";
+
+  if (unsplash.value) {
+    store.setWallpaper(DEFAULT_WALLPAPER);
+  }
+}
+
+async function loadTopics() {
+  loadingTopics.value = true;
+
+  try {
+    topics.value = await fetchTopics(store.unsplashKey);
+  } catch {
+    message.error("Impossible de récupérer les thèmes Unsplash pour le moment");
+  } finally {
+    loadingTopics.value = false;
+  }
+}
+
+function onPhotosShown(visible: boolean) {
+  if (visible && store.unsplashKey && !topics.value.length) {
+    loadTopics();
+  }
 }
 
 // --- Vidéos de la sélection
@@ -378,6 +419,12 @@ function onFileChosen(event: Event) {
 
 watch(show, onOpen);
 
+watch(
+  () => show.value && tab.value === "rotation" && rotationKind.value === "photos",
+  onPhotosShown,
+  { immediate: true }
+);
+
 watch(unsplash, readUnsplash, { immediate: true });
 
 watch(
@@ -398,21 +445,29 @@ watch(
     preset="card"
     title="Fond d'écran">
     <h-tabs v-model:value="tab" animated type="segment">
-      <h-tab-pane name="presets" tab="Dégradés">
-        <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
-          <h-grid-item v-for="preset in WALLPAPER_PRESETS" :key="preset.id" role="listitem">
-            <h-button
-              :aria-pressed="isPresetSelected(preset.id)"
-              :class="{ selected: isPresetSelected(preset.id) }"
-              class="preset"
-              native-focus-behavior
-              text
-              @click="choosePreset(preset.id)">
-              <span :style="{ background: presetPreview(preset.id) }" class="preview" />
-              <span class="label">{{ preset.label }}</span>
-            </h-button>
-          </h-grid-item>
-        </h-grid>
+      <h-tab-pane name="presets" tab="Fonds maison">
+        <section v-for="group in PRESET_GROUPS" :key="group.label" class="preset-group">
+          <h-text class="group-title" depth="3" strong tag="h3">{{ group.label }}</h-text>
+          <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
+            <h-grid-item v-for="preset in group.presets" :key="preset.id" role="listitem">
+              <h-button
+                :aria-pressed="isPresetSelected(preset.id)"
+                :class="{ selected: isPresetSelected(preset.id) }"
+                class="preset"
+                native-focus-behavior
+                text
+                @click="choosePreset(preset.id)">
+                <span :style="{ background: presetPreview(preset.id) }" class="preview">
+                  <animated-wallpaper
+                    v-if="preset.motion"
+                    :light="user.settings.theme === 'light'"
+                    :motion="preset.motion" />
+                </span>
+                <span class="label">{{ preset.label }}</span>
+              </h-button>
+            </h-grid-item>
+          </h-grid>
+        </section>
       </h-tab-pane>
       <h-tab-pane name="rotation" tab="Photos et vidéos">
         <h-radio-group v-model:value="rotationKind" class="kind">
@@ -423,18 +478,19 @@ watch(
           <h-form :model="unsplashForm" label-placement="top">
             <h-form-item v-if="hasKey" label="Photos">
               <h-radio-group :value="unsplashForm.selection" @update:value="chooseSelection">
-                <h-radio-button value="topic">D'un thème</h-radio-button>
+                <h-radio-button value="topic">D'un thème Unsplash</h-radio-button>
                 <h-radio-button value="collection">D'une collection</h-radio-button>
               </h-radio-group>
             </h-form-item>
-            <h-form-item v-if="!hasKey || unsplashForm.selection === 'topic'" label="Thème">
+            <h-form-item v-if="hasKey && unsplashForm.selection === 'topic'" label="Thème">
               <h-select
-                :options="UNSPLASH_TOPICS"
-                :value="unsplashForm.topic"
+                :loading="loadingTopics"
+                :options="topicOptions"
+                :value="topicValue"
                 @update:value="updateTopic" />
             </h-form-item>
             <h-form-item
-              v-else
+              v-if="hasKey && unsplashForm.selection === 'collection'"
               :feedback="collectionError"
               :validation-status="collectionError ? 'error' : undefined"
               label="Collection">
@@ -451,7 +507,7 @@ watch(
                 </h-button>
               </h-input-group>
             </h-form-item>
-            <h-form-item label="Nouvelle photo">
+            <h-form-item v-if="hasKey" label="Nouvelle photo">
               <h-select
                 :options="FREQUENCY_OPTIONS"
                 :value="unsplashForm.frequency"
@@ -460,7 +516,7 @@ watch(
             <h-form-item
               :feedback="keyError"
               :validation-status="keyError ? 'error' : undefined"
-              label="Clé d'accès Unsplash (facultative)">
+              label="Clé d'accès Unsplash">
               <h-input-group>
                 <h-input
                   v-model:value="keyForm.key"
@@ -482,13 +538,12 @@ watch(
             </h-form-item>
           </h-form>
           <h-text class="key-help" depth="3" tag="p">
-            Sans clé, les photos viennent d'une sélection Unsplash du site. Avec votre clé, gratuite
-            sur
+            Les photos Unsplash demandent votre clé d'accès, gratuite sur
             <a href="https://unsplash.com/developers" rel="noopener" target="_blank">
               unsplash.com/developers
             </a>
-            (« Access Key », jamais la « Secret Key »), vous pouvez aussi choisir une collection.
-            Elle est enregistrée avec votre Buroh.
+            (« Access Key », jamais la « Secret Key »). Elle est enregistrée avec votre Buroh. Vous
+            choisissez ensuite un thème d'Unsplash ou l'une de ses collections.
           </h-text>
           <h-flex justify="space-between">
             <h-text v-if="photoCredit" depth="3">
@@ -501,10 +556,10 @@ watch(
               </a>
             </h-text>
             <span v-else />
-            <h-button v-if="!unsplash" type="primary" @click="useUnsplash">
+            <h-button v-if="!unsplash" :disabled="!hasKey" type="primary" @click="useUnsplash">
               Utiliser Unsplash
             </h-button>
-            <h-button v-else :loading="fetching" @click="nextPhoto">
+            <h-button v-else :disabled="!hasKey" :loading="fetching" @click="nextPhoto">
               <template #icon>
                 <font-awesome-icon icon="rotate" />
               </template>
@@ -658,6 +713,16 @@ watch(
   &:focus-visible .preview {
     outline-color: rgb(10 132 255);
   }
+}
+
+.preset-group + .preset-group {
+  margin-top: 16px;
+}
+
+.group-title {
+  display: block;
+  margin: 0 0 8px;
+  font-size: 0.8rem;
 }
 
 .key-help {

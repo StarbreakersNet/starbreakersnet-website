@@ -1,11 +1,14 @@
 import { normalizeUrl } from "@/models/widgets";
 import type { MediaKind, RotationFrequency, UnsplashPhoto, Wallpaper } from "@/types/Wallpaper";
 
-// Préréglages : dégradés, avec une variante pour le thème clair au besoin
+export type WallpaperMotion = "aurora" | "stars" | "waves";
+
+// Préréglages : fonds maison, avec une variante pour le thème clair au besoin
 export interface WallpaperPreset {
   id: string;
   label: string;
   gradient: { dark: string; light?: string };
+  motion?: WallpaperMotion;
 }
 
 export const WALLPAPER_PRESETS: WallpaperPreset[] = [
@@ -82,6 +85,40 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
         "radial-gradient(80% 70% at 30% 20%, rgb(255 255 255), transparent 70%), rgb(220 220 226)",
     },
   },
+  {
+    id: "aurore",
+    label: "Aurore",
+    motion: "aurora",
+    gradient: {
+      dark: "radial-gradient(90% 70% at 50% 110%, rgb(20 40 90), transparent 70%), rgb(5 8 24)",
+      light:
+        "radial-gradient(90% 70% at 50% 110%, rgb(255 255 255), transparent 70%), rgb(236 240 250)",
+    },
+  },
+  {
+    id: "nuit-etoilee",
+    label: "Nuit étoilée",
+    motion: "stars",
+    gradient: {
+      dark:
+        "radial-gradient(70% 60% at 80% 10%, rgb(120 40 160 / 0.45), transparent 70%)," +
+        "radial-gradient(80% 60% at 10% 100%, rgb(190 30 45 / 0.4), transparent 70%)," +
+        "linear-gradient(180deg, rgb(6 6 22), rgb(18 10 40))",
+      light:
+        "radial-gradient(70% 60% at 80% 10%, rgb(200 170 255 / 0.7), transparent 70%)," +
+        "radial-gradient(80% 60% at 10% 100%, rgb(255 180 190 / 0.7), transparent 70%)," +
+        "linear-gradient(180deg, rgb(214 222 246), rgb(246 232 244))",
+    },
+  },
+  {
+    id: "vagues",
+    label: "Vagues",
+    motion: "waves",
+    gradient: {
+      dark: "linear-gradient(180deg, rgb(8 18 48), rgb(4 40 70) 70%, rgb(0 70 90))",
+      light: "linear-gradient(180deg, rgb(236 246 255), rgb(200 230 250) 70%, rgb(170 220 240))",
+    },
+  },
 ];
 
 // Sélection de vidéos de fond, choisies pour le site. Pour en ajouter une : déposer le fichier dans
@@ -117,18 +154,6 @@ export function pickVideo(currentId?: string) {
 }
 
 export const DEFAULT_WALLPAPER: Wallpaper = { source: "preset", preset: "starbreakers" };
-
-// Thèmes proposés avec une clé d'API Unsplash (requête de recherche envoyée à l'API)
-export const UNSPLASH_TOPICS = [
-  { value: "nature", label: "Nature" },
-  { value: "landscape", label: "Paysages" },
-  { value: "mountains", label: "Montagnes" },
-  { value: "ocean", label: "Océan" },
-  { value: "space", label: "Espace" },
-  { value: "city night", label: "Villes la nuit" },
-  { value: "architecture", label: "Architecture" },
-  { value: "abstract", label: "Abstrait" },
-];
 
 export const ROTATION_FREQUENCIES: { value: RotationFrequency; label: string; hours: number }[] = [
   { value: "visit", label: "À chaque visite", hours: 0 },
@@ -235,9 +260,10 @@ export function normalizeWallpaper(raw: unknown): Wallpaper {
     case "unsplash":
       return {
         source: "unsplash",
-        topic: UNSPLASH_TOPICS.some(topic => topic.value === wallpaper.topic)
-          ? String(wallpaper.topic)
-          : UNSPLASH_TOPICS[0]!.value,
+        topic:
+          typeof wallpaper.topic === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(wallpaper.topic)
+            ? wallpaper.topic
+            : "",
         collection:
           typeof wallpaper.collection === "string"
             ? (parseUnsplashCollection(wallpaper.collection) ?? "")

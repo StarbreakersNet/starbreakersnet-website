@@ -1,31 +1,12 @@
-import SELECTION from "@/models/unsplashSelection.json";
-import type { UnsplashPhoto } from "@/types/Wallpaper";
+import type { UnsplashPhoto, UnsplashTopic } from "@/types/Wallpaper";
 
-// Photos Unsplash du fond d'écran de Buroh : par l'API officielle avec la clé d'accès de
-// l'utilisateur, sinon (ou si l'API ne répond pas) dans la sélection intégrée au site
-// (models/unsplashSelection.json, générée par `yarn unsplash:selection`).
+// Photos Unsplash du fond d'écran de Buroh, par l'API officielle avec la clé d'accès de l'utilisateur
 
 const API_URL = "https://api.unsplash.com";
-const SITE_URL = "https://unsplash.com";
 const REFERRAL = "utm_source=starbreakersnet&utm_medium=referral";
-
-interface SelectionPhoto {
-  id: string;
-  raw: string;
-  author: string;
-  username: string;
-}
-
-const selection: Record<string, SelectionPhoto[]> = SELECTION;
 
 function screenWidth() {
   return Math.min(3840, Math.round(window.screen.width * (window.devicePixelRatio || 1)));
-}
-
-function imageUrl(raw: string) {
-  const separator = raw.includes("?") ? "&" : "?";
-
-  return `${raw}${separator}w=${screenWidth()}&q=80&fm=jpg&fit=crop`;
 }
 
 function apiHeaders(key: string) {
@@ -39,16 +20,20 @@ export function withReferral(url: string) {
 export interface PhotoQuery {
   topic: string;
   collection: string;
-  photo?: { id: string } | null;
 }
 
-async function fromApi({ topic, collection }: PhotoQuery, key: string): Promise<UnsplashPhoto> {
+export async function fetchRandomPhoto(
+  { topic, collection }: PhotoQuery,
+  key: string
+): Promise<UnsplashPhoto> {
   const params = new URLSearchParams({ orientation: "landscape", content_filter: "high" });
 
   if (collection) {
     params.set("collections", collection);
-  } else {
-    params.set("query", topic);
+  }
+
+  if (topic && !collection) {
+    params.set("topics", topic);
   }
 
   const headers = apiHeaders(key);
@@ -65,7 +50,7 @@ async function fromApi({ topic, collection }: PhotoQuery, key: string): Promise<
 
   return {
     id: photo.id,
-    url: imageUrl(photo.urls.raw),
+    url: `${photo.urls.raw}&w=${screenWidth()}&q=80&fm=jpg&fit=crop`,
     author: photo.user.name,
     photoUrl: photo.links.html,
     authorUrl: photo.user.links.html,
@@ -73,30 +58,18 @@ async function fromApi({ topic, collection }: PhotoQuery, key: string): Promise<
   };
 }
 
-function fromSelection({ topic, photo }: PhotoQuery): UnsplashPhoto {
-  const pool = selection[topic]?.length ? selection[topic] : Object.values(selection).flat();
-  const others = pool.filter(item => item.id !== photo?.id);
-  const choices = others.length ? others : pool;
-  const picked = choices[Math.floor(Math.random() * choices.length)]!;
+// Thèmes constitués par Unsplash, dans l'ordre où Unsplash les met en avant
+export async function fetchTopics(key: string): Promise<UnsplashTopic[]> {
+  const params = new URLSearchParams({ per_page: "30", order_by: "featured" });
+  const response = await fetch(`${API_URL}/topics?${params}`, { headers: apiHeaders(key) });
 
-  return {
-    id: picked.id,
-    url: imageUrl(picked.raw),
-    author: picked.author,
-    photoUrl: `${SITE_URL}/photos/${picked.id}`,
-    authorUrl: `${SITE_URL}/@${picked.username}`,
-    fetchedAt: new Date().toISOString(),
-  };
-}
-
-export async function fetchRandomPhoto(query: PhotoQuery, key: string): Promise<UnsplashPhoto> {
-  let photo: UnsplashPhoto | null = null;
-
-  if (key) {
-    photo = await fromApi(query, key).catch(() => null);
+  if (!response.ok) {
+    throw new Error(`Unsplash : ${response.status}`);
   }
 
-  return photo ?? fromSelection(query);
+  const topics: { id: string; title: string }[] = await response.json();
+
+  return topics.map(({ id, title }) => ({ id, title }));
 }
 
 // « invalid » : clé refusée par Unsplash ; « unavailable » : pas de réponse, ou limite atteinte
@@ -104,7 +77,7 @@ export async function checkUnsplashKey(key: string): Promise<"ok" | "invalid" | 
   let result: "ok" | "invalid" | "unavailable" = "unavailable";
 
   try {
-    const response = await fetch(`${API_URL}/photos/random`, { headers: apiHeaders(key) });
+    const response = await fetch(`${API_URL}/topics?per_page=1`, { headers: apiHeaders(key) });
 
     if (response.ok) {
       result = "ok";
