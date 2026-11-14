@@ -182,8 +182,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                     DuckDuckGo, qui ne reçoit que le nom de domaine de chaque lien, et la météo
                     d'Open-Meteo, qui ne reçoit que les coordonnées de la ville choisie, ou de votre
                     position arrondies à environ 1 km si vous l'utilisez. Les photos de fond d'écran
-                    viennent d'Unsplash, qui reçoit votre clé d'accès si vous en avez renseigné une
-                    ; une image ou une vidéo donnée par son adresse est chargée depuis le site qui
+                    viennent d'Unsplash, qui reçoit votre clé d'accès si vous en avez renseigné une.
+                    Une image ou une vidéo donnée par son adresse est chargée depuis le site qui
                     l'héberge.
                   </h-text>
                 </h-flex>
