@@ -7,8 +7,10 @@
 //
 // Derrière un proxy (HTTPS_PROXY) : NODE_USE_ENV_PROXY=1 yarn unsplash:selection
 //
-// Demande VITE_UNSPLASH_ACCESS_KEY, dans l'environnement ou dans le .env du front. À relancer
-// seulement pour renouveler la sélection, puis relire et enregistrer le fichier généré.
+// Outil de mainteneur, ni utilisé au build ni au déploiement : le fichier généré est versionné, et
+// le site s'en sert tel quel. Demande VITE_UNSPLASH_ACCESS_KEY (clé d'un développeur, dans
+// l'environnement ou dans le .env du front). À relancer seulement pour renouveler la sélection,
+// puis relire et enregistrer le fichier généré.
 //
 // Aucune dépendance : Node 22.
 

@@ -273,8 +273,9 @@ function setupDeploy(name, options) {
 VITE_SUPABASE_URL=https://${ref("API_DOMAIN")}
 VITE_SUPABASE_PUBLISHABLE_KEY=${ref("SUPABASE_PUBLISHABLE_KEY")}
 FRONT_HTTP_PORT=${ref("FRONT_HTTP_PORT")}
-# Facultatif : clé d'accès Unsplash (« Access Key », jamais la « Secret Key ») pour les photos de
-# fond de Buroh ; sans clé, sélection de photos intégrée au site
+# Facultatif : clé d'accès Unsplash (« Access Key », jamais la « Secret Key »), une seule pour tout
+# le site, jamais demandée aux visiteurs. Elle permet à chacun de choisir sa collection Unsplash ;
+# sans elle, Buroh garde ses dégradés et les photos d'une sélection intégrée au site
 VITE_UNSPLASH_ACCESS_KEY=
 # Moteurs de recherche : seule la prod (« live ») est indexée
 ROBOTS_TAG=${name === "live" ? "" : "noindex, nofollow"}

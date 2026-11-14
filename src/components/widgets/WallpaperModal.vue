@@ -414,8 +414,8 @@ watch(
               </h-input-group>
             </h-form-item>
             <h-alert v-if="!hasUnsplashKey" :bordered="false" class="note" type="info">
-              Photos d'une sélection Unsplash intégrée au site. Choisir une collection demande une
-              clé d'API Unsplash (voir le README).
+              Photos choisies parmi une sélection Unsplash du site, renouvelées selon le rythme
+              ci-dessous.
             </h-alert>
             <h-form-item label="Nouvelle photo">
               <h-select
