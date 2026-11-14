@@ -154,7 +154,7 @@ function refreshVideo(current: VideosWallpaper) {
 async function refreshPhoto(current: UnsplashWallpaper) {
   if (isStale(current.photo?.fetchedAt, current.frequency)) {
     try {
-      const photo = await fetchRandomPhoto(current);
+      const photo = await fetchRandomPhoto(current, store.unsplashKey);
 
       // Fond inchangé pendant la requête
       if (store.wallpaper === current) {

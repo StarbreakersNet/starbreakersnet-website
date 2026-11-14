@@ -158,6 +158,12 @@ export function parseUnsplashCollection(input: string): string | null {
   return /^[A-Za-z0-9_-]{1,40}$/.test(id) ? id : null;
 }
 
+export function normalizeUnsplashKey(raw: unknown) {
+  const key = typeof raw === "string" ? raw.trim() : "";
+
+  return /^[A-Za-z0-9_-]{20,100}$/.test(key) ? key : "";
+}
+
 const PAGE_LOADED_AT = Date.now();
 
 // Photo ou vidéo à renouveler selon le rythme choisi, d'après la date où elle a été choisie

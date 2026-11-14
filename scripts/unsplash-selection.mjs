@@ -1,20 +1,10 @@
 #!/usr/bin/env node
-// Génère la sélection de photos Unsplash de Buroh (src/models/unsplashSelection.json) : quelques
-// photos en paysage par thème, prises par l'API officielle d'Unsplash. Elle sert de fond d'écran
-// sans clé d'API, et de secours quand l'API ne répond pas (limite de requêtes atteinte, panne).
+// Génère src/models/unsplashSelection.json, la sélection de photos Unsplash utilisée par Buroh
+// sans clé d'accès. Outil de mainteneur, lancé seulement pour renouveler la sélection :
 //
-//   yarn unsplash:selection [--per-topic 12]
-//
-// Derrière un proxy (HTTPS_PROXY) : NODE_USE_ENV_PROXY=1 yarn unsplash:selection
-//
-// Outil de mainteneur, ni utilisé au build ni au déploiement : le fichier généré est versionné, et
-// le site s'en sert tel quel. Demande VITE_UNSPLASH_ACCESS_KEY (clé d'un développeur, dans
-// l'environnement ou dans le .env du front). À relancer seulement pour renouveler la sélection,
-// puis relire et enregistrer le fichier généré.
-//
-// Aucune dépendance : Node 22.
+//   UNSPLASH_ACCESS_KEY=<clé> yarn unsplash:selection [--per-topic 12]
 
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -22,7 +12,6 @@ import { parseArgs } from "node:util";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUTPUT = join(ROOT, "src/models/unsplashSelection.json");
 
-// Mêmes valeurs que UNSPLASH_TOPICS (src/models/wallpapers.ts)
 const TOPICS = [
   "nature",
   "landscape",
@@ -39,30 +28,7 @@ const { values } = parseArgs({
 });
 const perTopic = Math.min(30, Math.max(1, Number(values["per-topic"]) || 12));
 
-function readKey() {
-  if (process.env.VITE_UNSPLASH_ACCESS_KEY) return process.env.VITE_UNSPLASH_ACCESS_KEY;
-
-  const envFile = join(ROOT, ".env");
-  if (!existsSync(envFile)) return "";
-
-  const line = readFileSync(envFile, "utf8")
-    .split("\n")
-    .find(item => item.startsWith("VITE_UNSPLASH_ACCESS_KEY="));
-
-  return (
-    line
-      ?.slice("VITE_UNSPLASH_ACCESS_KEY=".length)
-      .trim()
-      .replace(/^["']|["']$/g, "") ?? ""
-  );
-}
-
-const key = readKey();
-
-if (!key) {
-  console.error("VITE_UNSPLASH_ACCESS_KEY manquante (environnement ou .env du front)");
-  process.exit(1);
-}
+const key = process.env.UNSPLASH_ACCESS_KEY;
 
 async function searchTopic(topic) {
   const params = new URLSearchParams({
@@ -82,8 +48,7 @@ async function searchTopic(topic) {
 
   const { results } = await response.json();
 
-  // Photos gratuites en paysage (pas d'Unsplash+, sous licence payante), avec les seuls champs utiles
-  // au fond d'écran et au crédit du photographe
+  // Photos gratuites seulement : Unsplash+ est sous licence payante
   return results
     .filter(photo => photo.width > photo.height && !photo.premium && !photo.plus)
     .filter(photo => new URL(photo.urls.raw).hostname === "images.unsplash.com")
@@ -95,12 +60,21 @@ async function searchTopic(topic) {
     }));
 }
 
-const selection = {};
+async function writeSelection() {
+  const selection = {};
 
-for (const topic of TOPICS) {
-  selection[topic] = await searchTopic(topic);
-  console.log(`${topic} : ${selection[topic].length} photos`);
+  for (const topic of TOPICS) {
+    selection[topic] = await searchTopic(topic);
+    console.log(`${topic} : ${selection[topic].length} photos`);
+  }
+
+  writeFileSync(OUTPUT, `${JSON.stringify(selection, null, 2)}\n`);
+  console.log(`Sélection enregistrée dans ${OUTPUT.slice(ROOT.length + 1)}`);
 }
 
-writeFileSync(OUTPUT, `${JSON.stringify(selection, null, 2)}\n`);
-console.log(`Sélection enregistrée dans ${OUTPUT.slice(ROOT.length + 1)}`);
+if (key) {
+  await writeSelection();
+} else {
+  console.error("UNSPLASH_ACCESS_KEY manquante");
+  process.exitCode = 1;
+}

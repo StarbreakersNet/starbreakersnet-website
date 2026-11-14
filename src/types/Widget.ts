@@ -83,6 +83,7 @@ export interface WidgetsDocument {
   version: 1;
   widgets: Widget[];
   wallpaper?: Wallpaper;
+  unsplashKey?: string;
 }
 
 // Widget placé sur la grille (components/widgets/WidgetGrid.vue), en cases

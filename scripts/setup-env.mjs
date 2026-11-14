@@ -273,10 +273,6 @@ function setupDeploy(name, options) {
 VITE_SUPABASE_URL=https://${ref("API_DOMAIN")}
 VITE_SUPABASE_PUBLISHABLE_KEY=${ref("SUPABASE_PUBLISHABLE_KEY")}
 FRONT_HTTP_PORT=${ref("FRONT_HTTP_PORT")}
-# Facultatif : clé d'accès Unsplash (« Access Key », jamais la « Secret Key »), une seule pour tout
-# le site, jamais demandée aux visiteurs. Elle permet à chacun de choisir sa collection Unsplash ;
-# sans elle, Buroh garde ses dégradés et les photos d'une sélection intégrée au site
-VITE_UNSPLASH_ACCESS_KEY=
 # Moteurs de recherche : seule la prod (« live ») est indexée
 ROBOTS_TAG=${name === "live" ? "" : "noindex, nofollow"}
 `
@@ -291,7 +287,6 @@ Créés (non versionnés), à coller dans Dokploy :${
   ${relative(ROOT, frontOut)}  → Environment de l'application « Front »
 
 À compléter dans l'application Supabase : SMTP_USER et SMTP_PASS (boîte mail OVH).
-À compléter dans l'application Front (facultatif) : VITE_UNSPLASH_ACCESS_KEY (clé d'accès Unsplash).
 Studio : admin / ${getVar(content, "DASHBOARD_PASSWORD")}  (à ranger dans le gestionnaire de mots de passe)
 
 Une fois copiés dans Dokploy, supprimez ces fichiers du poste.`);
