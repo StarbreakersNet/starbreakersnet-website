@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, ref, useTemplateRef, watch } from "vue";
+import AnimatedWallpaper from "@/components/widgets/AnimatedWallpaper.vue";
 import HAlert from "@/components/c/hAlert.vue";
 import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
@@ -91,7 +92,12 @@ function onOpen(visible: boolean) {
   }
 }
 
-// --- Dégradés
+// --- Fonds maison : animés d'abord, puis dégradés
+
+const PRESET_GROUPS = [
+  { label: "Animés", presets: WALLPAPER_PRESETS.filter(preset => preset.motion) },
+  { label: "Dégradés", presets: WALLPAPER_PRESETS.filter(preset => !preset.motion) },
+];
 
 function presetPreview(id: string) {
   const preset = WALLPAPER_PRESETS.find(item => item.id === id)!;
@@ -360,21 +366,29 @@ watch(
     preset="card"
     title="Fond d'écran">
     <h-tabs v-model:value="tab" animated type="segment">
-      <h-tab-pane name="presets" tab="Dégradés">
-        <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
-          <h-grid-item v-for="preset in WALLPAPER_PRESETS" :key="preset.id" role="listitem">
-            <h-button
-              :aria-pressed="isPresetSelected(preset.id)"
-              :class="{ selected: isPresetSelected(preset.id) }"
-              class="preset"
-              native-focus-behavior
-              text
-              @click="choosePreset(preset.id)">
-              <span :style="{ background: presetPreview(preset.id) }" class="preview" />
-              <span class="label">{{ preset.label }}</span>
-            </h-button>
-          </h-grid-item>
-        </h-grid>
+      <h-tab-pane name="presets" tab="Fonds maison">
+        <section v-for="group in PRESET_GROUPS" :key="group.label" class="preset-group">
+          <h3 class="group-title">{{ group.label }}</h3>
+          <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
+            <h-grid-item v-for="preset in group.presets" :key="preset.id" role="listitem">
+              <h-button
+                :aria-pressed="isPresetSelected(preset.id)"
+                :class="{ selected: isPresetSelected(preset.id) }"
+                class="preset"
+                native-focus-behavior
+                text
+                @click="choosePreset(preset.id)">
+                <span :style="{ background: presetPreview(preset.id) }" class="preview">
+                  <animated-wallpaper
+                    v-if="preset.motion"
+                    :light="user.settings.theme === 'light'"
+                    :motion="preset.motion" />
+                </span>
+                <span class="label">{{ preset.label }}</span>
+              </h-button>
+            </h-grid-item>
+          </h-grid>
+        </section>
       </h-tab-pane>
       <h-tab-pane name="rotation" tab="Photos et vidéos">
         <h-radio-group v-model:value="rotationKind" class="kind">
@@ -594,6 +608,17 @@ watch(
   &:focus-visible .preview {
     outline-color: rgb(10 132 255);
   }
+}
+
+.preset-group + .preset-group {
+  margin-top: 16px;
+}
+
+.group-title {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.6;
 }
 
 .note {

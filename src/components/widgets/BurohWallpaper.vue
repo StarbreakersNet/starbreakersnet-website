@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import AnimatedWallpaper from "@/components/widgets/AnimatedWallpaper.vue";
 import { createBackdrop } from "@/utils/backdrop";
 import { fetchRandomPhoto, withReferral } from "@/utils/unsplash";
 import { loadWallpaperFile } from "@/utils/wallpaperFile";
@@ -39,6 +40,13 @@ const gradient = computed(() => {
   const { dark, light } = preset.gradient;
 
   return user.settings.theme === "light" ? (light ?? dark) : dark;
+});
+
+// Animation du fond maison choisi, s'il en a une
+const motion = computed(() => {
+  const current = wallpaper.value;
+
+  return current.source === "preset" ? (presetById(current.preset).motion ?? null) : null;
 });
 
 // --- Média affiché par-dessus
@@ -219,6 +227,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div aria-hidden="true" class="wallpaper" :style="{ background: gradient }">
+    <animated-wallpaper v-if="motion" :light="user.settings.theme === 'light'" :motion="motion" />
     <template v-if="media && !failed">
       <img
         v-if="media.kind === 'image'"
