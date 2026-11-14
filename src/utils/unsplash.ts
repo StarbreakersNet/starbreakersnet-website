@@ -1,25 +1,44 @@
+import SELECTION from "@/models/unsplashSelection.json";
 import type { UnsplashPhoto } from "@/types/Wallpaper";
 
 // Photos Unsplash pour le fond d'écran de Buroh.
 // - Avec une clé d'API (VITE_UNSPLASH_ACCESS_KEY, gratuite sur unsplash.com/developers) : photo au
 //   hasard dans un thème ou une collection, par l'API officielle, avec le suivi de téléchargement
 //   qu'elle demande.
-// - Sans clé : photo au hasard parmi celles d'Unsplash reprises par Lorem Picsum (picsum.photos),
-//   gratuit et sans clé, mais sans choix de thème.
-// Dans les deux cas, l'image est affichée depuis le CDN d'origine et le photographe est crédité,
+// - Sans clé, ou quand l'API ne répond pas (limite de requêtes atteinte, panne) : photo au hasard
+//   dans la sélection intégrée au site, par thème (src/models/unsplashSelection.json, générée par
+//   `yarn unsplash:selection`).
+// Dans les deux cas, l'image est affichée depuis le CDN d'Unsplash et le photographe est crédité,
 // comme le demandent les conditions d'Unsplash.
 
 const ACCESS_KEY = import.meta.env.VITE_UNSPLASH_ACCESS_KEY;
 const API_URL = "https://api.unsplash.com";
-const PICSUM_URL = "https://picsum.photos";
+const SITE_URL = "https://unsplash.com";
 // Paramètres de suivi demandés par Unsplash sur les liens de crédit
 const REFERRAL = "utm_source=starbreakersnet&utm_medium=referral";
 
 export const hasUnsplashKey = Boolean(ACCESS_KEY);
 
+interface SelectionPhoto {
+  id: string;
+  // Adresse « raw » du CDN d'Unsplash, à compléter par la taille voulue
+  raw: string;
+  author: string;
+  username: string;
+}
+
+const selection: Record<string, SelectionPhoto[]> = SELECTION;
+
 // Largeur demandée : celle de l'écran en pixels réels, plafonnée
 function screenWidth() {
   return Math.min(3840, Math.round(window.screen.width * (window.devicePixelRatio || 1)));
+}
+
+// Image du CDN d'Unsplash à la largeur de l'écran
+function imageUrl(raw: string) {
+  const separator = raw.includes("?") ? "&" : "?";
+
+  return `${raw}${separator}w=${screenWidth()}&q=80&fm=jpg&fit=crop`;
 }
 
 export function withReferral(url: string) {
@@ -44,7 +63,7 @@ async function fromApi({ topic, collection }: PhotoQuery): Promise<UnsplashPhoto
 
   return {
     id: photo.id,
-    url: `${photo.urls.raw}&w=${screenWidth()}&q=80&fm=jpg&fit=crop`,
+    url: imageUrl(photo.urls.raw),
     author: photo.user.name,
     photoUrl: photo.links.html,
     authorUrl: photo.user.links.html,
@@ -52,30 +71,22 @@ async function fromApi({ topic, collection }: PhotoQuery): Promise<UnsplashPhoto
   };
 }
 
-async function fromPicsum(): Promise<UnsplashPhoto> {
-  // Une page au hasard de la liste, puis une photo en paysage au hasard dans cette page
-  const page = 1 + Math.floor(Math.random() * 10);
-  const response = await fetch(`${PICSUM_URL}/v2/list?page=${page}&limit=100`);
-  if (!response.ok) throw new Error(`Lorem Picsum : ${response.status}`);
+// Photo au hasard de la sélection du thème (toute la sélection si le thème n'y est pas), autre que
+// la photo affichée
+function fromSelection({ topic, photo }: PhotoQuery): UnsplashPhoto {
+  const all = Object.values(selection).flat();
+  const pool = selection[topic]?.length ? selection[topic] : all;
+  const others = pool.filter(item => item.id !== photo?.id);
+  const choices = others.length ? others : pool;
+  const picked = choices[Math.floor(Math.random() * choices.length)];
+  if (!picked) throw new Error("Sélection Unsplash vide");
 
-  const list = (await response.json()) as {
-    id: string;
-    author: string;
-    width: number;
-    height: number;
-    url: string;
-  }[];
-  const landscapes = list.filter(item => item.width > item.height);
-  const photo = landscapes[Math.floor(Math.random() * landscapes.length)];
-  if (!photo) throw new Error("Lorem Picsum : aucune photo");
-
-  const width = screenWidth();
   return {
-    id: `picsum-${photo.id}`,
-    url: `${PICSUM_URL}/id/${photo.id}/${width}/${Math.round((width * 9) / 16)}`,
-    author: photo.author,
-    photoUrl: photo.url,
-    authorUrl: null,
+    id: picked.id,
+    url: imageUrl(picked.raw),
+    author: picked.author,
+    photoUrl: `${SITE_URL}/photos/${picked.id}`,
+    authorUrl: `${SITE_URL}/@${picked.username}`,
     fetchedAt: new Date().toISOString(),
   };
 }
@@ -83,8 +94,18 @@ async function fromPicsum(): Promise<UnsplashPhoto> {
 export interface PhotoQuery {
   topic: string;
   collection: string;
+  // Photo affichée, pour en proposer une autre
+  photo?: { id: string } | null;
 }
 
-export function fetchRandomPhoto(query: PhotoQuery): Promise<UnsplashPhoto> {
-  return hasUnsplashKey ? fromApi(query) : fromPicsum();
+export async function fetchRandomPhoto(query: PhotoQuery): Promise<UnsplashPhoto> {
+  if (hasUnsplashKey) {
+    try {
+      return await fromApi(query);
+    } catch (error) {
+      console.warn("API Unsplash indisponible, photo de la sélection intégrée", error);
+    }
+  }
+
+  return fromSelection(query);
 }

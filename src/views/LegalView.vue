@@ -180,9 +180,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                     confidentialité renforcée ». Sur Buroh, les icônes du widget Liens viennent de
                     DuckDuckGo, qui ne reçoit que le nom de domaine de chaque lien, et la météo
                     d'Open-Meteo, qui ne reçoit que les coordonnées de la ville choisie. Les photos
-                    de fond d'écran viennent d'Unsplash (directement ou par Lorem Picsum) ; une
-                    image ou une vidéo donnée par son adresse est chargée depuis le site qui
-                    l'héberge.
+                    de fond d'écran viennent d'Unsplash ; une image ou une vidéo donnée par son
+                    adresse est chargée depuis le site qui l'héberge.
                   </h-text>
                 </h-flex>
               </template>

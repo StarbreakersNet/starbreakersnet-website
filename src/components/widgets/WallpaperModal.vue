@@ -383,41 +383,39 @@ watch(
         </h-radio-group>
         <template v-if="rotationKind === 'photos'">
           <h-form :model="unsplashForm" label-placement="top">
-            <template v-if="hasUnsplashKey">
-              <h-form-item label="Photos">
-                <h-radio-group :value="unsplashForm.selection" @update:value="chooseSelection">
-                  <h-radio-button value="topic">D'un thème</h-radio-button>
-                  <h-radio-button value="collection">D'une collection</h-radio-button>
-                </h-radio-group>
-              </h-form-item>
-              <h-form-item v-if="unsplashForm.selection === 'topic'" label="Thème">
-                <h-select
-                  :options="UNSPLASH_TOPICS"
-                  :value="unsplashForm.topic"
-                  @update:value="updateTopic" />
-              </h-form-item>
-              <h-form-item
-                v-else
-                :feedback="collectionError"
-                :validation-status="collectionError ? 'error' : undefined"
-                label="Collection">
-                <h-input-group>
-                  <h-input
-                    v-model:value="unsplashForm.collection"
-                    placeholder="https://unsplash.com/collections/…"
-                    @keydown.enter.prevent="applyCollection" />
-                  <h-button
-                    :disabled="!unsplash || !unsplashForm.collection.trim()"
-                    type="primary"
-                    @click="applyCollection">
-                    Appliquer
-                  </h-button>
-                </h-input-group>
-              </h-form-item>
-            </template>
-            <h-alert v-else :bordered="false" class="note" type="info">
-              Photos au hasard parmi celles d'Unsplash proposées par Lorem Picsum. Choisir un thème
-              ou une collection demande une clé d'API Unsplash (voir le README).
+            <h-form-item v-if="hasUnsplashKey" label="Photos">
+              <h-radio-group :value="unsplashForm.selection" @update:value="chooseSelection">
+                <h-radio-button value="topic">D'un thème</h-radio-button>
+                <h-radio-button value="collection">D'une collection</h-radio-button>
+              </h-radio-group>
+            </h-form-item>
+            <h-form-item v-if="!hasUnsplashKey || unsplashForm.selection === 'topic'" label="Thème">
+              <h-select
+                :options="UNSPLASH_TOPICS"
+                :value="unsplashForm.topic"
+                @update:value="updateTopic" />
+            </h-form-item>
+            <h-form-item
+              v-else
+              :feedback="collectionError"
+              :validation-status="collectionError ? 'error' : undefined"
+              label="Collection">
+              <h-input-group>
+                <h-input
+                  v-model:value="unsplashForm.collection"
+                  placeholder="https://unsplash.com/collections/…"
+                  @keydown.enter.prevent="applyCollection" />
+                <h-button
+                  :disabled="!unsplash || !unsplashForm.collection.trim()"
+                  type="primary"
+                  @click="applyCollection">
+                  Appliquer
+                </h-button>
+              </h-input-group>
+            </h-form-item>
+            <h-alert v-if="!hasUnsplashKey" :bordered="false" class="note" type="info">
+              Photos d'une sélection Unsplash intégrée au site. Choisir une collection demande une
+              clé d'API Unsplash (voir le README).
             </h-alert>
             <h-form-item label="Nouvelle photo">
               <h-select

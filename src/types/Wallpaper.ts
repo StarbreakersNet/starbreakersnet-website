@@ -9,7 +9,7 @@ export type RotationFrequency = "visit" | "hour" | "day" | "pause";
 
 export interface UnsplashPhoto {
   id: string;
-  // Adresse de l'image à afficher (CDN d'Unsplash ou Lorem Picsum)
+  // Adresse de l'image à afficher (CDN d'Unsplash)
   url: string;
   author: string;
   // Page de la photo sur Unsplash, pour le crédit
