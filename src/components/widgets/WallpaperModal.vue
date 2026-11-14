@@ -92,7 +92,7 @@ function onOpen(visible: boolean) {
   }
 }
 
-// --- Fonds maison : animés d'abord, puis dégradés
+// --- Fonds maison
 
 const PRESET_GROUPS = [
   { label: "Animés", presets: WALLPAPER_PRESETS.filter(preset => preset.motion) },
@@ -368,7 +368,7 @@ watch(
     <h-tabs v-model:value="tab" animated type="segment">
       <h-tab-pane name="presets" tab="Fonds maison">
         <section v-for="group in PRESET_GROUPS" :key="group.label" class="preset-group">
-          <h3 class="group-title">{{ group.label }}</h3>
+          <h-text class="group-title" depth="3" strong tag="h3">{{ group.label }}</h-text>
           <h-grid :cols="PREVIEW_COLUMNS" :x-gap="12" :y-gap="12" responsive="self" role="list">
             <h-grid-item v-for="preset in group.presets" :key="preset.id" role="listitem">
               <h-button
@@ -615,10 +615,9 @@ watch(
 }
 
 .group-title {
+  display: block;
   margin: 0 0 8px;
   font-size: 0.8rem;
-  font-weight: 600;
-  opacity: 0.6;
 }
 
 .note {

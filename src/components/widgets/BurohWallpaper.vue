@@ -42,7 +42,6 @@ const gradient = computed(() => {
   return user.settings.theme === "light" ? (light ?? dark) : dark;
 });
 
-// Animation du fond maison choisi, s'il en a une
 const motion = computed(() => {
   const current = wallpaper.value;
 

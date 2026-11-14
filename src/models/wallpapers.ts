@@ -1,11 +1,9 @@
 import { normalizeUrl } from "@/models/widgets";
 import type { MediaKind, RotationFrequency, UnsplashPhoto, Wallpaper } from "@/types/Wallpaper";
 
-// Animation d'un fond maison, dessinée par AnimatedWallpaper.vue au-dessus du dégradé
 export type WallpaperMotion = "aurora" | "stars" | "waves";
 
-// Préréglages : fonds maison, dégradés avec une variante pour le thème clair au besoin, animés ou
-// non. Le dégradé d'un fond animé reste dessous, et seul affiché avec « Réduire les animations ».
+// Préréglages : fonds maison, avec une variante pour le thème clair au besoin
 export interface WallpaperPreset {
   id: string;
   label: string;

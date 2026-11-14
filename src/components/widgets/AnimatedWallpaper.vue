@@ -1,17 +1,19 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, type PropType } from "vue";
 import type { WallpaperMotion } from "@/models/wallpapers";
 
-// Animation d'un fond maison, dessinée en CSS et SVG au-dessus de son dégradé, à la taille de son
-// conteneur (plein écran dans Buroh, vignette dans la fenêtre Fond d'écran). Seules la position et
-// l'opacité sont animées, pour rester léger ; avec « Réduire les animations », l'image reste fixe.
+const props = defineProps({
+  motion: {
+    type: String as PropType<WallpaperMotion>,
+    required: true,
+  },
+  light: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-const props = defineProps<{
-  motion: WallpaperMotion;
-  light: boolean;
-}>();
-
-// Tirage pseudo-aléatoire à graine fixe : les mêmes étoiles à chaque affichage
+// Graine fixe : les mêmes étoiles à chaque affichage
 function random(seed: number) {
   let state = seed;
 
@@ -24,7 +26,7 @@ function random(seed: number) {
   };
 }
 
-// --- Aurore : grandes taches de couleur qui dérivent lentement
+// --- Aurore
 
 const AURORA_COLORS = {
   dark: [
@@ -43,7 +45,7 @@ const AURORA_COLORS = {
 
 const auroraColors = computed(() => (props.light ? AURORA_COLORS.light : AURORA_COLORS.dark));
 
-// --- Nuit étoilée : étoiles fixes, dont une partie scintille
+// --- Nuit étoilée
 
 const STAR_FIELD = { width: 1600, height: 1000 };
 
@@ -71,7 +73,7 @@ const stars = (() => {
 
 const starColor = computed(() => (props.light ? "rgb(70 80 150)" : "rgb(255 255 255)"));
 
-// --- Vagues : couches de vagues qui défilent, chacune sur deux périodes pour boucler sans saut
+// --- Vagues
 
 const WAVE_PERIOD = 1440;
 const WAVE_HEIGHT = 320;
@@ -250,7 +252,6 @@ const WAVE_LAYERS = [
   }
 }
 
-// Étoile filante : traînée qui traverse en diagonale, puis longue pause invisible
 .shooting-star {
   position: absolute;
   width: 14%;
@@ -328,7 +329,6 @@ const WAVE_LAYERS = [
   }
 }
 
-// Image fixe : chaque élément reste à sa position de départ
 @media (prefers-reduced-motion: reduce) {
   .blob,
   .twinkle,
