@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
-import ViewerBonjourr from "@/components/ViewerBonjourr.vue";
 import ViewerDiscord from "@/components/ViewerDiscord.vue";
 import ViewerYoutube from "@/components/ViewerYoutube.vue";
 import AccountView from "@/views/AccountView.vue";
@@ -16,9 +15,10 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: "/bonjourr",
-      name: "bonjourr",
-      component: ViewerBonjourr,
+      // Buroh, page d'accueil à widgets
+      path: "/buroh",
+      name: "buroh",
+      component: () => import("@/views/BurohView.vue"),
     },
     {
       path: "/discord",

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { readLocalTheme } from "@/lib/localTheme";
+import { readLocalTheme } from "@/utils/localTheme";
 import type { UserSettingsType, UserType } from "@/types/User";
 
 export const useUserStore = defineStore("user", () => {

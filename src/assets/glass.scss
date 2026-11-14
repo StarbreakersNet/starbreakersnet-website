@@ -1,0 +1,106 @@
+// Verre « Liquid Glass » à la manière de macOS, pour Buroh (views/BurohView.vue).
+//
+// Choix de performance : pas de backdrop-filter sur les widgets. Ils reposent sur un fond en
+// dégradé lisse, que le flou ne modifierait presque pas, alors que chaque élément flouté coûte une
+// passe de rendu à chaque image (glisser-déposer compris). L'effet vient de ce qui est peu coûteux :
+// - un remplissage translucide (on voit le fond au travers) ;
+// - un reflet spéculaire : liseré lumineux en haut, plus sombre en bas (ombres internes) ;
+// - un éclat courbe, comme la lumière sur une surface bombée (dégradé radial, sans masque) ;
+// - une ombre portée douce.
+// Seuls les panneaux posés au-dessus de vrais contenus (barre d'outils, galerie) gardent un flou.
+//
+// Réglages d'accessibilité du système respectés : « Réduire la transparence » (surfaces opaques) et
+// « Augmenter le contraste » (bord marqué).
+
+:root {
+  --glass-radius: 26px;
+  --glass-bg: rgb(255 255 255 / 0.1);
+  --glass-bg-strong: rgb(36 30 34 / 0.72);
+  --glass-sheen: rgb(255 255 255 / 0.14);
+  --glass-rim-top: rgb(255 255 255 / 0.45);
+  --glass-rim-bottom: rgb(0 0 0 / 0.18);
+  --glass-hairline: rgb(255 255 255 / 0.12);
+  --glass-shadow: 0 10px 30px rgb(0 0 0 / 0.28);
+  --glass-text: rgb(255 255 255);
+  --glass-text-soft: rgb(255 255 255 / 0.68);
+  --glass-separator: rgb(255 255 255 / 0.14);
+  --glass-control: rgb(255 255 255 / 0.14);
+  --glass-control-hover: rgb(255 255 255 / 0.24);
+
+  &[data-theme="light"] {
+    --glass-bg: rgb(255 255 255 / 0.45);
+    --glass-bg-strong: rgb(255 255 255 / 0.8);
+    --glass-sheen: rgb(255 255 255 / 0.55);
+    --glass-rim-top: rgb(255 255 255 / 0.95);
+    --glass-rim-bottom: rgb(120 60 80 / 0.12);
+    --glass-hairline: rgb(255 255 255 / 0.6);
+    --glass-shadow: 0 10px 30px rgb(60 20 40 / 0.14);
+    --glass-text: rgb(29 29 31);
+    --glass-text-soft: rgb(29 29 31 / 0.62);
+    --glass-separator: rgb(29 29 31 / 0.1);
+    --glass-control: rgb(29 29 31 / 0.07);
+    --glass-control-hover: rgb(29 29 31 / 0.13);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    --glass-bg: rgb(48 36 40);
+    --glass-bg-strong: rgb(48 36 40);
+    --glass-sheen: transparent;
+
+    &[data-theme="light"] {
+      --glass-bg: rgb(246 240 242);
+      --glass-bg-strong: rgb(246 240 242);
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    --glass-hairline: rgb(255 255 255 / 0.6);
+
+    &[data-theme="light"] {
+      --glass-hairline: rgb(29 29 31 / 0.5);
+    }
+  }
+}
+
+.liquid-glass {
+  position: relative;
+  isolation: isolate;
+  color: var(--glass-text);
+  border-radius: var(--glass-radius);
+  // Éclat courbe en haut à gauche, par-dessus le remplissage translucide
+  background:
+    radial-gradient(120% 90% at 0% 0%, var(--glass-sheen), transparent 55%), var(--glass-bg);
+  box-shadow:
+    var(--glass-shadow),
+    inset 0 1px 0 var(--glass-rim-top),
+    inset 0 -1px 0 var(--glass-rim-bottom),
+    inset 0 0 0 1px var(--glass-hairline);
+
+  // Panneau posé au-dessus d'autres contenus (barre d'outils, galerie) : flou réel, un seul élément
+  &.liquid-glass--overlay {
+    background:
+      radial-gradient(120% 90% at 0% 0%, var(--glass-sheen), transparent 55%),
+      var(--glass-bg-strong);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+// Bouton en verre : <h-button glass> (components/c/hButton.vue). Couleurs et tailles passées à
+// Naive UI par le wrapper ; ici, ce que Naive ne propose pas : enfoncement au clic et contour au
+// clavier.
+.n-button.h-button--glass {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgb(10 132 255);
+    outline-offset: 2px;
+  }
+}

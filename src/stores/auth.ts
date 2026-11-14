@@ -6,12 +6,13 @@ import {
   type Session,
   type User,
 } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabaseClient";
-import { getAuthErrorMessage } from "@/lib/authErrors";
-import { APP_LOCALE } from "@/lib/locale";
+import { supabase } from "@/utils/supabaseClient";
+import { getAuthErrorMessage } from "@/utils/authErrors";
+import { APP_LOCALE } from "@/utils/locale";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";
+import { useWidgetsStore } from "@/stores/widgets";
 import type { UserType } from "@/types/User";
 
 type ProfileUpdate = Pick<UserType, "username" | "firstName" | "lastName">;
@@ -29,6 +30,7 @@ const PASSWORD_RESET_TEXT =
 export const useAuthStore = defineStore("auth", () => {
   const user = useUserStore();
   const settings = useSettingsStore();
+  const widgets = useWidgetsStore();
   const message = useMessage();
 
   // Passe à true quand on sait s'il y a une session (et que le profil est chargé s'il y en a une)
@@ -52,12 +54,14 @@ export const useAuthStore = defineStore("auth", () => {
     passwordRecovery.value = false;
     user.infos.connected = false;
     user.infos.me = null;
+    widgets.unload();
   }
 
   async function fetchUser(authUser: User) {
     const [{ data: profile, error }] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", authUser.id).single(),
       settings.load(authUser.id),
+      widgets.load(authUser.id),
     ]);
 
     user.infos.connected = true;

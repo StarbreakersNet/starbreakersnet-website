@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { supabase } from "@/lib/supabaseClient";
-import { writeLocalTheme } from "@/lib/localTheme";
+import { supabase } from "@/utils/supabaseClient";
+import { writeLocalTheme } from "@/utils/localTheme";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import type { ThemeType } from "@/types/User";

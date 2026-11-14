@@ -8,7 +8,7 @@ import HFlex from "@/components/c/hFlex.vue";
 import HButton from "@/components/c/hButton.vue";
 import HText from "@/components/c/hText.vue";
 import { useAuthStore } from "@/stores/auth";
-import { emailRule } from "@/lib/validation";
+import { emailRule } from "@/utils/validation";
 
 const props = defineProps({
   email: {

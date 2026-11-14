@@ -1,7 +1,7 @@
 export interface UserType {
   id?: string;
   username: string | null;
-  // Numéro qui distingue les membres ayant le même pseudo (formatUserTag, src/lib/userTag.ts)
+  // Numéro qui distingue les membres ayant le même pseudo (formatUserTag, src/utils/userTag.ts)
   tag?: number | null;
   email: string | null;
   // Nouvelle adresse en attente de confirmation (double confirmation de GoTrue)

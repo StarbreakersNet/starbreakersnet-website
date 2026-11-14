@@ -10,7 +10,7 @@ import { useAuthStore } from "@/stores/auth.ts";
 import { useUserStore } from "@/stores/user.ts";
 import { useSettingsStore } from "@/stores/settings.ts";
 import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
-import { formatUserTag } from "@/lib/userTag.ts";
+import { formatUserTag } from "@/utils/userTag.ts";
 
 const auth = useAuthStore();
 const user = useUserStore();

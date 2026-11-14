@@ -1,0 +1,100 @@
+// Mise en forme du texte d'une note, commune à son affichage (MarkdownWidget.vue) et à son éditeur
+// (NoteEditor.vue). TipTap ne fournit aucun style (éditeur « headless ») et la remise à zéro de
+// Tailwind efface celle du navigateur : titres, listes, citations et code la retrouvent ici.
+// À inclure dans un composant scoped, le HTML étant produit par TipTap :
+//   @use "@/assets/markdown";
+//   .note { @include markdown.content; }
+@mixin content {
+  :deep(h1),
+  :deep(h2),
+  :deep(h3) {
+    margin: 0 0 0.4em;
+    font-weight: 700;
+    line-height: 1.2;
+    color: inherit;
+  }
+
+  :deep(h1) {
+    font-size: 1.45em;
+  }
+
+  :deep(h2) {
+    font-size: 1.2em;
+  }
+
+  :deep(h3) {
+    font-size: 1.05em;
+  }
+
+  :deep(p),
+  :deep(ul),
+  :deep(ol),
+  :deep(blockquote),
+  :deep(pre) {
+    margin: 0 0 0.6em;
+  }
+
+  :deep(ul),
+  :deep(ol) {
+    padding-left: 1.3em;
+  }
+
+  // Points de liste serrés, même quand chacun est un paragraphe (éditeur, listes « aérées »)
+  :deep(li > p) {
+    margin: 0;
+  }
+
+  :deep(ul) {
+    list-style: disc;
+  }
+
+  :deep(ol) {
+    list-style: decimal;
+  }
+
+  :deep(strong) {
+    font-weight: 700;
+  }
+
+  :deep(em) {
+    font-style: italic;
+  }
+
+  :deep(a) {
+    color: rgb(10 132 255);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  :deep(code) {
+    padding: 0.1em 0.35em;
+    border-radius: 6px;
+    background: var(--glass-control);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.88em;
+  }
+
+  :deep(pre) {
+    padding: 0.6em 0.8em;
+    border-radius: 10px;
+    background: var(--glass-control);
+    white-space: pre-wrap;
+
+    code {
+      padding: 0;
+      background: none;
+    }
+  }
+
+  :deep(blockquote) {
+    padding-left: 0.8em;
+    border-left: 3px solid var(--glass-separator);
+    color: var(--glass-text-soft);
+  }
+
+  :deep(hr) {
+    margin: 0.8em 0;
+    border: none;
+    border-top: 1px solid var(--glass-separator);
+  }
+}

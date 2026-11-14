@@ -38,7 +38,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
 - **pas de `container_name` fixe** : beta et live tournent sur le même serveur ;
 - **données dans des volumes nommés** (`db-data`, `storage-data`, `studio-snippets`) : Dokploy vide le dossier du code à chaque déploiement ;
 - **Edge Functions et Supavisor désactivés** : réactivables en retirant leurs lignes ;
-- **règles de mot de passe** de GoTrue : 8 caractères minimum, avec minuscule, majuscule et chiffre, alignées avec `src/lib/validation.ts` ;
+- **règles de mot de passe** de GoTrue : 8 caractères minimum, avec minuscule, majuscule et chiffre, alignées avec `src/utils/validation.ts` ;
 - **mails d'authentification en français** (ou en anglais selon `user_metadata.locale`) : modèles de `supabase/templates`, servis à GoTrue par le service interne `mail-templates` (image nginx reconstruite à chaque `up`), et objets des mails ;
 - **service `migrations`** : vérifie les secrets, puis applique `supabase/migrations`. La passerelle (et donc l'API et Studio) ne démarre que s'il réussit.
 
@@ -306,28 +306,22 @@ Services actifs : `db`, `auth`, `rest`, `realtime`, `storage`, `imgproxy`, `meta
 
 ## Intégrations
 
-### Bonjourr
+### Buroh (`/buroh`)
 
-Bonjourr est une page d'accueil pour votre navigateur Internet inspirée par l'apparence d'iOS.
-Bien qu'elle se veuille minimale, elle vous offre de nombreuses options pour la personnaliser à votre guise. Voici quelques fonctionnalités :
+Buroh est la page d'accueil personnelle à widgets du site, dans l'esprit des widgets de macOS, avec un style « Liquid Glass ». Elle remplace l'ancienne intégration de Bonjourr. Code : `src/views/BurohView.vue` (route `buroh`) et `src/components/widgets/`.
 
-- 🍏 Langage de conception iOS
-- 🏞 Arrière-plans 4K dynamiques qui changent en fonction de l'humeur du jour
-- ⚡️ Rapide et léger !
-- 🔎 Barre de recherche (compatible avec tous les moteurs de recherche)
-- 🕰 Horloge analogique avec plusieurs visages d'horloge
-- 🌤 Météo
-- 🔗 Liens rapides
-- 👋 Vous accueille par votre nom
-- 🌘 Mode sombre
-- 🥖 Emoji comme favicon
-- 🧑‍💻 Style CSS personnalisé
-- 📝 Polices personnalisées
-- 🔒 Privacy focused
-- 🌎 Multilanguage
-
-<h1 align="center">
-  <a href="https://github.com/victrme/Bonjourr">
-    <img src="https://raw.githubusercontent.com/victrme/Bonjourr/master/src/assets/bonjourr.png" width="50%" alt="site web de Bonjourr">
-  </a>
-</h1>
+- **Grille libre** ([gridstack.js](https://gridstackjs.com), `src/components/widgets/WidgetGrid.vue`) : en mode « Modifier les widgets », on ajoute un widget depuis la galerie (type et taille : petit, moyen, grand), on le déplace par glisser-déposer, à la souris ou au doigt, on le règle ou on le supprime. Au toucher, un widget se saisit par un appui long (300 ms) : un doigt qui glisse aussitôt fait défiler la page.
+- **Mobile** (moins de 720 px de large) : grille de 4 colonnes (deux petits widgets par ligne, les autres sur toute la largeur), réordonnable comme l'écran d'accueil d'un téléphone. Sa disposition est enregistrée à part (`mobile` sur chaque widget) et ne change pas celle de l'ordinateur ; tant qu'on n'a rien déplacé sur mobile, les widgets suivent l'ordre de lecture de l'ordinateur. La galerie s'ouvre avec le bouton « + ».
+- **Widgets** : Horloge, Note (texte enregistré en Markdown, édité et affiché avec [TipTap](https://tiptap.dev), qui n'en garde que les balises connues de l'éditeur), Liens (icônes DuckDuckGo), Météo ([Open-Meteo](https://open-meteo.com), sans clé), Compte à rebours, Calendrier. Idées reprises de [Homarr](https://github.com/homarr-labs/homarr), code écrit pour le site.
+- **Pas d'ascenseur dans les widgets** : les widgets à contenu fixe (horloge, météo, calendrier, compte à rebours) sont dimensionnés en unités `cqh`, relatives à la hauteur du cadre. Les widgets à contenu libre (note, liens) réduisent leur contenu juste assez pour tenir (`useFitContent`) ; si on le modifie et qu'il ne tient plus qu'en devenant trop petit, le widget passe à la taille du dessus. Au-delà de la plus grande taille, la fin s'estompe.
+- **Liquid Glass sans surcoût** (`src/assets/glass.scss`) : pas de `backdrop-filter` sur les widgets, qui reposent sur un fond en dégradé que le flou ne changerait presque pas. L'effet vient du remplissage translucide, du reflet spéculaire (ombres internes), d'un éclat courbe (dégradé radial) et d'une ombre douce. Seuls la barre d'outils et la galerie, posées au-dessus des widgets, gardent un flou. Les réglages « Réduire la transparence » et « Augmenter le contraste » du système sont respectés.
+- **Barre d'outils discrète** : « Fond d'écran » et « Modifier les widgets » s'effacent après 1,5 seconde sans activité, et reviennent au moindre mouvement de souris, appui sur une touche ou toucher. Clic droit sur le Buroh : menu « Modifier les widgets » / « Changer le fond d'écran… », comme sur macOS.
+- **Fond d'écran** (`src/models/wallpapers.ts`, `BurohWallpaper.vue`, `WallpaperModal.vue`) :
+  - dégradés, avec une variante pour chaque thème ;
+  - photos Unsplash ou vidéos de la sélection du site, avec les mêmes options : renouvelées à chaque visite, toutes les heures, chaque jour, ou fixes, avec leur crédit. L'API Unsplash ne propose pas de vidéos : la sélection est une liste choisie pour le site (`WALLPAPER_VIDEOS` dans `src/models/wallpapers.ts`). Pour ajouter une vidéo : déposer le fichier dans `public/` (boucle courte, WebM ou MP4, 20 Mo au plus de préférence) ou utiliser l'adresse d'une vidéo libre de droits, puis l'ajouter à la liste avec son crédit.
+  - photos Unsplash : avec `VITE_UNSPLASH_ACCESS_KEY` (clé d'accès gratuite, [unsplash.com/developers](https://unsplash.com/developers)), choix d'un thème ou d'une collection Unsplash (adresse ou identifiant) par l'API officielle ; sans clé, photos Unsplash au hasard via [Lorem Picsum](https://picsum.photos) ;
+  - image ou vidéo par son adresse, ou fichier de l'ordinateur (100 Mo au maximum), gardé dans le navigateur (IndexedDB) sans être envoyé au serveur ;
+  - vidéos lues en boucle et sans son ; avec « Réduire les animations », seule la première image s'affiche.
+- **Verre sur une photo** : une miniature floue du fond est calculée une seule fois (`src/utils/backdrop.ts`) et affichée derrière chaque widget, alignée sur le fond (`background-attachment: fixed`) : effet de verre dépoli sans `backdrop-filter`. Sur une vidéo, ou une image d'un site qui en interdit la lecture (CORS), le verre est simplement plus couvrant.
+- **Enregistrement** : dans le navigateur pour les visiteurs, et sur le compte pour les membres connectés (colonne `user_settings.widgets`, fond d'écran compris), comme le thème. Voir `src/stores/widgets.ts`.
+- **Ajouter un type de widget** : le déclarer dans `src/types/Widget.ts` et `src/models/widgets.ts` (métadonnées, tailles, réglages par défaut, validation), puis ajouter son affichage et son formulaire de réglages dans `src/components/widgets/registry.ts`. Son contenu doit tenir sans ascenseur : tailles en `cqh`, ou `useFitContent`.
