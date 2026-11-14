@@ -40,10 +40,7 @@ export interface WeatherLocation {
 }
 
 export interface WeatherSettings {
-  // Ville cherchée dans les réglages, ou position de l'appareil (« Ma position »), demandée
-  // seulement au clic sur le bouton des réglages
   mode: "city" | "device";
-  // Ville choisie, ou dernière position connue, aux coordonnées arrondies (~1 km)
   location: WeatherLocation;
   unit: "celsius" | "fahrenheit";
 }

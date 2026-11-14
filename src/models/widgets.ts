@@ -101,7 +101,6 @@ export const WIDGET_DEFINITIONS: { [T in WidgetType]: WidgetDefinition<T> } = {
     }),
     normalize: raw => {
       const location = normalizeLocation(raw.location);
-      // Réglages d'avant « Ma position » : pas de mode, donc une ville
       const mode = location && raw.mode === "device" ? "device" : "city";
 
       return {

@@ -35,14 +35,12 @@ const feedback = computed(() => {
   return failed.value ? "Recherche indisponible, réessayez plus tard" : "";
 });
 
-// Nom affiché pour la position de l'appareil (pas de géocodage inverse)
 const DEVICE_NAME = "Ma position";
 
 function locationLabel(location: WeatherLocation) {
   return location.detail ? `${location.name}, ${location.detail}` : location.name;
 }
 
-// Ville ou position actuelle en tête, puis les résultats de la recherche
 const options = computed(() => [
   {
     label: settings.value.mode === "device" ? DEVICE_NAME : locationLabel(settings.value.location),
@@ -90,8 +88,6 @@ function select(value: string) {
   }
 }
 
-// Position demandée seulement ici, au clic : jamais à l'ouverture de la page. Échec (refus, délai,
-// page hors HTTPS…) : message, et la ville ou la position d'avant reste affichée.
 async function locate() {
   locating.value = true;
   locateError.value = "";
@@ -160,7 +156,6 @@ onBeforeUnmount(() => searchLater.cancel());
 </template>
 
 <style lang="scss" scoped>
-// Petit écran : bouton réduit à son icône, pour laisser la place au nom de la ville
 @media (max-width: 480px) {
   .locate-label {
     display: none;

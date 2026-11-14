@@ -17,14 +17,11 @@ export interface Forecast {
   days: { date: string; code: number; max: number; min: number }[];
 }
 
-// Position de l'appareil : attente maximale, et âge accepté d'une position déjà connue du navigateur
 const LOCATE_TIMEOUT = 10 * 1000;
 const LOCATE_MAX_AGE = 10 * 60 * 1000;
 
 const cache = new Map<string, { at: number; promise: Promise<Forecast> }>();
 
-// Coordonnées arrondies à 2 décimales (~1 km) : assez pour la météo, sans enregistrer sur le compte
-// ni envoyer à Open-Meteo l'adresse précise de l'appareil
 export function roundCoordinates({ latitude, longitude }: { latitude: number; longitude: number }) {
   const round = (value: number) => Math.round(value * 100) / 100;
 
@@ -88,8 +85,6 @@ export async function searchCities(query: string): Promise<WeatherLocation[]> {
   }));
 }
 
-// Position de l'appareil, demandée au navigateur (qui demande l'autorisation la première fois) et
-// arrondie. Échec : erreur au message court et lisible (« Position refusée par le navigateur »).
 export function locateDevice(): Promise<{ latitude: number; longitude: number }> {
   if (!window.isSecureContext) {
     return Promise.reject(new Error("Position disponible seulement en HTTPS"));
