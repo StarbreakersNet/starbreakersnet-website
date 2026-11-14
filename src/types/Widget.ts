@@ -40,6 +40,7 @@ export interface WeatherLocation {
 }
 
 export interface WeatherSettings {
+  mode: "city" | "device";
   location: WeatherLocation;
   unit: "celsius" | "fahrenheit";
 }

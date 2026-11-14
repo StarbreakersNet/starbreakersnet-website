@@ -1,7 +1,8 @@
 import type { WeatherLocation, WeatherSettings } from "@/types/Widget";
 
 // Météo et recherche de villes par Open-Meteo (https://open-meteo.com) : gratuit, sans clé ni
-// compte, appelé depuis le navigateur. Seules les coordonnées de la ville choisie lui sont envoyées.
+// compte, appelé depuis le navigateur. Seules les coordonnées de la ville choisie, ou de la position
+// de l'appareil arrondies à ~1 km, lui sont envoyées.
 
 const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
 const GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search";
@@ -16,9 +17,20 @@ export interface Forecast {
   days: { date: string; code: number; max: number; min: number }[];
 }
 
+const LOCATE_TIMEOUT = 10 * 1000;
+const LOCATE_MAX_AGE = 10 * 60 * 1000;
+
 const cache = new Map<string, { at: number; promise: Promise<Forecast> }>();
 
-export function fetchForecast({ location, unit }: WeatherSettings): Promise<Forecast> {
+export function roundCoordinates({ latitude, longitude }: { latitude: number; longitude: number }) {
+  const round = (value: number) => Math.round(value * 100) / 100;
+
+  return { latitude: round(latitude), longitude: round(longitude) };
+}
+
+export function fetchForecast(settings: WeatherSettings): Promise<Forecast> {
+  const { unit } = settings;
+  const location = roundCoordinates(settings.location);
   const key = `${location.latitude},${location.longitude},${unit}`;
   const cached = cache.get(key);
   if (cached && Date.now() - cached.at < CACHE_DURATION) {
@@ -71,6 +83,34 @@ export async function searchCities(query: string): Promise<WeatherLocation[]> {
     latitude: Number(result.latitude),
     longitude: Number(result.longitude),
   }));
+}
+
+export function locateDevice(): Promise<{ latitude: number; longitude: number }> {
+  if (!window.isSecureContext) {
+    return Promise.reject(new Error("Position disponible seulement en HTTPS"));
+  }
+  if (!("geolocation" in navigator)) {
+    return Promise.reject(new Error("Position non prise en charge par ce navigateur"));
+  }
+
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      position => resolve(roundCoordinates(position.coords)),
+      error => reject(new Error(locateErrorMessage(error))),
+      { enableHighAccuracy: false, timeout: LOCATE_TIMEOUT, maximumAge: LOCATE_MAX_AGE }
+    );
+  });
+}
+
+function locateErrorMessage(error: GeolocationPositionError) {
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      return "Position refusée par le navigateur";
+    case error.TIMEOUT:
+      return "Position introuvable à temps";
+    default:
+      return "Position indisponible";
+  }
 }
 
 // Codes météo WMO, regroupés comme dans l'app Météo : libellé et icône (jour, nuit)

@@ -179,10 +179,10 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                     peuvent déposer leurs propres cookies. La vidéo YouTube est intégrée en mode «
                     confidentialité renforcée ». Sur Buroh, les icônes du widget Liens viennent de
                     DuckDuckGo, qui ne reçoit que le nom de domaine de chaque lien, et la météo
-                    d'Open-Meteo, qui ne reçoit que les coordonnées de la ville choisie. Les photos
-                    de fond d'écran viennent d'Unsplash (directement ou par Lorem Picsum) ; une
-                    image ou une vidéo donnée par son adresse est chargée depuis le site qui
-                    l'héberge.
+                    d'Open-Meteo, qui ne reçoit que les coordonnées de la ville choisie, ou de votre
+                    position arrondies à environ 1 km si vous l'utilisez. Les photos de fond d'écran
+                    viennent d'Unsplash (directement ou par Lorem Picsum) ; une image ou une vidéo
+                    donnée par son adresse est chargée depuis le site qui l'héberge.
                   </h-text>
                 </h-flex>
               </template>
