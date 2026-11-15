@@ -16,7 +16,7 @@ function onClick(item: MenuItem) {
 
 <template>
   <n-flex :size="30" align="center" class="component apple-blurred" justify="center">
-    <div v-for="item in menuItems" class="item">
+    <div v-for="item in menuItems" :key="item.label" class="item">
       <n-button
         :color="item.color"
         :text-color="item.textColor ?? (item.color ? 'white' : '')"

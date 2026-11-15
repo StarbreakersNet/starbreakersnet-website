@@ -1,10 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { nextTick, onMounted, ref, watch } from "vue";
 import { getNaiveOverrideTheme, getNaiveTheme } from "@/composables/appUtils";
 import { vKonami } from "vue-konami";
 import AppLayout from "@/AppLayout.vue";
 import { dateFrFR, frFR } from "naive-ui";
 import { useUserStore } from "@/stores/user";
+import type { ThemeType } from "@/types/User";
 
 const user = useUserStore();
 
@@ -24,7 +25,7 @@ const maintenanceConfig = {
   },
 };
 
-function setAppTheme(newTheme) {
+function setAppTheme(newTheme: ThemeType) {
   theme.value = getNaiveTheme(newTheme);
   themeOverride.value = getNaiveOverrideTheme(newTheme);
 }

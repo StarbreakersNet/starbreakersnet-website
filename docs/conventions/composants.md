@@ -151,7 +151,7 @@ const emit = defineEmits<{
 - Une valeur qui se déduit d'une autre est un `computed`, jamais un `watch` qui recopie.
 - Un `watch` qui doit aussi s'exécuter au montage prend `{ immediate: true }` : on ne recopie pas son code dans `onMounted`.
 - Refs de template : `useTemplateRef<Type>("formRef")` **`lint`**, avec un nom qui finit par `Ref`. Un `ref="…"` inutilisé est retiré. **`lint`**
-- Tout ce qui est démarré au montage (`setInterval`, écouteur sur `window`) est arrêté dans `onBeforeUnmount` (voir `composables/currentTime.js`).
+- Tout ce qui est démarré au montage (`setInterval`, écouteur sur `window`) est arrêté dans `onBeforeUnmount` (voir `composables/currentTime.ts`).
 - Pas d'état partagé dans une variable de module (`let x` hors du composant) : c'est le rôle d'un store.
 
 ### Fonctions

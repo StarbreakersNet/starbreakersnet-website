@@ -52,7 +52,7 @@ const props = defineProps({
     default: undefined,
   },
   inputProps: {
-    type: Object as PropType<Record<string, any>>,
+    type: Object as PropType<InputProps["inputProps"]>,
     default: undefined,
   },
 });

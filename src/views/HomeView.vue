@@ -1,5 +1,5 @@
-<script setup>
-import { carouselListItems } from "@/models/CarouselItem";
+<script setup lang="ts">
+import { type CarouselItem, carouselListItems } from "@/models/CarouselItem";
 import { particlesOptions } from "@/models/ParticlesConfig";
 
 const carouselItemsStyle = carouselListItems.map(item => {
@@ -9,7 +9,7 @@ const carouselItemsStyle = carouselListItems.map(item => {
   return { align, delay };
 });
 
-function calculateDelays(item) {
+function calculateDelays(item: CarouselItem) {
   const baseDelay = 0.1;
   let list;
 
@@ -34,12 +34,12 @@ function calculateDelays(item) {
           <div
             v-if="item.thumbnail"
             :class="{ absolute: item.style.align !== 'center' }"
-            :style="{ transitionDelay: carouselItemsStyle[itemIndex].delay[0] }"
+            :style="{ transitionDelay: carouselItemsStyle[itemIndex]?.delay[0] }"
             class="thumbnail-container">
             <img :alt="item.thumbnail.alt" :src="item.thumbnail.src" class="thumbnail" />
           </div>
           <div
-            :style="{ transitionDelay: carouselItemsStyle[itemIndex].delay[1] }"
+            :style="{ transitionDelay: carouselItemsStyle[itemIndex]?.delay[1] }"
             class="title-container">
             <n-h1>
               {{ item.title }}
@@ -47,14 +47,14 @@ function calculateDelays(item) {
           </div>
           <n-card
             :bordered="false"
-            :style="{ transitionDelay: carouselItemsStyle[itemIndex].delay[2] }"
+            :style="{ transitionDelay: carouselItemsStyle[itemIndex]?.delay[2] }"
             class="description-container card-blurred">
             <n-text>{{ item.description }}</n-text>
           </n-card>
           <n-flex
-            :style="{ transitionDelay: carouselItemsStyle[itemIndex].delay[3] }"
+            :style="{ transitionDelay: carouselItemsStyle[itemIndex]?.delay[3] }"
             class="actions-container">
-            <template v-for="action in item.actions">
+            <template v-for="action in item.actions" :key="action.label">
               <n-button
                 :href="action.externalLink"
                 :tag="action.externalLink ? 'a' : 'button'"

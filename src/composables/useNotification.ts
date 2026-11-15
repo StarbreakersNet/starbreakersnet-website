@@ -13,6 +13,8 @@ import type {
 } from "naive-ui";
 import { computed, h } from "vue";
 
+type SentryWindow = Window & { Sentry?: { captureMessage: (message: string) => void } };
+
 const ERROR_DESCRIPTION =
   "Si le problème persiste, veuillez contacter supporthermes@investissement.valority.com";
 
@@ -103,8 +105,8 @@ export function useNotification() {
     });
 
     // Sentry logging si disponible
-    if (typeof window !== "undefined" && (window as any).Sentry) {
-      (window as any).Sentry.captureMessage(message);
+    if (typeof window !== "undefined") {
+      (window as SentryWindow).Sentry?.captureMessage(message);
     }
 
     if (error instanceof Error) {

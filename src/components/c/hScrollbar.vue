@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { NScrollbar, type ScrollbarInst, type ScrollbarProps } from "naive-ui";
-import { computed, type PropType, ref, useSlots } from "vue";
+import { computed, type CSSProperties, type PropType, ref } from "vue";
 
 const props = defineProps({
   trigger: {
@@ -20,7 +20,7 @@ const props = defineProps({
     default: undefined,
   },
   containerStyle: {
-    type: [String, Object] as PropType<string | Record<string, any>>,
+    type: [String, Object] as PropType<string | CSSProperties>,
     default: undefined,
   },
   contentClass: {
@@ -28,7 +28,7 @@ const props = defineProps({
     default: undefined,
   },
   contentStyle: {
-    type: [String, Object] as PropType<string | Record<string, any>>,
+    type: [String, Object] as PropType<string | CSSProperties>,
     default: undefined,
   },
   size: {
@@ -53,7 +53,6 @@ const props = defineProps({
   },
 });
 defineEmits(["scroll"]);
-const slots = useSlots();
 const scrollbar = ref<ScrollbarInst | null>(null);
 
 // Délégation à NScrollbar en conservant les surcharges de scrollTo / scrollBy

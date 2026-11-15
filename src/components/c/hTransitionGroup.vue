@@ -14,7 +14,7 @@ const props = defineProps({
   },
 });
 
-const elementSizes = new Map();
+const elementSizes = new Map<string, number>();
 const maxDimension = computed(() => `max-${props.mode}`);
 let transitionId = 0;
 
@@ -22,89 +22,105 @@ function generateTransitionId() {
   return `transition-${++transitionId}-${Date.now()}`;
 }
 
-function getElementId(el: any) {
+function getElementId(el: HTMLElement) {
   if (!el.dataset.transitionId) {
     el.dataset.transitionId = generateTransitionId();
   }
   return el.dataset.transitionId;
 }
 
-async function beforeEnter(el: any) {
+function getNaturalSize(el: HTMLElement) {
+  return props.mode === "width" ? el.scrollWidth : el.scrollHeight;
+}
+
+async function beforeEnter(el: Element) {
+  const element = el as HTMLElement;
+
   if (props.mode != null && props.raw) {
     await nextTick();
-    const naturalSize = el[`scroll${props.mode.charAt(0).toUpperCase() + props.mode.slice(1)}`];
+    const naturalSize = getNaturalSize(element);
 
-    el.style[maxDimension.value] = "none";
-    el.style.visibility = "hidden";
+    element.style.setProperty(maxDimension.value, "none");
+    element.style.visibility = "hidden";
 
-    elementSizes.set(getElementId(el), naturalSize);
+    elementSizes.set(getElementId(element), naturalSize);
 
-    el.style[maxDimension.value] = "0";
-    el.style.visibility = "visible";
+    element.style.setProperty(maxDimension.value, "0");
+    element.style.visibility = "visible";
   }
 }
 
-async function enter(el: any) {
+async function enter(el: Element) {
+  const element = el as HTMLElement;
+
   if (props.mode != null && props.raw) {
     await nextTick();
-    const naturalSize = elementSizes.get(getElementId(el));
+    const naturalSize = elementSizes.get(getElementId(element));
 
     if (naturalSize) {
-      void el.offsetHeight; // Forcer un reflow
+      void element.offsetHeight; // Forcer un reflow
 
-      el.style[maxDimension.value] = naturalSize + "px";
-      el.style.overflow = "hidden";
+      element.style.setProperty(maxDimension.value, naturalSize + "px");
+      element.style.overflow = "hidden";
     } else {
-      console.warn("[hTransitionGroup] enter - Taille non trouvée pour ID:", getElementId(el));
+      console.warn("[hTransitionGroup] enter - Taille non trouvée pour ID:", getElementId(element));
     }
   }
 }
 
-async function afterEnter(el: any) {
+async function afterEnter(el: Element) {
+  const element = el as HTMLElement;
+
   if (props.mode != null && props.raw) {
     await nextTick();
 
-    el.style[maxDimension.value] = "";
-    el.style.overflow = "";
+    element.style.setProperty(maxDimension.value, "");
+    element.style.overflow = "";
 
-    elementSizes.delete(getElementId(el));
+    elementSizes.delete(getElementId(element));
 
-    delete el.dataset.transitionId;
+    delete element.dataset.transitionId;
   }
 }
 
-async function beforeLeave(el: any) {
+async function beforeLeave(el: Element) {
+  const element = el as HTMLElement;
+
   if (props.mode != null && props.raw) {
     await nextTick();
-    const naturalSize = el[`scroll${props.mode.charAt(0).toUpperCase() + props.mode.slice(1)}`];
+    const naturalSize = getNaturalSize(element);
 
-    elementSizes.set(getElementId(el), naturalSize);
+    elementSizes.set(getElementId(element), naturalSize);
 
-    el.style[maxDimension.value] = naturalSize + "px";
-    el.style.overflow = "hidden";
+    element.style.setProperty(maxDimension.value, naturalSize + "px");
+    element.style.overflow = "hidden";
   }
 }
 
-async function leave(el: any) {
+async function leave(el: Element) {
+  const element = el as HTMLElement;
+
   if (props.mode != null && props.raw) {
     await nextTick();
 
-    void el.offsetHeight; // Forcer un reflow
+    void element.offsetHeight; // Forcer un reflow
 
-    el.style[maxDimension.value] = "0";
+    element.style.setProperty(maxDimension.value, "0");
   }
 }
 
-async function afterLeave(el: any) {
+async function afterLeave(el: Element) {
+  const element = el as HTMLElement;
+
   if (props.mode != null && props.raw) {
     await nextTick();
 
-    el.style[maxDimension.value] = "";
-    el.style.overflow = "";
+    element.style.setProperty(maxDimension.value, "");
+    element.style.overflow = "";
 
-    elementSizes.delete(getElementId(el));
+    elementSizes.delete(getElementId(element));
 
-    delete el.dataset.transitionId;
+    delete element.dataset.transitionId;
   }
 }
 </script>

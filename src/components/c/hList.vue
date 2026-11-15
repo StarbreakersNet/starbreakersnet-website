@@ -3,7 +3,7 @@ import HAlert from "@/components/c/hAlert.vue";
 import HListItem from "@/components/c/hListItem.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { type ListProps, NList } from "naive-ui";
-import { computed, type PropType, useSlots } from "vue";
+import { computed, type PropType, useSlots, type VNode } from "vue";
 
 const props = defineProps({
   showDivider: {
@@ -44,12 +44,12 @@ const emit = defineEmits<{
 }>();
 
 defineSlots<{
-  default: () => any;
-  item: (props: { index: number; item: T }) => any;
-  empty: () => any;
-  header: () => any;
-  footer: () => any;
-  suffix: (props: { index: number; item: T }) => any;
+  default: () => VNode[];
+  item: (props: { index: number; item: T }) => VNode[];
+  empty: () => VNode[];
+  header: () => VNode[];
+  footer: () => VNode[];
+  suffix: (props: { index: number; item: T }) => VNode[];
 }>();
 
 const slots = useSlots();
@@ -58,14 +58,14 @@ const isHoverable = computed(() => props.hoverable && (!props.items || props.ite
 
 function getItemHref(item: T): string | undefined {
   if (props.clickable) {
-    return (item as any)?.href;
+    return (item as { href?: string } | undefined)?.href;
   } else {
     return undefined;
   }
 }
 
 function getItemKey(item: T, index: number): string | number {
-  return (item as any)?.id ?? index;
+  return (item as { id?: string | number } | undefined)?.id ?? index;
 }
 
 function handleItemClick(item: T) {

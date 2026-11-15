@@ -183,6 +183,7 @@ onBeforeUnmount(() => {
         :vertical="!props.inline">
         <h-thing
           v-for="block in blockCount"
+          :key="block"
           :class="{
             'skeleton-dark': isDarkTheme,
             'skeleton-background': props.background,

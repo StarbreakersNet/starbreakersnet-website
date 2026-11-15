@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { RouterView, useRoute, useRouter } from "vue-router";
 import MainMenu from "@/components/MainMenu.vue";
 import { onMounted, ref, watch } from "vue";
@@ -23,7 +23,7 @@ const isHome = ref(true);
 const showHeader = ref(false);
 const showFooter = ref(false);
 
-function setUiVisibility(isHome) {
+function setUiVisibility(isHome: boolean) {
   showHeader.value = true;
   showFooter.value = isHome;
 }

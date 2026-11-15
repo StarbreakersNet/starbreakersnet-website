@@ -1,14 +1,12 @@
 <script lang="ts" setup>
 import type { HFormInst } from "@/types/components/c/hForm";
 import _ from "lodash";
-import type { FormRules, FormValidationError } from "naive-ui";
+import type { FormItemRule, FormRules, FormValidationError } from "naive-ui";
 import { onMounted, provide, ref, useTemplateRef, watch } from "vue";
 
+const model = defineModel<object>("model", { required: true });
+
 const props = defineProps({
-  model: {
-    type: Object,
-    required: true,
-  },
   rules: {
     type: Object as () => FormRules,
     default: () => ({}),
@@ -20,16 +18,20 @@ const emit = defineEmits(["submit", "validate"]);
 const naiveFormRef = useTemplateRef<HFormInst>("naiveFormRef");
 
 const isValid = ref(false);
-const initialValues = ref<Record<string, any>>({});
+const initialValues = ref<Record<string, unknown>>({});
 const hasChanges = ref(false);
 
 function reset() {
-  Object.assign(props.model, initialValues.value);
+  const values = model.value as Record<string, unknown>;
+
+  for (const [key, value] of Object.entries(initialValues.value)) {
+    values[key] = value;
+  }
   naiveFormRef.value?.restoreValidation();
   recomputeSilentValidity();
 }
 
-function isEmpty(value: any) {
+function isEmpty(value: unknown) {
   return (
     value == null ||
     (typeof value === "string" && value.trim() === "") ||
@@ -39,26 +41,26 @@ function isEmpty(value: any) {
 
 function computeIsValidSilently() {
   const rules: FormRules = props.rules || {};
-  const model = props.model || ({} as Record<string, any>);
+  const values = (model.value || {}) as Record<string, unknown>;
 
   for (const [path, ruleDef] of Object.entries(rules)) {
-    const ruleList = Array.isArray(ruleDef) ? ruleDef : [ruleDef as any];
+    const ruleList = Array.isArray(ruleDef) ? ruleDef : [ruleDef as FormItemRule];
 
     for (const rule of ruleList) {
       if (!rule) continue;
 
       if (rule.required === true) {
-        const value = (model as any)[path as any];
+        const value = values[path];
         if (isEmpty(value)) return false;
       }
 
       if (rule.validator) {
-        const value = (model as any)[path as any];
+        const value = values[path];
         try {
-          const result = rule.validator(rule, value, () => {});
+          const result = rule.validator(rule, value, () => {}, values, {});
 
           if (result instanceof Error) return false;
-        } catch (error) {
+        } catch {
           return false;
         }
       }
@@ -77,15 +79,15 @@ function handleValidate(errors: Array<FormValidationError> | undefined) {
 }
 
 onMounted(() => {
-  initialValues.value = { ...props.model };
+  initialValues.value = { ...model.value };
   recomputeSilentValidity();
 });
 
 watch(
-  () => props.model,
+  () => model.value,
   () => {
     recomputeSilentValidity();
-    hasChanges.value = !_.isEqual(props.model, initialValues.value);
+    hasChanges.value = !_.isEqual(model.value, initialValues.value);
   },
   { deep: true }
 );

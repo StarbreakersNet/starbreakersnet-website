@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { type FlexProps, NFlex, useThemeVars } from "naive-ui";
-import { type PropType, useAttrs, useSlots } from "vue";
+import { type FlexProps, NFlex } from "naive-ui";
+import type { PropType } from "vue";
 
 const props = defineProps({
   align: {

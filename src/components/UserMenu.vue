@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import TimeClock from "@/components/TimeClock.vue";
 import { computed, h, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -31,7 +31,7 @@ const options = computed(() => {
         type: "render",
         render: () =>
           h("div", { class: "user-identity" }, [
-            h("span", { class: "username" }, me.username),
+            h("span", { class: "username" }, me.username ?? undefined),
             h("span", { class: "tag" }, formatUserTag(me.tag)),
           ]),
       });
@@ -114,7 +114,7 @@ function handleConnected() {
   }
 }
 
-function handleSelect(key) {
+function handleSelect(key: string) {
   switch (key) {
     case "login":
       openLoginModal();

@@ -119,7 +119,7 @@ const props = defineProps({
 const formItemRef = ref<FormItemInst>();
 
 defineExpose({
-  validate: (...args: any[]) => formItemRef.value?.validate(...args),
+  validate: (...args: Parameters<FormItemInst["validate"]>) => formItemRef.value?.validate(...args),
   restoreValidation: () => formItemRef.value?.restoreValidation(),
 });
 </script>
