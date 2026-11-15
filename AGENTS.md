@@ -77,7 +77,7 @@ Lire d'abord le fichier de [`docs/conventions/`](docs/conventions/README.md) qui
 | `import … from "@/stores/auth.ts"` | `import … from "@/stores/auth"` |
 | `@click="$router.push(…)"` | Une fonction qui appelle `router.push` |
 | `supabase.from(…)` dans un composant | Une action de store |
-| `window.$message.error(…)` | `useMessage().error(…)` |
+| `useMessage()` ou `useNotification()` de `naive-ui` | `useAppMessage()` ou `useAppNotification()` |
 | `const saving = ref(false)`, passé à `true` puis à `false` | `const saving = useLoader()` et `await saving.run(…)` |
 | `_.find(items, …)` | `items.find(…)` |
 | `<style scoped></style>` vide | Pas de bloc `<style>` |

@@ -11,11 +11,11 @@ import HInput from "@/components/c/hInput.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HButton from "@/components/c/hButton.vue";
 import { useAuthStore } from "@/stores/auth";
-import { useMessage } from "@/composables/useMessage";
+import { useAppMessage } from "@/composables/useAppMessage";
 import { passwordConfirmationRule, passwordRule } from "@/utils/validation";
 
 const auth = useAuthStore();
-const message = useMessage();
+const message = useAppMessage();
 const route = useRoute();
 const router = useRouter();
 

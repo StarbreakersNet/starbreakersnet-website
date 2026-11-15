@@ -14,6 +14,21 @@ const NO_TS_EXTENSION = {
   message: "Importer sans l'extension .ts (voir docs/conventions/composants.md)",
 };
 
+const NAIVE_FEEDBACK_IMPORTS = {
+  name: "naive-ui",
+  importNames: ["useMessage", "useNotification"],
+  message:
+    "Utiliser useAppMessage ou useAppNotification de @/composables/ (voir docs/conventions/organisation.md)",
+};
+
+const NAIVE_COMPONENT_IMPORTS = {
+  group: ["naive-ui"],
+  importNamePattern: "^N[A-Z]",
+  allowTypeImports: true,
+  message:
+    "Utiliser le wrapper h-* de components/c/, à créer s'il n'existe pas (voir docs/conventions/wrappers.md)",
+};
+
 export default defineConfigWithVueTs(
   {
     name: "app/files-to-lint",
@@ -41,7 +56,10 @@ export default defineConfigWithVueTs(
       "vue/component-name-in-template-casing": ["error", "kebab-case"],
       "vue/no-empty-component-block": "error",
       "vue/require-macro-variable-name": "error",
-      "no-restricted-imports": ["error", { patterns: [NO_TS_EXTENSION] }],
+      "no-restricted-imports": [
+        "error",
+        { paths: [NAIVE_FEEDBACK_IMPORTS], patterns: [NO_TS_EXTENSION] },
+      ],
 
       // Avertissements tant que l'existant n'est pas converti (docs/conventions/mise-en-conformite.md)
       "vue/prefer-use-template-ref": "warn",
@@ -77,18 +95,19 @@ export default defineConfigWithVueTs(
       "no-restricted-imports": [
         "error",
         {
-          patterns: [
-            NO_TS_EXTENSION,
-            {
-              group: ["naive-ui"],
-              importNamePattern: "^N[A-Z]",
-              allowTypeImports: true,
-              message:
-                "Utiliser le wrapper h-* de components/c/, à créer s'il n'existe pas (voir docs/conventions/wrappers.md)",
-            },
-          ],
+          paths: [NAIVE_FEEDBACK_IMPORTS],
+          patterns: [NO_TS_EXTENSION, NAIVE_COMPONENT_IMPORTS],
         },
       ],
+    },
+  },
+
+  // AppLayout est sous les providers de messages et de notifications : il transmet leur API aux composables
+  {
+    name: "app/feedback-providers",
+    files: ["src/AppLayout.vue"],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: [NO_TS_EXTENSION, NAIVE_COMPONENT_IMPORTS] }],
     },
   },
 

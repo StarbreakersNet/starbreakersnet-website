@@ -9,7 +9,7 @@ import {
 import { supabase } from "@/utils/supabaseClient";
 import { getAuthErrorMessage } from "@/utils/authErrors";
 import { APP_LOCALE } from "@/utils/locale";
-import { useMessage } from "@/composables/useMessage";
+import { useAppMessage } from "@/composables/useAppMessage";
 import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";
 import { useWidgetsStore } from "@/stores/widgets";
@@ -31,7 +31,7 @@ export const useAuthStore = defineStore("auth", () => {
   const user = useUserStore();
   const settings = useSettingsStore();
   const widgets = useWidgetsStore();
-  const message = useMessage();
+  const message = useAppMessage();
 
   // Passe à true quand on sait s'il y a une session (et que le profil est chargé s'il y en a une)
   const isReady = ref(false);

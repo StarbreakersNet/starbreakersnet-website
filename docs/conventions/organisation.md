@@ -10,8 +10,8 @@ Les règles marquées **`lint`** sont vérifiées par `yarn lint`.
 | `components/` | Composants de l'application | PascalCase, au moins deux mots : `UserMenu.vue`, `TimeClock.vue` |
 | `views/` | Pages routées et contenus de modale (`LoginView` dans la modale de connexion) | `XxxView.vue` |
 | `stores/` | Stores Pinia, seuls à parler à Supabase | `auth.ts` → `useAuthStore()`, id `"auth"` |
-| `composables/` | Fonctions `useXxx()` qui utilisent la réactivité ou le cycle de vie de Vue | `useXxx.ts` |
-| `utils/` | Fonctions et constantes TypeScript sans réactivité, clients (Supabase). Un fichier par sujet | camelCase, au nom du sujet : `userTag.ts`, jamais `utils.ts` ni `helpers.ts` |
+| `composables/` | Fonctions `useXxx()` liées à l'application en cours : état, service (messages, notifications), réactivité ou cycle de vie de Vue | `useXxx.ts` |
+| `utils/` | Fonctions et constantes TypeScript indépendantes de l'application en cours (calculs, formats, constantes), clients (Supabase). Un fichier par sujet | camelCase, au nom du sujet : `userTag.ts`, jamais `utils.ts` ni `helpers.ts` |
 | `types/` | Types partagés ; `types/components/` pour les types publics des composants (`HFormInst`) | PascalCase : `User.ts` |
 | `models/` | Données statiques et leur type (menus, carrousel) | PascalCase : `MenuItem.ts` |
 | `assets/` | Styles globaux (`variables.scss`, `main.scss`), thèmes Naive UI | |
@@ -21,6 +21,6 @@ Les règles marquées **`lint`** sont vérifiées par `yarn lint`.
 
 - **Stores** : Pinia en mode setup (`defineStore("auth", () => { … })`), avec un `return` qui liste explicitement ce qui est public. Dans un composant : `const auth = useAuthStore()`. On ne déstructure pas un store (on perdrait la réactivité), sauf avec `storeToRefs`.
 - **Supabase ne s'appelle que depuis les stores.** Une action de store affiche elle-même son message d'erreur et renvoie un booléen ou un code de résultat (`LoginResult`). Le composant décide seulement de ce qu'il change à l'écran.
-- **Messages à l'utilisateur** : `useMessage()` de `@/composables/useMessage`, qui applique les durées du projet. Ni `window.$message`, ni le `useMessage` de Naive UI.
-- **Composable** : une fonction `useXxx()` qui utilise la réactivité ou le cycle de vie de Vue et renvoie un objet. Une fonction sans réactivité va dans `utils/`.
+- **Messages et notifications à l'utilisateur** : `useAppMessage()` et `useAppNotification()` de `@/composables/`, qui appliquent les réglages du projet et marchent aussi dans les stores. Jamais le `useMessage` ni le `useNotification` de Naive UI : seul `AppLayout`, placé sous leurs providers, les appelle pour transmettre leur API aux composables. **`lint`**
+- **Composable** : une fonction `useXxx()` qui donne à un composant ou à un store ce dont il a besoin : un état (`useLoader`), un service de l'application (`useAppMessage`) ou un comportement lié au cycle de vie de Vue (`useFitContent`). Une fonction qui calcule seulement un résultat à partir de ses paramètres va dans `utils/`.
 - **Natif d'abord** : `Array.prototype.find`, `some`, `structuredClone`… plutôt que lodash. Lodash reste pour ce qui demanderait du code maison (`debounce`, `cloneDeep` d'objets non sérialisables).

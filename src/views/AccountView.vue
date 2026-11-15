@@ -16,7 +16,7 @@ import type { FormItemRule, FormRules } from "naive-ui";
 import { computed, onMounted, reactive, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useLoader } from "@/composables/useLoader";
-import { useMessage } from "@/composables/useMessage";
+import { useAppMessage } from "@/composables/useAppMessage";
 import { useUserStore } from "@/stores/user";
 import { useAuthStore } from "@/stores/auth";
 import type { HFormInst } from "@/types/components/c/hForm";
@@ -38,7 +38,7 @@ const EMAIL_CHANGE_DURATION = 10000;
 
 const user = useUserStore();
 const auth = useAuthStore();
-const message = useMessage();
+const message = useAppMessage();
 const route = useRoute();
 const router = useRouter();
 

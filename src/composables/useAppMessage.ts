@@ -1,5 +1,5 @@
-import { type MessageOptions, type MessageReactive } from "naive-ui";
-import { computed, type VNodeChild } from "vue";
+import type { MessageApi, MessageOptions, MessageReactive } from "naive-ui";
+import type { VNodeChild } from "vue";
 
 type MessageContent = string | (() => VNodeChild);
 
@@ -16,15 +16,29 @@ const DEFAULT_OPTIONS = {
   keepAliveOnHover: true,
 };
 
-export function useMessage() {
-  const message = computed(() => window.$message);
+// Les stores ne sont pas sous le n-message-provider : AppLayout transmet ici l'API du provider
+let messageApi: MessageApi | undefined;
 
+export function registerMessageApi(api: MessageApi) {
+  messageApi = api;
+}
+
+function getMessageApi() {
+  if (messageApi) {
+    return messageApi;
+  }
+  throw new Error(
+    "useAppMessage : l'API du n-message-provider n'est pas encore enregistrée par AppLayout"
+  );
+}
+
+export function useAppMessage() {
   function create(content: MessageContent, options?: MessageOptions): MessageReactive {
-    return message.value.create(content, { ...DEFAULT_OPTIONS, ...options });
+    return getMessageApi().create(content, { ...DEFAULT_OPTIONS, ...options });
   }
 
   function info(content: MessageContent, options?: MessageOptions): MessageReactive {
-    return message.value.info(content, {
+    return getMessageApi().info(content, {
       ...DEFAULT_OPTIONS,
       duration: DEFAULT_DURATIONS.info,
       ...options,
@@ -32,7 +46,7 @@ export function useMessage() {
   }
 
   function success(content: MessageContent, options?: MessageOptions): MessageReactive {
-    return message.value.success(content, {
+    return getMessageApi().success(content, {
       ...DEFAULT_OPTIONS,
       duration: DEFAULT_DURATIONS.success,
       ...options,
@@ -40,7 +54,7 @@ export function useMessage() {
   }
 
   function warning(content: MessageContent, options?: MessageOptions): MessageReactive {
-    return message.value.warning(content, {
+    return getMessageApi().warning(content, {
       ...DEFAULT_OPTIONS,
       duration: DEFAULT_DURATIONS.warning,
       ...options,
@@ -48,7 +62,7 @@ export function useMessage() {
   }
 
   function error(content: MessageContent, options?: MessageOptions): MessageReactive {
-    return message.value.error(content, {
+    return getMessageApi().error(content, {
       ...DEFAULT_OPTIONS,
       closable: true,
       duration: DEFAULT_DURATIONS.error,
@@ -57,7 +71,7 @@ export function useMessage() {
   }
 
   function loading(content: MessageContent, options?: MessageOptions): MessageReactive {
-    return message.value.loading(content, {
+    return getMessageApi().loading(content, {
       ...DEFAULT_OPTIONS,
       duration: DEFAULT_DURATIONS.loading,
       ...options,
@@ -65,7 +79,7 @@ export function useMessage() {
   }
 
   function destroyAll(): void {
-    message.value.destroyAll();
+    getMessageApi().destroyAll();
   }
 
   return {

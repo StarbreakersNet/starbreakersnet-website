@@ -29,7 +29,7 @@ import {
 } from "@/models/wallpapers";
 import { normalizeUrl } from "@/models/widgets";
 import { useLoader } from "@/composables/useLoader";
-import { useMessage } from "@/composables/useMessage";
+import { useAppMessage } from "@/composables/useAppMessage";
 import { useUserStore } from "@/stores/user";
 import { useWidgetsStore } from "@/stores/widgets";
 import type {
@@ -47,7 +47,7 @@ const show = defineModel("show", {
 
 const store = useWidgetsStore();
 const user = useUserStore();
-const message = useMessage();
+const message = useAppMessage();
 
 const FREQUENCY_OPTIONS = ROTATION_FREQUENCIES.map(({ value, label }) => ({ value, label }));
 

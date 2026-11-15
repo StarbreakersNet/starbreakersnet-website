@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { RouterView, useRoute, useRouter } from "vue-router";
 import MainMenu from "@/components/MainMenu.vue";
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import MaintenanceView from "@/views/MaintenanceView.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useMessage, useNotification } from "naive-ui";
+import { registerMessageApi } from "@/composables/useAppMessage";
+import { registerNotificationApi } from "@/composables/useAppNotification";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import HButton from "@/components/c/hButton.vue";
@@ -14,6 +16,10 @@ import HSpin from "@/components/c/hSpin.vue";
 const { maintenanceMode = false } = defineProps<{
   maintenanceMode?: boolean;
 }>();
+
+registerMessageApi(useMessage());
+registerNotificationApi(useNotification());
+
 const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
@@ -57,11 +63,6 @@ watch(
     }
   }
 );
-
-onMounted(async () => {
-  window.$message = useMessage();
-  window.$notification = useNotification();
-});
 </script>
 
 <template>

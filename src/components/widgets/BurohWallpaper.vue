@@ -5,7 +5,7 @@ import { createBackdrop } from "@/utils/backdrop";
 import { fetchRandomPhoto, withReferral } from "@/utils/unsplash";
 import { loadWallpaperFile } from "@/utils/wallpaperFile";
 import { isStale, pickVideo, presetById, videoById, WALLPAPER_PRESETS } from "@/models/wallpapers";
-import { useMessage } from "@/composables/useMessage";
+import { useAppMessage } from "@/composables/useAppMessage";
 import { useUserStore } from "@/stores/user";
 import { useWidgetsStore } from "@/stores/widgets";
 import type {
@@ -24,7 +24,7 @@ const emit = defineEmits<{
 
 const store = useWidgetsStore();
 const user = useUserStore();
-const message = useMessage();
+const message = useAppMessage();
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 

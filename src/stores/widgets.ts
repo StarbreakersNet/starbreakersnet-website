@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import _ from "lodash";
 import { supabase } from "@/utils/supabaseClient";
-import { useMessage } from "@/composables/useMessage";
+import { useAppMessage } from "@/composables/useAppMessage";
 import {
   createId,
   defaultWidgets,
@@ -60,7 +60,7 @@ function writeLocal(widgets: Widget[], wallpaper: Wallpaper, unsplashKey: string
 // Widgets de Buroh. Comme le thème (stores/settings.ts) : la copie du compte l'emporte à
 // la connexion, la copie locale sert aux visiteurs et au premier affichage.
 export const useWidgetsStore = defineStore("widgets", () => {
-  const message = useMessage();
+  const message = useAppMessage();
 
   const local = readLocal();
   const widgets = ref<Widget[]>(local.widgets ?? defaultWidgets());

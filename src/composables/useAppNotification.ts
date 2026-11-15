@@ -9,14 +9,31 @@ import type {
 } from "@/types/components/AppNotification";
 import { DateTime } from "luxon";
 import type {
+  NotificationApi,
   NotificationOptions as NaiveNotificationOptions,
   NotificationReactive,
 } from "naive-ui";
-import { computed, h } from "vue";
+import { h } from "vue";
 
 type SentryWindow = Window & { Sentry?: { captureMessage: (message: string) => void } };
 
 const ERROR_DESCRIPTION = `Si le problème persiste, écrivez-nous à ${CONTACT_EMAIL}`;
+
+// Les stores ne sont pas sous le n-notification-provider : AppLayout transmet ici l'API du provider
+let notificationApi: NotificationApi | undefined;
+
+export function registerNotificationApi(api: NotificationApi) {
+  notificationApi = api;
+}
+
+function getNotificationApi() {
+  if (notificationApi) {
+    return notificationApi;
+  }
+  throw new Error(
+    "useAppNotification : l'API du n-notification-provider n'est pas encore enregistrée par AppLayout"
+  );
+}
 
 function getNaiveType(type: NotificationType): NaiveNotificationType {
   switch (type) {
@@ -31,9 +48,7 @@ function getNaiveType(type: NotificationType): NaiveNotificationType {
   }
 }
 
-export function useNotification() {
-  const notification = computed(() => window.$notification);
-
+export function useAppNotification() {
   function custom(options: NotificationOptions): NotificationReactive {
     const clickIcon = options.clickIcon || "arrow-up-right-from-square";
 
@@ -85,7 +100,7 @@ export function useNotification() {
       action: options.action,
     };
 
-    return notification.value.create(notificationOptions);
+    return getNotificationApi().create(notificationOptions);
   }
 
   function success(message: string, duration = 2000): NotificationReactive {
