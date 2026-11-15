@@ -141,7 +141,6 @@ interface Props {
           :class="{
             'skeleton-background': background,
             'forced-primary': type === 'primary',
-            'forced-accent': type === 'accent',
             'forced-info': type === 'info',
             'forced-success': type === 'success',
             'forced-warning': type === 'warning',
@@ -282,11 +281,6 @@ interface Props {
   &.forced-primary {
     @include set-skeleton-colors();
     --skeleton-main-color: v-bind("themeVars.primaryColor");
-  }
-
-  &.forced-accent {
-    @include set-skeleton-colors();
-    --skeleton-main-color: v-bind("themeVars.accentColor");
   }
 
   &.forced-info {

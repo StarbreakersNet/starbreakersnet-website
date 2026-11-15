@@ -1,17 +1,9 @@
 <script setup lang="ts">
-import {
-  NButton,
-  useThemeVars,
-  type ButtonProps,
-  type ButtonSlots,
-  type PopoverPlacement,
-} from "naive-ui";
+import { NButton, type ButtonProps, type ButtonSlots, type PopoverPlacement } from "naive-ui";
 import { computed } from "vue";
 import HTooltip from "@/components/c/hTooltip.vue";
 
 interface Props extends /* @vue-ignore */ ButtonProps {
-  /** Couleur d'accent du thème (variable `accentColor`) au lieu de la couleur primaire */
-  accent?: boolean;
   /** Bouton en verre (glass.scss) : fond translucide, arrondi et sans bordure */
   glass?: boolean;
   /** Texte de l'infobulle, sans infobulle si vide */
@@ -30,7 +22,6 @@ interface Props extends /* @vue-ignore */ ButtonProps {
 defineOptions({ inheritAttrs: false });
 
 const {
-  accent = false,
   glass = false,
   tooltip = "",
   tooltipPosition = "top",
@@ -82,13 +73,8 @@ const GLASS_THEME_OVERRIDES: ButtonProps["themeOverrides"] = {
 // Verre : nativeFocusBehavior empêche Naive de forcer le focus au clic (il le fait sous Safari), sinon
 // le contour clavier de glass.scss resterait affiché après un clic à la souris
 
-const themeVars = useThemeVars();
-
 const mergedThemeOverrides = computed<ButtonProps["themeOverrides"]>(() => ({
   ...themeOverrides,
-  ...(accent && {
-    common: { ...themeOverrides?.common, primaryColor: themeVars.value.accentColor },
-  }),
   ...(glass && GLASS_THEME_OVERRIDES),
 }));
 

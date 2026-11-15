@@ -2,7 +2,7 @@
 
 Les règles marquées **`lint`** sont vérifiées par `yarn lint`.
 
-Un wrapper `hXxx.vue` est la seule porte d'entrée vers un composant Naive UI `NXxx`. Il porte les valeurs par défaut du projet et les props maison (`accent`, `tooltip`…). C'est aussi le seul endroit à modifier si un composant Naive change ou est remplacé.
+Un wrapper `hXxx.vue` est la seule porte d'entrée vers un composant Naive UI `NXxx`. Il porte les valeurs par défaut du projet et les props maison (`glass`, `tooltip`…). C'est aussi le seul endroit à modifier si un composant Naive change ou est remplacé.
 
 ## Principe : le minimum, seulement ce que le wrapper ajoute ou modifie
 
@@ -18,7 +18,7 @@ Côté parent, le typage est **celui de Naive**, grâce à `/* @vue-ignore */`. 
 | La prop est… | On écrit |
 |---|---|
 | Une prop Naive que le wrapper ne touche pas | Rien : elle passe par `$attrs` |
-| Une prop maison (`accent`, `tooltip`) | Déclarée dans `Props`, avec un commentaire `/** … */` |
+| Une prop maison (`glass`, `tooltip`) | Déclarée dans `Props`, avec un commentaire `/** … */` |
 | Une prop Naive que le wrapper lit dans son script | Redéclarée, puis repassée explicitement au composant Naive. Un booléen s'écrit `disabled?: boolean`, avec `= undefined` par défaut. Une autre prop prend le type de Naive : `themeOverrides?: ButtonProps["themeOverrides"]` |
 | Une prop Naive dont le projet change la valeur par défaut | Redéclarée avec le défaut du projet (`wrap = false` dans `hFlex`), puis repassée |
 
@@ -52,16 +52,16 @@ defineSlots<InputSlots>();
 
 ## Wrapper avec props maison
 
-Version courte de `hButton`. La version complète ajoute l'infobulle et l'interception du `click` sur un lien.
+Version courte de `hButton`. La version complète ajoute l'infobulle, l'interception du `click` sur un lien et le reste du style en verre.
 
 ```vue
 <script setup lang="ts">
-import { NButton, useThemeVars, type ButtonProps, type ButtonSlots } from "naive-ui";
+import { NButton, type ButtonProps, type ButtonSlots } from "naive-ui";
 import { computed } from "vue";
 
 interface Props extends /* @vue-ignore */ ButtonProps {
-  /** Couleur d'accent du thème (variable `accentColor`) au lieu de la couleur primaire */
-  accent?: boolean;
+  /** Bouton en verre (glass.scss) : fond translucide, arrondi et sans bordure */
+  glass?: boolean;
   /** Fait du bouton un lien `<a>` */
   href?: string;
   disabled?: boolean;
@@ -70,24 +70,24 @@ interface Props extends /* @vue-ignore */ ButtonProps {
 
 defineOptions({ inheritAttrs: false });
 
-const { accent = false, href, disabled = undefined, themeOverrides } = defineProps<Props>();
+const { glass = false, href, disabled = undefined, themeOverrides } = defineProps<Props>();
 
 defineSlots<ButtonSlots>();
 
-const themeVars = useThemeVars();
+const GLASS_THEME_OVERRIDES: ButtonProps["themeOverrides"] = {
+  color: "var(--glass-control)",
+  textColor: "var(--glass-text)",
+};
 
-const mergedThemeOverrides = computed<ButtonProps["themeOverrides"]>(() =>
-  accent
-    ? {
-        ...themeOverrides,
-        common: { ...themeOverrides?.common, primaryColor: themeVars.value.accentColor },
-      }
-    : themeOverrides
-);
+const mergedThemeOverrides = computed<ButtonProps["themeOverrides"]>(() => ({
+  ...themeOverrides,
+  ...(glass && GLASS_THEME_OVERRIDES),
+}));
 </script>
 
 <template>
   <n-button
+    :class="{ 'h-button--glass': glass }"
     :disabled="disabled"
     :href="disabled ? undefined : href"
     :tag="href ? 'a' : undefined"
