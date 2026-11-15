@@ -188,7 +188,7 @@ Les conventions du front (structure d'un composant, syntaxes à préférer, wrap
 yarn format && yarn lint && yarn type-check
 ```
 
-La CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) refait ces vérifications sur chaque PR et chaque push sur `main`, sans corriger : format, oxlint, ESLint, types et build. Toute erreur la fait échouer.
+La CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) refait ces vérifications sur chaque PR et chaque push sur `main`, sans corriger : format, oxlint, ESLint, noms de fichiers, types et build. Toute erreur la fait échouer.
 
 ## Déploiement (staging / prod)
 

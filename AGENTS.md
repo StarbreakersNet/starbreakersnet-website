@@ -38,9 +38,11 @@ Lire d'abord le fichier de [`docs/conventions/`](docs/conventions/README.md) qui
 | Événement émis | camelCase, au participe passé | `registered`, `itemClick` |
 | Classe CSS | kebab-case | `.app-container`, `.icon-wrapper` |
 
+`yarn lint` vérifie ces noms, sauf ceux des booléens, des gestionnaires d'événement et des classes CSS, et le participe passé des événements.
+
 ## Langue, textes et commentaires
 
-- Identifiants en anglais. Textes affichés et commentaires en français, avec des guillemets droits : `"Retirer"`, pas `« Retirer »`.
+- Identifiants en anglais. Textes affichés et commentaires en français, avec des guillemets droits : `"Retirer"`, pas `« Retirer »`. **`lint`**
 - **Par défaut, pas de commentaire.** Un commentaire n'existe que si, sans lui, quelqu'un qui lit ou modifie le code mergé se tromperait : une contrainte qui ne se voit pas dans le code, un comportement surprenant de Supabase, de GoTrue ou du navigateur, un choix de sécurité. Par exemple, dans `LoginView.vue` : pas de bouton désactivé, parce que les champs remplis par le gestionnaire de mots de passe ne sont visibles du script qu'après une interaction.
 - **Le test : servira-t-il dans six mois à quelqu'un qui découvre le fichier ?** Un commentaire qui n'a servi que pendant le développement ou le débogage est retiré avant la PR.
 - **Jamais de commentaire pour** :
@@ -50,7 +52,7 @@ Lire d'abord le fichier de [`docs/conventions/`](docs/conventions/README.md) qui
   - répéter une règle de la charte ou le message d'une règle de lint.
 - Un commentaire tient en une ligne si possible.
 - Pas de code commenté : l'historique git le garde.
-- Pas de `console.log` oublié. `console.warn` et `console.error` restent pour un vrai diagnostic.
+- Pas de `console.log` oublié. **`lint`** `console.warn` et `console.error` restent pour un vrai diagnostic.
 
 ## À éviter
 
