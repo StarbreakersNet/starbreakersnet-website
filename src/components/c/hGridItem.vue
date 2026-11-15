@@ -1,29 +1,15 @@
-<script lang="ts" setup>
-import { type GridItemProps, NGridItem } from "naive-ui";
-import { type PropType } from "vue";
+<script setup lang="ts">
+import { NGridItem, type GridItemProps } from "naive-ui";
 
-defineOptions({
-  __GRID_ITEM__: true,
-});
+defineOptions({ __GRID_ITEM__: true, inheritAttrs: false });
 
-const props = defineProps({
-  offset: {
-    type: Number as PropType<GridItemProps["offset"]>,
-    default: undefined,
-  },
-  span: {
-    type: [Number, String] as PropType<GridItemProps["span"]>,
-    default: undefined,
-  },
-  suffix: {
-    type: Boolean as PropType<GridItemProps["suffix"]>,
-    default: undefined,
-  },
-});
+defineProps</* @vue-ignore */ GridItemProps>();
 </script>
 
 <template>
-  <n-grid-item :offset="props.offset" :span="props.span" :suffix="props.suffix" v-bind="$attrs">
-    <slot />
+  <n-grid-item v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps ?? {}" />
+    </template>
   </n-grid-item>
 </template>

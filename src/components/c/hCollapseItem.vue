@@ -1,47 +1,17 @@
-<script lang="ts" setup>
-import { NCollapseItem } from "naive-ui";
-import { type PropType, useSlots } from "vue";
+<script setup lang="ts">
+import { NCollapseItem, type CollapseItemProps, type CollapseItemSlots } from "naive-ui";
 
-const props = defineProps({
-  title: {
-    type: String,
-    default: undefined,
-  },
-  name: {
-    type: [String, Number] as PropType<string | number>,
-    default: undefined,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  displayDirective: {
-    type: String as PropType<"if" | "show">,
-    default: undefined,
-  },
-});
+defineOptions({ inheritAttrs: false });
 
-const slots = useSlots();
+defineProps</* @vue-ignore */ CollapseItemProps>();
+
+defineSlots<CollapseItemSlots>();
 </script>
 
 <template>
-  <n-collapse-item
-    :disabled="props.disabled"
-    :display-directive="props.displayDirective"
-    :name="props.name"
-    :title="props.title"
-    v-bind="$attrs">
-    <template v-if="slots.default" #default>
-      <slot name="default" />
-    </template>
-    <template v-if="slots.header" #header="slotProps">
-      <slot name="header" v-bind="slotProps" />
-    </template>
-    <template v-if="slots['header-extra']" #header-extra="slotProps">
-      <slot name="header-extra" v-bind="slotProps" />
-    </template>
-    <template v-if="slots.arrow" #arrow="slotProps">
-      <slot name="arrow" v-bind="slotProps" />
+  <n-collapse-item v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof CollapseItemSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-collapse-item>
 </template>

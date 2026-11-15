@@ -1,87 +1,21 @@
-<script lang="ts" setup>
-import { type ButtonProps, NPopconfirm, type PopconfirmProps } from "naive-ui";
-import { type PropType, useSlots } from "vue";
+<script setup lang="ts">
+import { NPopconfirm, type PopconfirmProps, type PopconfirmSlots } from "naive-ui";
 
-const props = defineProps({
-  show: {
-    type: Boolean as PropType<PopconfirmProps["show"]>,
-    default: undefined,
-  },
-  to: {
-    type: [String, Object, Boolean] as PropType<PopconfirmProps["to"]>,
-    default: undefined,
-  },
-  trigger: {
-    type: String as PropType<PopconfirmProps["trigger"]>,
-    default: undefined,
-  },
-  placement: {
-    type: String as PropType<PopconfirmProps["placement"]>,
-    default: undefined,
-  },
-  positiveText: {
-    type: String as PropType<PopconfirmProps["positiveText"]>,
-    default: undefined,
-  },
-  negativeText: {
-    type: String as PropType<PopconfirmProps["negativeText"]>,
-    default: undefined,
-  },
-  positiveButtonProps: {
-    type: Object as PropType<ButtonProps>,
-    default: undefined,
-  },
-  negativeButtonProps: {
-    type: Object as PropType<ButtonProps>,
-    default: undefined,
-  },
-  showIcon: {
-    type: Boolean as PropType<PopconfirmProps["showIcon"]>,
-    default: true,
-  },
-  disabled: {
-    type: Boolean,
-    default: undefined,
-  },
-  showArrow: {
-    type: Boolean,
-    default: false,
-  },
-});
+interface Props extends /* @vue-ignore */ PopconfirmProps {
+  showArrow?: boolean;
+}
 
-defineEmits(["positive-click", "negative-click", "update:show"]);
+defineOptions({ inheritAttrs: false });
 
-const slots = useSlots();
+const { showArrow = false } = defineProps<Props>();
+
+defineSlots<PopconfirmSlots>();
 </script>
 
 <template>
-  <n-popconfirm
-    :disabled="props.disabled"
-    :negative-button-props="props.negativeButtonProps"
-    :negative-text="props.negativeText"
-    :placement="props.placement"
-    :positive-button-props="props.positiveButtonProps"
-    :positive-text="props.positiveText"
-    :show="props.show"
-    :show-arrow="!!props.showArrow"
-    :show-icon="props.showIcon"
-    :to="props.to"
-    :trigger="props.trigger"
-    v-bind="$attrs"
-    @positive-click="$emit('positive-click', $event)"
-    @negative-click="$emit('negative-click', $event)"
-    @update:show="$emit('update:show', $event)">
-    <template v-if="slots.trigger" #trigger>
-      <slot name="trigger" />
-    </template>
-    <template v-if="slots.icon" #icon>
-      <slot name="icon" />
-    </template>
-    <template v-if="slots.action" #action>
-      <slot name="action" />
-    </template>
-    <template #default>
-      <slot />
+  <n-popconfirm :show-arrow="showArrow" v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof PopconfirmSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-popconfirm>
 </template>

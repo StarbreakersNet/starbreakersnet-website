@@ -1,64 +1,24 @@
-<script lang="ts" setup>
-import { type AnchorProps, NAnchor } from "naive-ui";
-import { type PropType, useSlots, useTemplateRef } from "vue";
+<script setup lang="ts">
+import { NAnchor, type AnchorProps, type AnchorInst } from "naive-ui";
+import { useTemplateRef } from "vue";
 
-const props = defineProps({
-  affix: {
-    type: Boolean as PropType<AnchorProps["affix"]>,
-    default: undefined,
-  },
-  bound: {
-    type: Number as PropType<AnchorProps["bound"]>,
-    default: undefined,
-  },
-  ignoreGap: {
-    type: Boolean as PropType<AnchorProps["ignoreGap"]>,
-    default: undefined,
-  },
-  offsetTarget: {
-    type: String as PropType<AnchorProps["offsetTarget"]>,
-    default: undefined,
-  },
-  showRail: {
-    type: Boolean as PropType<AnchorProps["showRail"]>,
-    default: undefined,
-  },
-  showBackground: {
-    type: Boolean as PropType<AnchorProps["showBackground"]>,
-    default: undefined,
-  },
-  type: {
-    type: String as PropType<AnchorProps["type"]>,
-    default: undefined,
-  },
-});
+defineOptions({ inheritAttrs: false });
 
-const anchor = useTemplateRef("anchor");
+defineProps</* @vue-ignore */ AnchorProps>();
 
-const slots = useSlots();
+const anchorRef = useTemplateRef<AnchorInst>("anchorRef");
 
 function scrollTo(href: string) {
-  anchor.value?.scrollTo(href);
+  anchorRef.value?.scrollTo(href);
 }
 
-defineExpose({
-  scrollTo,
-});
+defineExpose({ scrollTo });
 </script>
 
 <template>
-  <n-anchor
-    ref="anchor"
-    :affix="props.affix"
-    :bound="props.bound"
-    :ignore-gap="props.ignoreGap"
-    :offset-target="props.offsetTarget"
-    :show-background="props.showBackground"
-    :show-rail="props.showRail"
-    :type="props.type"
-    v-bind="$attrs">
-    <template v-if="slots.default">
-      <slot />
+  <n-anchor ref="anchorRef" v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps ?? {}" />
     </template>
   </n-anchor>
 </template>

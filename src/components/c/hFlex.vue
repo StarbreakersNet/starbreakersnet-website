@@ -1,48 +1,25 @@
-<script lang="ts" setup>
-import { type FlexProps, NFlex } from "naive-ui";
-import type { PropType } from "vue";
+<script setup lang="ts">
+import { NFlex, type FlexProps } from "naive-ui";
 
-const props = defineProps({
-  align: {
-    type: String as PropType<FlexProps["align"]>,
-    default: undefined,
-  },
-  justify: {
-    type: String as PropType<FlexProps["justify"]>,
-    default: undefined,
-  },
-  inline: {
-    type: Boolean as PropType<FlexProps["inline"]>,
-    default: undefined,
-  },
-  vertical: {
-    type: Boolean as PropType<FlexProps["vertical"]>,
-    default: undefined,
-  },
-  wrap: {
-    type: Boolean as PropType<FlexProps["wrap"]>,
-    default: false,
-  },
-  size: {
-    type: [String, Number, Array] as PropType<FlexProps["size"]>,
-    default: undefined,
-  },
-  themeOverrides: {
-    type: Object as PropType<FlexProps["themeOverrides"]>,
-  },
-});
+interface Props extends /* @vue-ignore */ FlexProps {
+  align?: FlexProps["align"];
+  vertical?: boolean;
+  wrap?: boolean;
+}
+
+defineOptions({ inheritAttrs: false });
+
+const { align, vertical = false, wrap = false } = defineProps<Props>();
 </script>
 
 <template>
   <n-flex
-    :align="props.align || (!props.vertical ? 'center' : undefined)"
-    :justify="props.justify"
-    :inline="props.inline"
-    :vertical="props.vertical"
-    :wrap="props.wrap"
-    :size="props.size"
-    :theme-overrides="props.themeOverrides"
+    :align="align || (vertical ? undefined : 'center')"
+    :vertical="vertical"
+    :wrap="wrap"
     v-bind="$attrs">
-    <slot />
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps ?? {}" />
+    </template>
   </n-flex>
 </template>

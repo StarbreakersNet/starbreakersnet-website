@@ -1,61 +1,19 @@
-<script lang="ts" setup>
-import { NBadge } from "naive-ui";
-import { type PropType } from "vue";
+<script setup lang="ts">
+import { NBadge, type BadgeProps } from "naive-ui";
 
-export type hBadgeType = "default" | "error" | "info" | "success" | "warning";
+interface Props extends /* @vue-ignore */ BadgeProps {
+  max?: BadgeProps["max"];
+}
 
-const props = defineProps({
-  color: {
-    type: String,
-    default: undefined,
-  },
-  dot: {
-    type: Boolean,
-    default: false,
-  },
-  max: {
-    type: Number,
-    default: 99,
-  },
-  offset: {
-    type: [] as PropType<readonly [number | string, number | string]>,
-    default: () => undefined,
-  },
-  processing: {
-    type: Boolean,
-    default: false,
-  },
-  showZero: {
-    type: Boolean,
-    default: false,
-  },
-  show: {
-    type: Boolean,
-    default: true,
-  },
-  type: {
-    type: String as PropType<hBadgeType>,
-    default: "default",
-  },
-  value: {
-    type: [String, Number],
-    default: undefined,
-  },
-});
+defineOptions({ inheritAttrs: false });
+
+const { max = 99 } = defineProps<Props>();
 </script>
 
 <template>
-  <n-badge
-    :color="props.color"
-    :dot="props.dot"
-    :max="props.max"
-    :offset="props.offset"
-    :processing="props.processing"
-    :show="props.show"
-    :show-zero="props.showZero"
-    :type="props.type"
-    :value="props.value"
-    v-bind="$attrs">
-    <slot />
+  <n-badge :max="max" v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps ?? {}" />
+    </template>
   </n-badge>
 </template>

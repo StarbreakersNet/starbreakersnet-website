@@ -1,21 +1,15 @@
 <script lang="ts" setup>
-import { computed, nextTick, type PropType } from "vue";
+import { computed, nextTick } from "vue";
 
 type ModeType = "width" | "height";
 
-const props = defineProps({
-  mode: {
-    type: String as PropType<ModeType>,
-    default: "height",
-  },
-  raw: {
-    type: Boolean,
-    default: false,
-  },
-});
+const { mode = "height", raw = false } = defineProps<{
+  mode?: ModeType;
+  raw?: boolean;
+}>();
 
 const elementSizes = new Map<string, number>();
-const maxDimension = computed(() => `max-${props.mode}`);
+const maxDimension = computed(() => `max-${mode}`);
 let transitionId = 0;
 
 function generateTransitionId() {
@@ -30,13 +24,13 @@ function getElementId(el: HTMLElement) {
 }
 
 function getNaturalSize(el: HTMLElement) {
-  return props.mode === "width" ? el.scrollWidth : el.scrollHeight;
+  return mode === "width" ? el.scrollWidth : el.scrollHeight;
 }
 
 async function beforeEnter(el: Element) {
   const element = el as HTMLElement;
 
-  if (props.mode != null && !props.raw) {
+  if (mode != null && !raw) {
     await nextTick();
     const naturalSize = getNaturalSize(element);
 
@@ -53,7 +47,7 @@ async function beforeEnter(el: Element) {
 async function enter(el: Element) {
   const element = el as HTMLElement;
 
-  if (props.mode != null && !props.raw) {
+  if (mode != null && !raw) {
     await nextTick();
     const naturalSize = elementSizes.get(getElementId(element));
 
@@ -69,7 +63,7 @@ async function enter(el: Element) {
 async function afterEnter(el: Element) {
   const element = el as HTMLElement;
 
-  if (props.mode != null && !props.raw) {
+  if (mode != null && !raw) {
     await nextTick();
 
     element.style.setProperty(maxDimension.value, "");
@@ -84,7 +78,7 @@ async function afterEnter(el: Element) {
 async function beforeLeave(el: Element) {
   const element = el as HTMLElement;
 
-  if (props.mode != null && !props.raw) {
+  if (mode != null && !raw) {
     await nextTick();
     const naturalSize = getNaturalSize(element);
 
@@ -98,7 +92,7 @@ async function beforeLeave(el: Element) {
 async function leave(el: Element) {
   const element = el as HTMLElement;
 
-  if (props.mode != null && !props.raw) {
+  if (mode != null && !raw) {
     await nextTick();
 
     void element.offsetHeight; // Forcer un reflow
@@ -110,7 +104,7 @@ async function leave(el: Element) {
 async function afterLeave(el: Element) {
   const element = el as HTMLElement;
 
-  if (props.mode != null && !props.raw) {
+  if (mode != null && !raw) {
     await nextTick();
 
     element.style.setProperty(maxDimension.value, "");

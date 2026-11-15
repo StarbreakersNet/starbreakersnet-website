@@ -1,37 +1,15 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { NRadioGroup, type RadioGroupProps } from "naive-ui";
-import { type PropType } from "vue";
 
-const props = defineProps({
-  value: {
-    type: [String, Number, Boolean] as PropType<RadioGroupProps["value"]>,
-    default: undefined,
-  },
-  name: {
-    type: String,
-    default: undefined,
-  },
-  size: {
-    type: String as PropType<RadioGroupProps["size"]>,
-    default: undefined,
-  },
-  disabled: {
-    type: Boolean,
-    default: undefined,
-  },
-});
+defineOptions({ inheritAttrs: false });
 
-defineEmits(["update:value"]);
+defineProps</* @vue-ignore */ RadioGroupProps>();
 </script>
 
 <template>
-  <n-radio-group
-    :disabled="props.disabled"
-    :name="props.name"
-    :size="props.size"
-    :value="props.value"
-    v-bind="$attrs"
-    @update:value="$emit('update:value', $event)">
-    <slot />
+  <n-radio-group v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps ?? {}" />
+    </template>
   </n-radio-group>
 </template>

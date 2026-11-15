@@ -1,25 +1,24 @@
-<script lang="ts" setup>
-import { NListItem } from "naive-ui";
-import { useSlots } from "vue";
+<script setup lang="ts">
+import { NListItem, type ListItemSlots } from "naive-ui";
 
-const props = defineProps({
-  href: {
-    type: String,
-    default: undefined,
-  },
-});
+defineOptions({ inheritAttrs: false });
 
-const slots = useSlots();
+const { href } = defineProps<{
+  /** Lien ouvert au clic, dans un nouvel onglet au clic du milieu */
+  href?: string;
+}>();
+
+defineSlots<ListItemSlots>();
 
 function handleClick() {
-  if (props.href) {
-    window.location.href = props.href;
+  if (href) {
+    window.location.href = href;
   }
 }
 
 function handleMiddleClick() {
-  if (props.href) {
-    window.open(props.href, "_blank");
+  if (href) {
+    window.open(href, "_blank");
   }
 }
 </script>
@@ -28,16 +27,10 @@ function handleMiddleClick() {
   <n-list-item
     :class="{ clickable: href }"
     v-bind="$attrs"
-    @click.middle="handleMiddleClick"
-    @click.left="handleClick">
-    <template v-if="slots.default" #default>
-      <slot name="default" />
-    </template>
-    <template v-if="slots.prefix" #prefix>
-      <slot name="prefix" />
-    </template>
-    <template v-if="slots.suffix" #suffix>
-      <slot name="suffix" />
+    @click.middle="handleMiddleClick()"
+    @click.left="handleClick()">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof ListItemSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-list-item>
 </template>

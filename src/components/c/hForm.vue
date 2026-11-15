@@ -4,16 +4,18 @@ import _ from "lodash";
 import type { FormItemRule, FormRules, FormValidationError } from "naive-ui";
 import { onMounted, provide, ref, useTemplateRef, watch } from "vue";
 
+defineOptions({ inheritAttrs: false });
+
 const model = defineModel<object>("model", { required: true });
 
-const props = defineProps({
-  rules: {
-    type: Object as () => FormRules,
-    default: () => ({}),
-  },
-});
+const { rules = {} } = defineProps<{
+  rules?: FormRules;
+}>();
 
-const emit = defineEmits(["submit", "validate"]);
+const emit = defineEmits<{
+  submit: [event: Event];
+  validate: [errors: Array<FormValidationError> | undefined];
+}>();
 
 const naiveFormRef = useTemplateRef<HFormInst>("naiveFormRef");
 
@@ -56,7 +58,6 @@ function isRuleSatisfied(rule: FormItemRule, value: unknown, values: Record<stri
 }
 
 function computeIsValidSilently() {
-  const rules: FormRules = props.rules || {};
   const values = (model.value || {}) as Record<string, unknown>;
 
   return Object.entries(rules).every(([path, ruleDef]) => {
@@ -88,7 +89,7 @@ watch(
   { deep: true }
 );
 watch(
-  () => props.rules,
+  () => rules,
   () => recomputeSilentValidity(),
   { deep: true }
 );

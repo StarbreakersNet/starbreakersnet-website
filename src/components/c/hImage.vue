@@ -1,112 +1,25 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { NImage } from "naive-ui";
-import type { ImageRenderToolbarProps } from "naive-ui/es/image/src/public-types";
-import type { IntersectionObserverOptions } from "naive-ui/es/image/src/utils";
-import { type ImgHTMLAttributes, type PropType, useSlots, type VNodeChild } from "vue";
+import { NImage, type ImageProps, type ImageSlots } from "naive-ui";
 
-const props = defineProps({
-  alt: {
-    type: String,
-    default: undefined,
-  },
-  fallbackSrc: {
-    type: String,
-    default: undefined,
-  },
-  height: {
-    type: [String, Number],
-    default: undefined,
-  },
-  imgProps: {
-    type: Object as PropType<ImgHTMLAttributes>,
-    default: undefined,
-  },
-  intersectionObserverOptions: {
-    type: Object as PropType<IntersectionObserverOptions>,
-    default: undefined,
-  },
-  lazy: {
-    type: Boolean,
-    default: false,
-  },
-  loadDescription: {
-    type: String,
-    default: undefined,
-  },
-  objectFit: {
-    type: String as PropType<"fill" | "contain" | "cover" | "none" | "scale-down">,
-    default: "cover",
-  },
-  previewDisabled: {
-    type: Boolean,
-    default: false,
-  },
-  previewSrc: {
-    type: String,
-    default: undefined,
-  },
-  previewedImgProps: {
-    type: Object as PropType<ImgHTMLAttributes>,
-    default: undefined,
-  },
-  renderToolbar: {
-    type: Function as PropType<(props: ImageRenderToolbarProps) => VNodeChild>,
-    default: undefined,
-  },
-  showToolbar: {
-    type: Boolean,
-    default: true,
-  },
-  showToolbarTooltip: {
-    type: Boolean,
-    default: false,
-  },
-  src: {
-    type: String,
-    default: undefined,
-  },
-  width: {
-    type: [String, Number],
-    default: undefined,
-  },
-});
+interface Props extends /* @vue-ignore */ ImageProps {
+  objectFit?: ImageProps["objectFit"];
+}
 
-defineEmits(["error", "load", "preview-prev", "preview-next"]);
+defineOptions({ inheritAttrs: false });
 
-const slots = useSlots();
+const { objectFit = "cover" } = defineProps<Props>();
+
+defineSlots<ImageSlots>();
 </script>
 
 <template>
-  <n-image
-    :alt="props.alt"
-    :fallback-src="props.fallbackSrc"
-    :height="props.height"
-    :img-props="props.imgProps"
-    :intersection-observer-options="props.intersectionObserverOptions"
-    :lazy="props.lazy"
-    :load-description="props.loadDescription"
-    :object-fit="props.objectFit"
-    :preview-disabled="props.previewDisabled"
-    :preview-src="props.previewSrc"
-    :previewed-img-props="props.previewedImgProps"
-    :render-toolbar="props.renderToolbar"
-    :show-toolbar="props.showToolbar"
-    :show-toolbar-tooltip="props.showToolbarTooltip"
-    :src="props.src"
-    :width="props.width"
-    v-bind="$attrs"
-    @error="$emit('error', $event)"
-    @load="$emit('load', $event)"
-    @preview-prev="$emit('preview-prev')"
-    @preview-next="$emit('preview-next')">
-    <template v-if="slots.placeholder" #placeholder>
-      <slot name="placeholder" />
-    </template>
+  <n-image :object-fit="objectFit" v-bind="$attrs">
     <template #error>
-      <slot name="error">
-        <font-awesome-icon :icon="['fas', 'image']" />
-      </slot>
+      <font-awesome-icon :icon="['fas', 'image']" />
+    </template>
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof ImageSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-image>
 </template>
