@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { particlesOptions } from "@/models/ParticlesConfig";
+import HFlex from "@/components/c/hFlex.vue";
 </script>
 
 <template>
   <main>
     <vue-particles id="tsparticles" :options="particlesOptions" />
-    <n-flex align="center" justify="center" class="container">
+    <h-flex wrap align="center" justify="center" class="container">
       <h3>🚧 Site en maintenance 🚧</h3>
-    </n-flex>
+    </h-flex>
   </main>
 </template>
 

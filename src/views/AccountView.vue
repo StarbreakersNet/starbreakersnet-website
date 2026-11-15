@@ -28,6 +28,8 @@ import {
   usernameRule,
 } from "@/utils/validation";
 import { formatUserTag } from "@/utils/userTag";
+import HFloatButtonGroup from "@/components/c/hFloatButtonGroup.vue";
+import HFloatButton from "@/components/c/hFloatButton.vue";
 
 const EMAIL_CHANGE_TEXT =
   "Un lien de confirmation a été envoyé à votre adresse actuelle et à la nouvelle. " +
@@ -343,11 +345,11 @@ onMounted(() => {
       </h-modal>
     </template>
     <template #action-float>
-      <n-float-button-group>
-        <n-float-button type="primary" @click="handleSubmit()">
+      <h-float-button-group>
+        <h-float-button type="primary" @click="handleSubmit()">
           <font-awesome-icon :icon="saving.loading ? 'spinner' : 'save'" :spin="saving.loading" />
-        </n-float-button>
-      </n-float-button-group>
+        </h-float-button>
+      </h-float-button-group>
     </template>
   </h-card>
 </template>

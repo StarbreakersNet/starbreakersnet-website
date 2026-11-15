@@ -17,6 +17,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { emailRule } from "@/utils/validation";
 import { renderNaiveFontAwesomeIcon } from "@/utils/naiveIcons";
+import HA from "@/components/c/hA.vue";
 
 const emit = defineEmits<{
   connected: [];
@@ -111,11 +112,11 @@ function handleRegistered() {
         </h-alert>
         <h-button :loading="loggingIn.loading" attr-type="submit">Se connecter</h-button>
         <h-text>
-          <n-a @click="showForgotPasswordModal = true">Mot de passe oublié ?</n-a>
+          <h-a @click="showForgotPasswordModal = true">Mot de passe oublié ?</h-a>
         </h-text>
         <h-text>
           Vous n'avez pas de compte ?
-          <n-a @click="showRegisterModal = true">S'inscrire</n-a>
+          <h-a @click="showRegisterModal = true">S'inscrire</h-a>
         </h-text>
       </h-flex>
     </h-form>

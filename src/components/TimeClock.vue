@@ -2,6 +2,7 @@
 import { useCurrentTime } from "@/composables/useCurrentTime";
 import NumberAnimated from "@/components/NumberAnimated.vue";
 import { computed } from "vue";
+import HFlex from "@/components/c/hFlex.vue";
 
 const currentTime = useCurrentTime();
 const time = computed(() => {
@@ -15,12 +16,12 @@ const time = computed(() => {
 
 <template>
   <div class="time-clock">
-    <n-flex :size="3" align="center" justify="center">
+    <h-flex wrap :size="3" align="center" justify="center">
       <number-animated :digits="2" :value="time.hours" />
       <div>:</div>
       <number-animated :digits="2" :value="time.minutes" />
       <div>:</div>
       <number-animated :digits="2" :value="time.seconds" />
-    </n-flex>
+    </h-flex>
   </div>
 </template>

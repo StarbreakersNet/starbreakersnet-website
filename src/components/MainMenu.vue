@@ -2,6 +2,8 @@
 import { type MenuItem, menuItems } from "@/models/MenuItem";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useRouter } from "vue-router";
+import HButton from "@/components/c/hButton.vue";
+import HFlex from "@/components/c/hFlex.vue";
 
 const router = useRouter();
 
@@ -15,19 +17,19 @@ function onClick(item: MenuItem) {
 </script>
 
 <template>
-  <n-flex :size="30" align="center" class="component apple-blurred" justify="center">
+  <h-flex wrap :size="30" align="center" class="component apple-blurred" justify="center">
     <div v-for="item in menuItems" :key="item.label" class="item">
-      <n-button
+      <h-button
         :color="item.color"
         :text-color="item.textColor ?? (item.color ? 'white' : '')"
         @click="onClick(item)">
-        <n-flex :size="10" align="center" justify="center" vertical>
+        <h-flex wrap :size="10" align="center" justify="center" vertical>
           <font-awesome-icon v-if="item.icon" :icon="item.icon" class="fa-icon" />
           <span v-if="item.label" class="label">{{ item.label }}</span>
-        </n-flex>
-      </n-button>
+        </h-flex>
+      </h-button>
     </div>
-  </n-flex>
+  </h-flex>
 </template>
 
 <style lang="scss" scoped>

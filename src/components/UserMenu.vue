@@ -11,6 +11,13 @@ import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";
 import { renderNaiveFontAwesomeIcon } from "@/utils/naiveIcons";
 import { formatUserTag } from "@/utils/userTag";
+import HDropdown from "@/components/c/hDropdown.vue";
+import HButton from "@/components/c/hButton.vue";
+import HFlex from "@/components/c/hFlex.vue";
+import HText from "@/components/c/hText.vue";
+import HTag from "@/components/c/hTag.vue";
+import HH4 from "@/components/c/hH4.vue";
+import HA from "@/components/c/hA.vue";
 
 const auth = useAuthStore();
 const user = useUserStore();
@@ -136,21 +143,21 @@ function handleSelect(key: string) {
 
 <template>
   <div>
-    <n-flex key="menu" :size="0" align="center" class="apple-container">
+    <h-flex wrap key="menu" :size="0" align="center" class="apple-container">
       <transition-group name="insert">
-        <n-tag key="icon" :bordered="false" :color="{ color: 'transparent' }" round>
-          <n-flex align="center">
+        <h-tag key="icon" :bordered="false" :color="{ color: 'transparent' }" round>
+          <h-flex wrap align="center">
             <time-clock key="time" />
-          </n-flex>
-        </n-tag>
+          </h-flex>
+        </h-tag>
         <div key="menu">
-          <n-dropdown
+          <h-dropdown
             :options="options"
             class="apple-container"
             trigger="click"
             @select="handleSelect($event)">
-            <n-button :bordered="false" round>
-              <n-flex align="center">
+            <h-button :bordered="false" round>
+              <h-flex wrap align="center">
                 <transition mode="out-in" name="scale">
                   <font-awesome-icon
                     v-if="user.infos.connected"
@@ -158,13 +165,13 @@ function handleSelect(key: string) {
                     icon="user-circle" />
                   <font-awesome-icon v-else key="icon-bars" icon="bars" />
                 </transition>
-              </n-flex>
-            </n-button>
-          </n-dropdown>
+              </h-flex>
+            </h-button>
+          </h-dropdown>
         </div>
       </transition-group>
-    </n-flex>
-    <n-modal
+    </h-flex>
+    <h-modal
       v-model:show="showModal"
       :closable="false"
       :show-icon="false"
@@ -172,24 +179,24 @@ function handleSelect(key: string) {
       preset="dialog"
       transform-origin="center">
       <template #default>
-        <n-flex align="center" justify="center" vertical>
-          <n-h4>Portail des Starbreakers</n-h4>
-          <n-text>
+        <h-flex wrap align="center" justify="center" vertical>
+          <h-h4>Portail des Starbreakers</h-h4>
+          <h-text>
             Actuellement un simple site vitrine mais comme il s'agit d'un grand terrain de jeu pour
             votre renard, le site s'agrémentera de pleins de belles choses au fil du temps.
-          </n-text>
-          <n-text>
+          </h-text>
+          <h-text>
             Si vous êtes intéressé pour participer au développement, n'hésitez pas à contacter
-            <n-text strong type="info">TheRedfoox</n-text>
+            <h-text strong type="info">TheRedfoox</h-text>
             sur Discord ou à passer sur notre
-            <n-a href="https://github.com/StarbreakersNet" target="_blank">GitHub</n-a>
-          </n-text>
-          <n-text code>
+            <h-a href="https://github.com/StarbreakersNet" target="_blank">GitHub</h-a>
+          </h-text>
+          <h-text code>
             <p>Version {{ packageVersion }} © 2024–{{ currentYear }}</p>
-          </n-text>
-        </n-flex>
+          </h-text>
+        </h-flex>
       </template>
-    </n-modal>
+    </h-modal>
     <h-modal
       :icon="() => renderNaiveFontAwesomeIcon({ fas: 'user' })"
       :show="showLoginModal"

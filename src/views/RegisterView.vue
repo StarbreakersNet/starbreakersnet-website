@@ -16,6 +16,7 @@ import {
   USERNAME_MAX_LENGTH,
   usernameRule,
 } from "@/utils/validation";
+import HA from "@/components/c/hA.vue";
 
 const emit = defineEmits<{
   registered: [];
@@ -82,7 +83,7 @@ async function handleSubmit() {
         </h-button>
         <h-text depth="3">
           En créant un compte, vous acceptez le traitement de vos données décrit dans les
-          <n-a href="/mentions-legales" target="_blank">mentions légales et de confidentialité</n-a>
+          <h-a href="/mentions-legales" target="_blank">mentions légales et de confidentialité</h-a>
         </h-text>
       </h-flex>
     </h-form>

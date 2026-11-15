@@ -3,6 +3,14 @@ import HCard from "@/components/c/hCard.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HButton from "@/components/c/hButton.vue";
 import HText from "@/components/c/hText.vue";
+import HDescriptionsItem from "@/components/c/hDescriptionsItem.vue";
+import HDescriptions from "@/components/c/hDescriptions.vue";
+import HGrid from "@/components/c/hGrid.vue";
+import HTag from "@/components/c/hTag.vue";
+import HUl from "@/components/c/hUl.vue";
+import HLi from "@/components/c/hLi.vue";
+import HGridItem from "@/components/c/hGridItem.vue";
+import HA from "@/components/c/hA.vue";
 
 // Dernière mise à jour du texte, à changer à chaque modification
 const UPDATED_AT = "9 novembre 2026";
@@ -27,7 +35,7 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
   <h-card class="legal tw:max-w-3xl tw:self-start">
     <template #header>Mentions légales et confidentialité</template>
     <template #header-extra>
-      <n-tag :bordered="false" round size="small">Mis à jour le {{ UPDATED_AT }}</n-tag>
+      <h-tag :bordered="false" round size="small">Mis à jour le {{ UPDATED_AT }}</h-tag>
     </template>
     <template #default>
       <h-flex vertical>
@@ -46,24 +54,24 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique, l'éditeur a
                 choisi de ne pas rendre publique son identité, qu'il a communiquée à l'hébergeur.
               </h-text>
-              <n-descriptions
+              <h-descriptions
                 :column="1"
                 :label-style="{ whiteSpace: 'nowrap' }"
                 bordered
                 label-placement="left"
                 size="small">
-                <n-descriptions-item label="Éditeur">{{ EDITOR }}</n-descriptions-item>
-                <n-descriptions-item label="Contact">
-                  <n-a :href="`mailto:${CONTACT_EMAIL}`">{{ CONTACT_EMAIL }}</n-a>
-                </n-descriptions-item>
-                <n-descriptions-item label="Hébergeur">
+                <h-descriptions-item label="Éditeur">{{ EDITOR }}</h-descriptions-item>
+                <h-descriptions-item label="Contact">
+                  <h-a :href="`mailto:${CONTACT_EMAIL}`">{{ CONTACT_EMAIL }}</h-a>
+                </h-descriptions-item>
+                <h-descriptions-item label="Hébergeur">
                   <h-flex :size="0" vertical>
                     <strong>{{ HOST.name }}</strong>
                     <span>{{ HOST.address }}</span>
                     <span>Téléphone : {{ HOST.phone }}</span>
                   </h-flex>
-                </n-descriptions-item>
-              </n-descriptions>
+                </h-descriptions-item>
+              </h-descriptions>
             </h-flex>
           </template>
         </h-card>
@@ -82,28 +90,28 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 traitons les données ci-dessous. Le responsable du traitement est l'éditeur du site,
                 {{ EDITOR }}, joignable à {{ CONTACT_EMAIL }}.
               </h-text>
-              <n-ul class="tw:m-0 tw:list-disc">
-                <n-li>votre adresse email et votre pseudo, à l'inscription ;</n-li>
-                <n-li>
+              <h-ul class="tw:m-0 tw:list-disc">
+                <h-li>votre adresse email et votre pseudo, à l'inscription ;</h-li>
+                <h-li>
                   votre mot de passe, enregistré uniquement sous forme chiffrée (hachée) ;
-                </n-li>
-                <n-li>votre prénom et votre nom, seulement si vous les renseignez ;</n-li>
-                <n-li>
+                </h-li>
+                <h-li>votre prénom et votre nom, seulement si vous les renseignez ;</h-li>
+                <h-li>
                   vos préférences d'affichage (thème clair ou sombre) et les widgets de votre page
                   Buroh, avec leur contenu (notes, liens) et votre clé d'accès Unsplash si vous la
                   renseignez ;
-                </n-li>
-                <n-li>
+                </h-li>
+                <h-li>
                   des données techniques de connexion (adresse IP, date, navigateur), conservées
                   dans les journaux du serveur pour la sécurité des comptes.
-                </n-li>
-              </n-ul>
+                </h-li>
+              </h-ul>
             </h-flex>
           </template>
         </h-card>
 
-        <n-grid cols="1 m:2" responsive="screen" :x-gap="12" :y-gap="12">
-          <n-gi>
+        <h-grid cols="1 m:2" responsive="screen" :x-gap="12" :y-gap="12">
+          <h-grid-item>
             <h-card :bordered="false" class="tw:h-full" embedded segmented size="small">
               <template #header>
                 <h-flex size="small">
@@ -121,8 +129,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 </h-text>
               </template>
             </h-card>
-          </n-gi>
-          <n-gi>
+          </h-grid-item>
+          <h-grid-item>
             <h-card :bordered="false" class="tw:h-full" embedded segmented size="small">
               <template #header>
                 <h-flex size="small">
@@ -139,8 +147,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 </h-text>
               </template>
             </h-card>
-          </n-gi>
-          <n-gi>
+          </h-grid-item>
+          <h-grid-item>
             <h-card :bordered="false" class="tw:h-full" embedded segmented size="small">
               <template #header>
                 <h-flex size="small">
@@ -157,8 +165,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 </h-text>
               </template>
             </h-card>
-          </n-gi>
-          <n-gi>
+          </h-grid-item>
+          <h-grid-item>
             <h-card :bordered="false" class="tw:h-full" embedded segmented size="small">
               <template #header>
                 <h-flex size="small">
@@ -189,8 +197,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 </h-flex>
               </template>
             </h-card>
-          </n-gi>
-        </n-grid>
+          </h-grid-item>
+        </h-grid>
 
         <h-card :bordered="false" embedded segmented size="small">
           <template #header>
