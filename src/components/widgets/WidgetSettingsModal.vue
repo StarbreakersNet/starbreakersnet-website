@@ -64,7 +64,7 @@ function onUpdateShow(show: boolean) {
     :show="!!widget"
     class="widget-settings apple-menu"
     preset="card"
-    @update:show="onUpdateShow">
+    @update:show="onUpdateShow($event)">
     <template #header>
       <h-flex size="small">
         <font-awesome-icon v-if="definition" :icon="definition.icon" />
@@ -73,13 +73,13 @@ function onUpdateShow(show: boolean) {
     </template>
     <template v-if="widget && form" #default>
       <h-form-item v-if="sizeOptions.length > 1" label="Taille" label-placement="top">
-        <h-radio-group :value="widget.size" @update:value="updateSize">
+        <h-radio-group :value="widget.size" @update:value="updateSize($event)">
           <h-radio-button v-for="option in sizeOptions" :key="option.value" :value="option.value">
             {{ option.label }}
           </h-radio-button>
         </h-radio-group>
       </h-form-item>
-      <component :is="form" :settings="widget.settings" @update:settings="updateSettings" />
+      <component :is="form" :settings="widget.settings" @update:settings="updateSettings($event)" />
     </template>
     <template #footer>
       <h-flex justify="end">

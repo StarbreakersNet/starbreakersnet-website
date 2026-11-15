@@ -47,24 +47,20 @@ function updateTimezone(value: string) {
 <template>
   <h-form :model="settings" label-placement="top">
     <h-form-item label="Style">
-      <h-radio-group
-        :value="settings.style"
-        @update:value="(style: ClockSettings['style']) => update({ style })">
+      <h-radio-group :value="settings.style" @update:value="update({ style: $event })">
         <h-radio-button value="analog">À aiguilles</h-radio-button>
         <h-radio-button value="digital">En chiffres</h-radio-button>
       </h-radio-group>
     </h-form-item>
     <h-form-item label="Secondes">
-      <h-switch
-        :value="settings.seconds"
-        @update:value="(seconds: boolean) => update({ seconds })" />
+      <h-switch :value="settings.seconds" @update:value="update({ seconds: $event })" />
     </h-form-item>
     <h-form-item label="Fuseau horaire">
       <h-select
         :options="timezoneOptions"
         :value="settings.timezone ?? DEVICE_TIMEZONE"
         filterable
-        @update:value="updateTimezone" />
+        @update:value="updateTimezone($event)" />
     </h-form-item>
     <h-form-item label="Nom affiché">
       <h-input
@@ -72,7 +68,7 @@ function updateTimezone(value: string) {
         :placeholder="labelPlaceholder"
         :value="settings.label"
         clearable
-        @update:value="(label: string) => update({ label })" />
+        @update:value="update({ label: $event })" />
     </h-form-item>
   </h-form>
 </template>

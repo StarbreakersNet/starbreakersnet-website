@@ -109,7 +109,7 @@ const ACTIONS: Action[] = [
 
 const linkOpen = ref(false);
 const linkUrl = ref("");
-const linkInput = useTemplateRef<InstanceType<typeof HInput>>("linkInput");
+const linkInputRef = useTemplateRef<InstanceType<typeof HInput>>("linkInputRef");
 
 const linkHref = computed(() => normalizeUrl(linkUrl.value));
 
@@ -127,7 +127,7 @@ async function toggleLink() {
     linkOpen.value = true;
 
     await nextTick();
-    linkInput.value?.focus();
+    linkInputRef.value?.focus();
   }
 }
 
@@ -182,23 +182,23 @@ onBeforeUnmount(() => editor.value?.destroy());
         :type="onLink || linkOpen ? 'primary' : 'default'"
         quaternary
         size="small"
-        @click="toggleLink">
+        @click="toggleLink()">
         <font-awesome-icon :icon="onLink ? 'link-slash' : 'link'" />
       </h-button>
     </h-flex>
     <h-flex v-if="linkOpen" :size="6" :wrap="false" class="link-row">
       <h-input
-        ref="linkInput"
+        ref="linkInputRef"
         v-model:value="linkUrl"
         :status="linkInvalid ? 'error' : undefined"
         placeholder="https://exemple.fr"
         size="small"
-        @keydown.enter.prevent="applyLink"
-        @keydown.esc.prevent.stop="cancelLink" />
-      <h-button :disabled="!linkHref" size="small" type="primary" @click="applyLink">
+        @keydown.enter.prevent="applyLink()"
+        @keydown.esc.prevent.stop="cancelLink()" />
+      <h-button :disabled="!linkHref" size="small" type="primary" @click="applyLink()">
         Ajouter
       </h-button>
-      <h-button quaternary size="small" @click="cancelLink">Annuler</h-button>
+      <h-button quaternary size="small" @click="cancelLink()">Annuler</h-button>
     </h-flex>
     <editor-content :editor="editor" class="content" />
     <p :class="{ error: tooLong }" class="count">

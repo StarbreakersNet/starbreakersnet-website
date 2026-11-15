@@ -35,7 +35,7 @@ function updateTarget(millis: number | null) {
         :maxlength="40"
         :value="settings.title"
         placeholder="Soirée jeux, anniversaire…"
-        @update:value="updateTitle" />
+        @update:value="updateTitle($event)" />
     </h-form-item>
     <h-form-item label="Date et heure">
       <h-date-picker
@@ -44,7 +44,7 @@ function updateTarget(millis: number | null) {
         class="date-picker"
         format="d MMMM yyyy, HH:mm"
         type="datetime"
-        @update:value="updateTarget" />
+        @update:value="updateTarget($event)" />
     </h-form-item>
   </h-form>
 </template>

@@ -7,6 +7,11 @@ export type WidgetType = "clock" | "markdown" | "links" | "weather" | "countdown
 // Tailles en cases de la grille, comme les widgets de macOS : petit carré, moyen, grand
 export type WidgetSize = "small" | "medium" | "large";
 
+export interface NewWidget {
+  type: WidgetType;
+  size: WidgetSize;
+}
+
 export interface ClockSettings {
   style: "analog" | "digital";
   seconds: boolean;

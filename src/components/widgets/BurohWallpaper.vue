@@ -239,8 +239,8 @@ onBeforeUnmount(() => {
         alt=""
         class="media"
         decoding="async"
-        @error="onError"
-        @load="onLoaded" />
+        @error="onError()"
+        @load="onLoaded()" />
       <video
         v-else
         :key="media.src"
@@ -253,9 +253,9 @@ onBeforeUnmount(() => {
         muted
         playsinline
         preload="auto"
-        @error="onError"
-        @loadeddata="onLoaded"
-        @loadedmetadata="onVideoMetadata" />
+        @error="onError()"
+        @loadeddata="onLoaded()"
+        @loadedmetadata="onVideoMetadata($event)" />
     </template>
   </div>
   <p v-if="credit" class="credit">

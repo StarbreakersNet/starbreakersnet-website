@@ -1,12 +1,12 @@
-export type CarouselAction = {
+export interface CarouselAction {
   label: string;
   icon?: string[];
   routeName?: string;
   externalLink?: string;
   type: "default" | "tertiary" | "primary" | "success" | "info" | "warning" | "error";
-};
+}
 
-export type CarouselItem = {
+export interface CarouselItem {
   title: string;
   description?: string;
   style: {
@@ -23,7 +23,7 @@ export type CarouselItem = {
     alt: string;
   };
   actions?: CarouselAction[];
-};
+}
 
 export const carouselListItems: CarouselItem[] = [
   {

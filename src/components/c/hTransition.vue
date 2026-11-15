@@ -26,12 +26,12 @@ const {
 <template>
   <transition
     v-bind="$attrs"
-    @before-enter="handleBeforeEnter"
-    @enter="handleEnter"
-    @after-enter="handleAfterEnter"
-    @before-leave="handleBeforeLeave"
-    @leave="handleLeave"
-    @after-leave="handleAfterLeave">
+    @before-enter="handleBeforeEnter($event)"
+    @enter="handleEnter($event)"
+    @after-enter="handleAfterEnter($event)"
+    @before-leave="handleBeforeLeave($event)"
+    @leave="handleLeave($event)"
+    @after-leave="handleAfterLeave($event)">
     <slot></slot>
   </transition>
 </template>

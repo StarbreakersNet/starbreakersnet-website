@@ -41,7 +41,7 @@ defineExpose({ blur, clear, focus, scrollTo, select });
   </n-input>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 :deep(.n-input) {
   width: 100%;
 }

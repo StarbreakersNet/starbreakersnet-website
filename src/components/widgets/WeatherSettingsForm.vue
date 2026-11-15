@@ -122,14 +122,14 @@ onBeforeUnmount(() => searchLater.cancel());
           filterable
           placeholder="Rechercher une ville"
           remote
-          @search="search"
-          @update:value="select" />
+          @search="search($event)"
+          @update:value="select($event)" />
         <h-button
           :loading="locating.loading"
           :type="settings.mode === 'device' ? 'primary' : 'default'"
           aria-label="Ma position"
           title="Ma position"
-          @click="locate">
+          @click="locate()">
           <template #icon>
             <font-awesome-icon icon="location-arrow" />
           </template>
@@ -138,7 +138,7 @@ onBeforeUnmount(() => searchLater.cancel());
       </h-input-group>
     </h-form-item>
     <h-form-item label="Unité">
-      <h-radio-group :value="settings.unit" @update:value="updateUnit">
+      <h-radio-group :value="settings.unit" @update:value="updateUnit($event)">
         <h-radio-button value="celsius">°C</h-radio-button>
         <h-radio-button value="fahrenheit">°F</h-radio-button>
       </h-radio-group>

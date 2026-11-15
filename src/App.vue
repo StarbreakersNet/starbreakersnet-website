@@ -16,12 +16,11 @@ const maintenanceConfig = {
   timeout: 500,
   chain: ["h", "a", "c", "k", "e", "r", "m", "a", "n"],
   callback() {
-    if (maintenanceMode.value) {
-      console.log("Maintenance mode disabled. You are a hacker!");
-    } else {
-      console.log("Maintenance mode enabled. You are a hacker!");
-    }
     maintenanceMode.value = !maintenanceMode.value;
+    // eslint-disable-next-line no-console -- message voulu, pour qui trouve le code Konami
+    console.log(
+      `Maintenance mode ${maintenanceMode.value ? "enabled" : "disabled"}. You are a hacker!`
+    );
   },
 };
 

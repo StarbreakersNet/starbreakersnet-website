@@ -12,6 +12,7 @@ import HLi from "@/components/c/hLi.vue";
 import HGridItem from "@/components/c/hGridItem.vue";
 import HA from "@/components/c/hA.vue";
 import { CONTACT_EMAIL } from "@/utils/contact";
+import { useRouter } from "vue-router";
 
 // Dernière mise à jour du texte, à changer à chaque modification
 const UPDATED_AT = "9 novembre 2026";
@@ -28,6 +29,12 @@ const HOST = {
 };
 
 const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
+
+const router = useRouter();
+
+function handleAccountClick() {
+  router.push({ name: "account" });
+}
 </script>
 
 <template>
@@ -215,7 +222,7 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                 saisir la CNIL (Commission nationale de l'informatique et des libertés).
               </h-text>
               <h-flex wrap>
-                <h-button @click="$router.push({ name: 'account' })">Mon compte</h-button>
+                <h-button @click="handleAccountClick()">Mon compte</h-button>
                 <h-button :href="`mailto:${CONTACT_EMAIL}`" tag="a">Nous écrire</h-button>
                 <h-button :href="CNIL_COMPLAINT_URL" tag="a" target="_blank">
                   Saisir la CNIL

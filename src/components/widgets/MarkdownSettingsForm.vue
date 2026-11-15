@@ -23,7 +23,7 @@ function updateContent(content: string) {
         :max-length="MARKDOWN_MAX_LENGTH"
         :model-value="settings.content"
         class="editor"
-        @update:model-value="updateContent" />
+        @update:model-value="updateContent($event)" />
     </h-form-item>
   </h-form>
 </template>

@@ -18,9 +18,8 @@ import {
   WIDGET_SIZES,
 } from "@/models/widgets";
 import { useWidgetsStore } from "@/stores/widgets";
-import type { FitState } from "@/composables/useFitContent";
 import type { WallpaperAppearance } from "@/types/Wallpaper";
-import type { GridItem, GridPosition, WidgetSize, WidgetType } from "@/types/Widget";
+import type { GridItem, GridPosition, NewWidget } from "@/types/Widget";
 
 // Buroh, page d'accueil à widgets à la manière du bureau de macOS : grille libre où l'on place
 // et règle ses widgets.
@@ -82,7 +81,7 @@ const galleryLabel = computed(() =>
   galleryOpen.value ? "Fermer la galerie" : "Ajouter un widget"
 );
 
-function addWidget(type: WidgetType, size: WidgetSize) {
+function addWidget({ type, size }: NewWidget) {
   galleryOpen.value = false;
 
   const widget = store.add(type, size);
@@ -213,7 +212,7 @@ onBeforeUnmount(() => {
     :data-wallpaper="appearance.kind"
     :style="burohStyle"
     class="buroh"
-    @contextmenu="onContextMenu">
+    @contextmenu="onContextMenu($event)">
     <buroh-wallpaper @appearance="appearance = $event" />
     <widget-grid
       :key="isMobile ? 'mobile' : 'desktop'"
@@ -224,7 +223,7 @@ onBeforeUnmount(() => {
       :gap="isMobile ? MOBILE_GAP : GAP"
       :items="gridItems"
       class="grid"
-      @moved="onMoved">
+      @moved="onMoved($event)">
       <template #item="{ id }">
         <widget-frame
           v-if="widgetsById.get(id)"
@@ -236,18 +235,18 @@ onBeforeUnmount(() => {
             :is="WIDGET_COMPONENTS[widgetsById.get(id)!.type].view"
             :settings="widgetsById.get(id)!.settings"
             :size="widgetsById.get(id)!.size"
-            @fit="(state: FitState) => store.growIfCramped(id, state)" />
+            @fit="store.growIfCramped(id, $event)" />
         </widget-frame>
       </template>
     </widget-grid>
     <div class="dock">
       <transition name="slide-up">
-        <widget-gallery v-if="showGallery" @add="addWidget" />
+        <widget-gallery v-if="showGallery" @add="addWidget($event)" />
       </transition>
       <div
         :class="{ hidden: !toolbarVisible }"
         class="toolbar liquid-glass liquid-glass--overlay"
-        @focusin="onToolbarFocusIn"
+        @focusin="onToolbarFocusIn($event)"
         @focusout="toolbarFocused = false"
         @pointerenter="toolbarHovered = true"
         @pointerleave="toolbarHovered = false">
@@ -282,7 +281,7 @@ onBeforeUnmount(() => {
           </template>
           Remplacer vos widgets par ceux d'origine ?
         </h-popconfirm>
-        <h-button :type="editing ? 'primary' : 'default'" glass @click="toggleEditing">
+        <h-button :type="editing ? 'primary' : 'default'" glass @click="toggleEditing()">
           <template #icon>
             <font-awesome-icon :icon="editing ? 'check' : 'pen'" />
           </template>
@@ -290,7 +289,7 @@ onBeforeUnmount(() => {
         </h-button>
       </div>
     </div>
-    <widget-settings-modal :widget-id="configuredId" @close="closeSettings" />
+    <widget-settings-modal :widget-id="configuredId" @close="closeSettings()" />
     <wallpaper-modal v-model:show="showWallpaper" />
     <h-dropdown
       :options="menuOptions"
@@ -300,7 +299,7 @@ onBeforeUnmount(() => {
       placement="bottom-start"
       trigger="manual"
       @clickoutside="menu.show = false"
-      @select="onMenuSelect" />
+      @select="onMenuSelect($event)" />
   </main>
 </template>
 

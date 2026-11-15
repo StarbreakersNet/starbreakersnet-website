@@ -119,7 +119,7 @@ defineExpose({
     :model="model"
     :rules="rules"
     v-bind="$attrs"
-    @validate="handleValidate"
+    @validate="handleValidate($event)"
     @submit.prevent="emit('submit', $event)">
     <slot />
   </n-form>

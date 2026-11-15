@@ -327,7 +327,7 @@ const customForm = reactive({
 
 const urlError = ref("");
 const saving = useLoader();
-const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
+const fileInputRef = useTemplateRef<HTMLInputElement>("fileInputRef");
 
 const fileName = computed(() => (wallpaper.value.source === "file" ? wallpaper.value.name : ""));
 
@@ -459,7 +459,9 @@ watch(
         <template v-if="rotationKind === 'photos'">
           <h-form :model="unsplashForm" label-placement="top">
             <h-form-item v-if="hasKey" label="Photos">
-              <h-radio-group :value="unsplashForm.selection" @update:value="chooseSelection">
+              <h-radio-group
+                :value="unsplashForm.selection"
+                @update:value="chooseSelection($event)">
                 <h-radio-button value="topic">D'un thème Unsplash</h-radio-button>
                 <h-radio-button value="collection">D'une collection</h-radio-button>
               </h-radio-group>
@@ -469,7 +471,7 @@ watch(
                 :loading="loadingTopics.loading"
                 :options="topicOptions"
                 :value="topicValue"
-                @update:value="updateTopic" />
+                @update:value="updateTopic($event)" />
             </h-form-item>
             <h-form-item
               v-if="hasKey && unsplashForm.selection === 'collection'"
@@ -480,11 +482,11 @@ watch(
                 <h-input
                   v-model:value="unsplashForm.collection"
                   placeholder="https://unsplash.com/collections/…"
-                  @keydown.enter.prevent="applyCollection" />
+                  @keydown.enter.prevent="applyCollection()" />
                 <h-button
                   :disabled="!unsplash || !unsplashForm.collection.trim()"
                   type="primary"
-                  @click="applyCollection">
+                  @click="applyCollection()">
                   Appliquer
                 </h-button>
               </h-input-group>
@@ -493,7 +495,7 @@ watch(
               <h-select
                 :options="FREQUENCY_OPTIONS"
                 :value="unsplashForm.frequency"
-                @update:value="updatePhotoFrequency" />
+                @update:value="updatePhotoFrequency($event)" />
             </h-form-item>
             <h-form-item
               :feedback="keyError"
@@ -506,14 +508,14 @@ watch(
                   placeholder="Access Key de votre application Unsplash"
                   show-password-on="click"
                   type="password"
-                  @keydown.enter.prevent="saveKey" />
-                <h-button v-if="hasKey" @click="removeKey">Retirer</h-button>
+                  @keydown.enter.prevent="saveKey()" />
+                <h-button v-if="hasKey" @click="removeKey()">Retirer</h-button>
                 <h-button
                   v-else
                   :disabled="!keyForm.key.trim()"
                   :loading="checkingKey.loading"
                   type="primary"
-                  @click="saveKey">
+                  @click="saveKey()">
                   Enregistrer
                 </h-button>
               </h-input-group>
@@ -538,10 +540,10 @@ watch(
               </a>
             </h-text>
             <span v-else />
-            <h-button v-if="!unsplash" :disabled="!hasKey" type="primary" @click="useUnsplash">
+            <h-button v-if="!unsplash" :disabled="!hasKey" type="primary" @click="useUnsplash()">
               Utiliser Unsplash
             </h-button>
-            <h-button v-else :disabled="!hasKey" :loading="fetching.loading" @click="nextPhoto">
+            <h-button v-else :disabled="!hasKey" :loading="fetching.loading" @click="nextPhoto()">
               <template #icon>
                 <font-awesome-icon icon="rotate" />
               </template>
@@ -572,16 +574,16 @@ watch(
               <h-select
                 :options="FREQUENCY_OPTIONS"
                 :value="videoForm.frequency"
-                @update:value="updateVideoFrequency" />
+                @update:value="updateVideoFrequency($event)" />
             </h-form-item>
           </h-form>
           <h-flex justify="space-between">
             <h-text v-if="currentVideo" depth="3">Vidéo : {{ currentVideo.credit }}</h-text>
             <span v-else />
-            <h-button v-if="!videos" type="primary" @click="useVideos">
+            <h-button v-if="!videos" type="primary" @click="useVideos()">
               Utiliser les vidéos
             </h-button>
-            <h-button v-else :disabled="WALLPAPER_VIDEOS.length < 2" @click="nextVideo">
+            <h-button v-else :disabled="WALLPAPER_VIDEOS.length < 2" @click="nextVideo()">
               <template #icon>
                 <font-awesome-icon icon="rotate" />
               </template>
@@ -591,7 +593,7 @@ watch(
         </template>
       </h-tab-pane>
       <h-tab-pane name="custom" tab="Personnalisé">
-        <h-form :model="customForm" label-placement="top" @submit="applyUrl">
+        <h-form :model="customForm" label-placement="top" @submit="applyUrl()">
           <h-form-item
             :feedback="urlError"
             :validation-status="urlError ? 'error' : undefined"
@@ -600,19 +602,19 @@ watch(
               <h-input
                 :value="customForm.url"
                 placeholder="https://exemple.fr/fond.jpg"
-                @update:value="updateUrl" />
+                @update:value="updateUrl($event)" />
               <h-select
                 v-model:value="customForm.kind"
                 :options="KIND_OPTIONS"
                 class="kind-select" />
-              <h-button :disabled="!customForm.url.trim()" type="primary" @click="applyUrl">
+              <h-button :disabled="!customForm.url.trim()" type="primary" @click="applyUrl()">
                 Appliquer
               </h-button>
             </h-input-group>
           </h-form-item>
           <h-form-item label="Depuis votre ordinateur">
             <h-flex>
-              <h-button :loading="saving.loading" @click="fileInput?.click()">
+              <h-button :loading="saving.loading" @click="fileInputRef?.click()">
                 <template #icon>
                   <font-awesome-icon icon="upload" />
                 </template>
@@ -621,11 +623,11 @@ watch(
               <h-text v-if="fileName" depth="3">{{ fileName }}</h-text>
             </h-flex>
             <input
-              ref="fileInput"
+              ref="fileInputRef"
               accept="image/*,video/*"
               class="file-input"
               type="file"
-              @change="onFileChosen" />
+              @change="onFileChosen($event)" />
           </h-form-item>
         </h-form>
         <h-text depth="3">

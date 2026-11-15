@@ -5,12 +5,12 @@ import HFlex from "@/components/c/hFlex.vue";
 import HGrid from "@/components/c/hGrid.vue";
 import HGridItem from "@/components/c/hGridItem.vue";
 import { WIDGET_DEFINITIONS, WIDGET_SIZES, WIDGET_TYPES } from "@/models/widgets";
-import type { WidgetSize, WidgetType } from "@/types/Widget";
+import type { NewWidget, WidgetSize, WidgetType } from "@/types/Widget";
 
 // Galerie du mode édition, comme celle des widgets de macOS : un type, une taille, Ajouter.
 
 const emit = defineEmits<{
-  add: [type: WidgetType, size: WidgetSize];
+  add: [widget: NewWidget];
 }>();
 
 // Une carte par colonne sur mobile, jusqu'à trois sur un grand écran
@@ -60,7 +60,7 @@ function shapeStyle(size: WidgetSize) {
                 <span :style="shapeStyle(size)" class="shape" />
               </h-button>
             </h-flex>
-            <h-button glass @click="emit('add', type, selectedSizes[type])">
+            <h-button glass @click="emit('add', { type, size: selectedSizes[type] })">
               <template #icon>
                 <font-awesome-icon icon="plus" />
               </template>

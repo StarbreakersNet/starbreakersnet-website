@@ -201,7 +201,9 @@ export const useWidgetsStore = defineStore("widgets", () => {
       const samePlace = fits(rect, others(id));
       const position = samePlace ? { x: widget.x, y: widget.y } : findFreeSpot(size, others(id));
 
-      Object.assign(widget, { size, ...position });
+      widget.size = size;
+      widget.x = position.x;
+      widget.y = position.y;
       persist();
     }
   }

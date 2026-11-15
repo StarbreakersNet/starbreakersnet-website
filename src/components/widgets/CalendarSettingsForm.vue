@@ -18,7 +18,7 @@ function updateWeekNumbers(weekNumbers: boolean) {
 <template>
   <h-form :model="settings" label-placement="top">
     <h-form-item label="Numéros de semaine">
-      <h-switch :value="settings.weekNumbers" @update:value="updateWeekNumbers" />
+      <h-switch :value="settings.weekNumbers" @update:value="updateWeekNumbers($event)" />
     </h-form-item>
   </h-form>
 </template>

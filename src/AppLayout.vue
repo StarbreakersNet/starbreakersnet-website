@@ -34,6 +34,10 @@ function setUiVisibility(isHome: boolean) {
   showFooter.value = isHome;
 }
 
+function handleHomeClick() {
+  router.push({ name: "home" });
+}
+
 watch(
   () => route.name,
   () => {
@@ -82,7 +86,7 @@ watch(
               key="home"
               :bordered="false"
               class="apple-blurred"
-              @click="$router.push({ name: 'home' })">
+              @click="handleHomeClick()">
               <h-flex wrap align="center">
                 <font-awesome-icon icon="arrow-left" />
                 Accueil

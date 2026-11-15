@@ -35,7 +35,7 @@ function handleMiddleClick() {
   </n-list-item>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .clickable {
   cursor: pointer;
 }
