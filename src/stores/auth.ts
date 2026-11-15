@@ -68,10 +68,9 @@ export const useAuthStore = defineStore("auth", () => {
 
     if (error) {
       message.error("Impossible de récupérer les informations du compte");
-      return;
+    } else {
+      user.infos.me = toUser(authUser, profile);
     }
-
-    user.infos.me = toUser(authUser, profile);
   }
 
   function toUser(

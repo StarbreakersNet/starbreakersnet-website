@@ -34,14 +34,15 @@ export const useSettingsStore = defineStore("settings", () => {
 
     const userId = user.infos.me?.id;
 
-    if (!userId) {
-      return;
-    }
+    if (userId) {
+      const { error } = await supabase
+        .from("user_settings")
+        .update({ theme })
+        .eq("user_id", userId);
 
-    const { error } = await supabase.from("user_settings").update({ theme }).eq("user_id", userId);
-
-    if (error) {
-      message.error("Impossible d'enregistrer le thème sur votre compte");
+      if (error) {
+        message.error("Impossible d'enregistrer le thème sur votre compte");
+      }
     }
   }
 

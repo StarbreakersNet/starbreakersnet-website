@@ -301,6 +301,50 @@ export function mobileLayout(widgets: Widget[]): Map<string, { x: number; y: num
 
 // --- Lecture du stockage (navigateur ou compte)
 
+function normalizeWidget(item: unknown, placed: Rect[]): Widget | null {
+  if (!item || typeof item !== "object") {
+    return null;
+  }
+
+  const entry = item as Record<string, unknown>;
+  const type = entry.type as WidgetType;
+  const definition = WIDGET_DEFINITIONS[type];
+
+  if (!definition) {
+    return null;
+  }
+
+  const size = definition.sizes.includes(entry.size as WidgetSize)
+    ? (entry.size as WidgetSize)
+    : definition.defaultSize;
+  const settings = definition.normalize(
+    entry.settings && typeof entry.settings === "object"
+      ? (entry.settings as Record<string, unknown>)
+      : {}
+  );
+
+  let position = {
+    x: Number.isInteger(entry.x) ? (entry.x as number) : -1,
+    y: Number.isInteger(entry.y) ? (entry.y as number) : -1,
+  };
+  if (!fits({ ...position, ...WIDGET_SIZES[size] }, placed)) {
+    position = findFreeSpot(size, placed);
+  }
+
+  const mobile = entry.mobile as Record<string, unknown> | undefined;
+  return {
+    id: typeof entry.id === "string" ? entry.id : createId(),
+    type,
+    size,
+    ...position,
+    // Vérifiée à l'affichage par mobileLayout, comme les chevauchements
+    ...(Number.isInteger(mobile?.x) && Number.isInteger(mobile?.y)
+      ? { mobile: { x: mobile!.x as number, y: mobile!.y as number } }
+      : {}),
+    settings,
+  } as Widget;
+}
+
 // Document relu tel quel : widgets inconnus ou abîmés écartés, chevauchements replacés ailleurs
 export function normalizeDocument(raw: unknown): Widget[] | null {
   if (!raw || typeof raw !== "object" || !Array.isArray((raw as WidgetsDocument).widgets)) {
@@ -311,44 +355,12 @@ export function normalizeDocument(raw: unknown): Widget[] | null {
   const widgets: Widget[] = [];
 
   for (const item of (raw as WidgetsDocument).widgets as unknown[]) {
-    if (!item || typeof item !== "object") continue;
-    const entry = item as Record<string, unknown>;
-    const type = entry.type as WidgetType;
-    const definition = WIDGET_DEFINITIONS[type];
-    if (!definition) continue;
+    const widget = normalizeWidget(item, placed);
 
-    const size = definition.sizes.includes(entry.size as WidgetSize)
-      ? (entry.size as WidgetSize)
-      : definition.defaultSize;
-    const settings = definition.normalize(
-      entry.settings && typeof entry.settings === "object"
-        ? (entry.settings as Record<string, unknown>)
-        : {}
-    );
-
-    let position = {
-      x: Number.isInteger(entry.x) ? (entry.x as number) : -1,
-      y: Number.isInteger(entry.y) ? (entry.y as number) : -1,
-    };
-    if (!fits({ ...position, ...WIDGET_SIZES[size] }, placed)) {
-      position = findFreeSpot(size, placed);
+    if (widget) {
+      placed.push(widgetRect(widget));
+      widgets.push(widget);
     }
-
-    const mobile = entry.mobile as Record<string, unknown> | undefined;
-    const widget = {
-      id: typeof entry.id === "string" ? entry.id : createId(),
-      type,
-      size,
-      ...position,
-      // Vérifiée à l'affichage par mobileLayout, comme les chevauchements
-      ...(Number.isInteger(mobile?.x) && Number.isInteger(mobile?.y)
-        ? { mobile: { x: mobile!.x as number, y: mobile!.y as number } }
-        : {}),
-      settings,
-    } as Widget;
-
-    placed.push(widgetRect(widget));
-    widgets.push(widget);
   }
 
   return widgets;

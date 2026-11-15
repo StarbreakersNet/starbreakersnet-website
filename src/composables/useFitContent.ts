@@ -33,23 +33,14 @@ export function useFitContent(
 
   // Recherche par dichotomie de la plus grande échelle qui tient (lectures de mise en page
   // synchrones, quelques itérations seulement)
-  function fit() {
-    const target = element.value;
-    if (!target || target.clientHeight === 0) return;
-
-    apply(target, 1);
-    if (!overflows(target)) {
-      scale.value = 1;
-      overflowing.value = false;
-      onFit?.({ scale: 1, overflowing: false });
-      return;
-    }
-
+  function findLargestScale(target: HTMLElement) {
     let low = minScale;
     let high = 1;
+
     for (let step = 0; step < STEPS; step++) {
       const middle = (low + high) / 2;
       apply(target, middle);
+
       if (overflows(target)) {
         high = middle;
       } else {
@@ -57,10 +48,32 @@ export function useFitContent(
       }
     }
 
-    apply(target, low);
-    scale.value = Math.round(low * 100) / 100;
-    overflowing.value = overflows(target);
+    return low;
+  }
+
+  function fitTarget(target: HTMLElement) {
+    apply(target, 1);
+
+    if (overflows(target)) {
+      const fitted = findLargestScale(target);
+
+      apply(target, fitted);
+      scale.value = Math.round(fitted * 100) / 100;
+      overflowing.value = overflows(target);
+    } else {
+      scale.value = 1;
+      overflowing.value = false;
+    }
+
     onFit?.({ scale: scale.value, overflowing: overflowing.value });
+  }
+
+  function fit() {
+    const target = element.value;
+
+    if (target && target.clientHeight !== 0) {
+      fitTarget(target);
+    }
   }
 
   const resizeObserver = new ResizeObserver(() => fit());
