@@ -128,6 +128,10 @@ const SCRIPT_SYNTAX = [
     message: `Fonctions en camelCase (${AGENTS_DOC})`,
   },
   {
+    selector: "FunctionDeclaration > Identifier.id[name=/^on[A-Z]/]",
+    message: `Un gestionnaire d'événement s'appelle handleXxx, ou porte le verbe de son action (addLink) : jamais onXxx (${AGENTS_DOC})`,
+  },
+  {
     selector: "VariableDeclarator > Identifier.id[name!=/^([a-z][A-Za-z0-9]*|[A-Z][A-Z0-9_]*)$/]",
     message: `Variables en camelCase, constantes de module en UPPER_SNAKE_CASE (${AGENTS_DOC})`,
   },

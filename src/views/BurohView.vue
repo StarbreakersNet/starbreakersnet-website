@@ -47,7 +47,7 @@ const configuredId = ref<string | null>(null);
 const mobileQuery = window.matchMedia(MOBILE_QUERY);
 const isMobile = ref(mobileQuery.matches);
 
-function onMobileChange(event: MediaQueryListEvent) {
+function handleMobileChange(event: MediaQueryListEvent) {
   isMobile.value = event.matches;
 }
 
@@ -65,7 +65,7 @@ const gridItems = computed<GridItem[]>(() => {
 
 const widgetsById = computed(() => new Map(store.widgets.map(widget => [widget.id, widget])));
 
-function onMoved(positions: GridPosition[]) {
+function handleMoved(positions: GridPosition[]) {
   store.move(positions, isMobile.value ? "mobile" : "desktop");
 }
 
@@ -144,7 +144,7 @@ function sleep() {
 
 // Seul le focus au clavier garde la barre affichée : après un clic, ou quand une fenêtre rend le
 // focus à son bouton en se fermant, elle s'efface comme d'habitude
-function onToolbarFocusIn(event: FocusEvent) {
+function handleToolbarFocusIn(event: FocusEvent) {
   toolbarFocused.value = (event.target as Element).matches(":focus-visible");
 }
 
@@ -157,7 +157,7 @@ const menuOptions = computed(() => [
   { key: "wallpaper", label: "Changer le fond d'écran…" },
 ]);
 
-function onContextMenu(event: MouseEvent) {
+function handleContextMenu(event: MouseEvent) {
   // Menu du navigateur conservé sur les liens et les champs de saisie
   const onField = (event.target as Element).closest("a, input, textarea, [contenteditable]");
 
@@ -167,7 +167,7 @@ function onContextMenu(event: MouseEvent) {
   }
 }
 
-function onMenuSelect(key: string) {
+function handleMenuSelect(key: string) {
   menu.value.show = false;
 
   if (key === "edit") {
@@ -190,7 +190,7 @@ const toolbarVisible = computed(
 );
 
 onMounted(() => {
-  mobileQuery.addEventListener("change", onMobileChange);
+  mobileQuery.addEventListener("change", handleMobileChange);
 
   wake();
   ACTIVITY_EVENTS.forEach(event => window.addEventListener(event, wake, { passive: true }));
@@ -198,7 +198,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  mobileQuery.removeEventListener("change", onMobileChange);
+  mobileQuery.removeEventListener("change", handleMobileChange);
 
   clearTimeout(idleTimer);
   ACTIVITY_EVENTS.forEach(event => window.removeEventListener(event, wake));
@@ -212,7 +212,7 @@ onBeforeUnmount(() => {
     :data-wallpaper="appearance.kind"
     :style="burohStyle"
     class="buroh"
-    @contextmenu="onContextMenu($event)">
+    @contextmenu="handleContextMenu($event)">
     <buroh-wallpaper @appearance="appearance = $event" />
     <widget-grid
       :key="isMobile ? 'mobile' : 'desktop'"
@@ -223,7 +223,7 @@ onBeforeUnmount(() => {
       :gap="isMobile ? MOBILE_GAP : GAP"
       :items="gridItems"
       class="grid"
-      @moved="onMoved($event)">
+      @moved="handleMoved($event)">
       <template #item="{ id }">
         <widget-frame
           v-if="widgetsById.get(id)"
@@ -246,7 +246,7 @@ onBeforeUnmount(() => {
       <div
         :class="{ hidden: !toolbarVisible }"
         class="toolbar liquid-glass liquid-glass--overlay"
-        @focusin="onToolbarFocusIn($event)"
+        @focusin="handleToolbarFocusIn($event)"
         @focusout="toolbarFocused = false"
         @pointerenter="toolbarHovered = true"
         @pointerleave="toolbarHovered = false">
@@ -299,7 +299,7 @@ onBeforeUnmount(() => {
       placement="bottom-start"
       trigger="manual"
       @clickoutside="menu.show = false"
-      @select="onMenuSelect($event)" />
+      @select="handleMenuSelect($event)" />
   </main>
 </template>
 

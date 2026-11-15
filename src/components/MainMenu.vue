@@ -7,7 +7,7 @@ import HFlex from "@/components/c/hFlex.vue";
 
 const router = useRouter();
 
-function onClick(item: MenuItem) {
+function handleClick(item: MenuItem) {
   if (item.routeName) {
     router.push({ name: item.routeName });
   } else if (item.externalLink) {
@@ -22,7 +22,7 @@ function onClick(item: MenuItem) {
       <h-button
         :color="item.color"
         :text-color="item.textColor ?? (item.color ? 'white' : '')"
-        @click="onClick(item)">
+        @click="handleClick(item)">
         <h-flex wrap :size="10" align="center" justify="center" vertical>
           <font-awesome-icon v-if="item.icon" :icon="item.icon" class="fa-icon" />
           <span v-if="item.label" class="label">{{ item.label }}</span>

@@ -157,7 +157,7 @@ const emit = defineEmits<{
 ### Fonctions
 
 - Déclarées avec `function` **`lint`**. Les fonctions fléchées restent pour les callbacks en ligne (`items.filter(item => …)`).
-- Gestionnaires d'événements : `handleXxx` (`handleSubmit`, `handleSelect`). Pour une modale : `openXxx` et `closeXxx`.
+- Gestionnaires d'événements : `handleXxx` (`handleSubmit`, `handleSelect`), ou le verbe de l'action quand la fonction ne fait que ça (`addLink`, `saveKey`). Jamais `onXxx` **`lint`**. Pour une modale : `openXxx` et `closeXxx`.
 - `async` / `await`, pas `.then()` **`lint`**. Les indicateurs de chargement passent par `useLoader()` (voir [Chargements](#chargements)).
 - **Courtes et unitaires** : une fonction fait une seule chose, et son nom dit laquelle (`areFormsValid`, `saveAccount`). Un gestionnaire `handleXxx` se lit comme un résumé : il vérifie les conditions et confie le travail à des fonctions nommées.
 - **Conditions en positif, et le code qui en dépend dans le `if`** : l'indentation montre ce qui ne s'exécute qu'à cette condition. Pas de sortie anticipée : ni `return;` vide **`lint`**, ni `continue` dans une boucle **`lint`**.

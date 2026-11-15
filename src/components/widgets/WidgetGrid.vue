@@ -78,7 +78,7 @@ function createGrid(element: HTMLElement) {
 }
 
 // Fin d'un glisser-déposer : positions de tous les widgets, poussés compris
-function onDragStop() {
+function handleDragStop() {
   const nodes = grid?.engine.nodes ?? [];
 
   const positions = nodes.map(node => ({
@@ -146,7 +146,7 @@ onMounted(() => {
 
   if (grid) {
     remember(items);
-    grid.on("dragstop", onDragStop);
+    grid.on("dragstop", handleDragStop);
   }
 });
 

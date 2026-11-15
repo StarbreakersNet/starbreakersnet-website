@@ -31,14 +31,14 @@ Lire d'abord le fichier de [`docs/conventions/`](docs/conventions/README.md) qui
 | Constante de module | UPPER_SNAKE_CASE | `EMAIL_CHANGE_DURATION` |
 | Booléen | `isXxx`, `hasXxx`, `canXxx`, `showXxx` | `isReady`, `showDeleteModal` |
 | Loader (`useLoader`) | L'action en cours, en *-ing* | `saving`, `deleting` |
-| Gestionnaire d'événement | `handleXxx` | `handleSubmit` |
+| Gestionnaire d'événement | `handleXxx`, ou le verbe de son action ; jamais `onXxx` | `handleSubmit`, `addLink` |
 | Ref de template | suffixe `Ref` | `formRef` |
 | Type, interface | PascalCase ; `interface` pour un objet, `type` pour une union | `HFormInst`, `ThemeType` |
 | Store | `useXxxStore`, fichier et id identiques | `stores/auth.ts`, `useAuthStore`, `"auth"` |
 | Événement émis | camelCase, au participe passé | `registered`, `itemClick` |
 | Classe CSS | kebab-case | `.app-container`, `.icon-wrapper` |
 
-`yarn lint` vérifie ces noms, sauf ceux des booléens, des gestionnaires d'événement et des classes CSS, et le participe passé des événements.
+`yarn lint` vérifie ces noms, sauf ceux des booléens et des classes CSS, et le participe passé des événements. Pour les gestionnaires d'événement, il refuse seulement `onXxx`.
 
 ## Langue, textes et commentaires
 

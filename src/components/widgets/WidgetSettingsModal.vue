@@ -52,7 +52,7 @@ function updateSize(size: WidgetSize) {
   }
 }
 
-function onUpdateShow(show: boolean) {
+function handleUpdateShow(show: boolean) {
   if (!show) {
     emit("close");
   }
@@ -64,7 +64,7 @@ function onUpdateShow(show: boolean) {
     :show="!!widget"
     class="widget-settings apple-menu"
     preset="card"
-    @update:show="onUpdateShow($event)">
+    @update:show="handleUpdateShow($event)">
     <template #header>
       <h-flex size="small">
         <font-awesome-icon v-if="definition" :icon="definition.icon" />

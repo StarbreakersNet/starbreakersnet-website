@@ -111,13 +111,13 @@ async function readFile(addedAt: string | null) {
   }
 }
 
-function onMediaChange() {
+function handleMediaChange() {
   loaded.value = false;
   failed.value = false;
   emit("appearance", GRADIENT_APPEARANCE);
 }
 
-async function onLoaded() {
+async function handleLoaded() {
   const current = media.value;
 
   loaded.value = true;
@@ -132,14 +132,14 @@ async function onLoaded() {
   }
 }
 
-function onError() {
+function handleError() {
   failed.value = true;
   emit("appearance", GRADIENT_APPEARANCE);
   message.error("Impossible d'afficher ce fond d'écran : retour au dégradé");
 }
 
 // Vidéo avec "Réduire les animations" : première image, sans lecture
-function onVideoMetadata(event: Event) {
+function handleVideoMetadata(event: Event) {
   if (reducedMotion) {
     (event.target as HTMLVideoElement).currentTime = 0.1;
   }
@@ -208,7 +208,7 @@ watch(() => (wallpaper.value.source === "file" ? wallpaper.value.addedAt : null)
   immediate: true,
 });
 
-watch(() => media.value?.src, onMediaChange);
+watch(() => media.value?.src, handleMediaChange);
 
 watch(rotationKey, key => {
   if (key) {
@@ -239,8 +239,8 @@ onBeforeUnmount(() => {
         alt=""
         class="media"
         decoding="async"
-        @error="onError()"
-        @load="onLoaded()" />
+        @error="handleError()"
+        @load="handleLoaded()" />
       <video
         v-else
         :key="media.src"
@@ -253,9 +253,9 @@ onBeforeUnmount(() => {
         muted
         playsinline
         preload="auto"
-        @error="onError()"
-        @loadeddata="onLoaded()"
-        @loadedmetadata="onVideoMetadata($event)" />
+        @error="handleError()"
+        @loadeddata="handleLoaded()"
+        @loadedmetadata="handleVideoMetadata($event)" />
     </template>
   </div>
   <p v-if="credit" class="credit">

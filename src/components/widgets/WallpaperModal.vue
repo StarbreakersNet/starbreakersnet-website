@@ -73,7 +73,7 @@ const tab = ref("presets");
 const rotationKind = ref<"photos" | "videos">("photos");
 
 // À l'ouverture, onglet et options du fond d'écran actuel
-function onOpen(visible: boolean) {
+function handleOpen(visible: boolean) {
   const source = wallpaper.value.source;
 
   if (visible) {
@@ -270,7 +270,7 @@ async function loadTopics() {
   }
 }
 
-function onPhotosShown(visible: boolean) {
+function handlePhotosShown(visible: boolean) {
   if (visible && store.unsplashKey && !topics.value.length) {
     loadTopics();
   }
@@ -379,7 +379,7 @@ async function saveFile(file: File, kind: MediaKind) {
   }
 }
 
-function onFileChosen(event: Event) {
+function handleFileChosen(event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   const kind = file ? fileKind(file) : null;
@@ -399,11 +399,11 @@ function onFileChosen(event: Event) {
   }
 }
 
-watch(show, onOpen);
+watch(show, handleOpen);
 
 watch(
   () => show.value && tab.value === "rotation" && rotationKind.value === "photos",
-  onPhotosShown,
+  handlePhotosShown,
   { immediate: true }
 );
 
@@ -627,7 +627,7 @@ watch(
               accept="image/*,video/*"
               class="file-input"
               type="file"
-              @change="onFileChosen($event)" />
+              @change="handleFileChosen($event)" />
           </h-form-item>
         </h-form>
         <h-text depth="3">
