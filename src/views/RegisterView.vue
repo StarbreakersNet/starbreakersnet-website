@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useAuthStore } from "@/stores/auth";
-import { computed, reactive, ref, useTemplateRef } from "vue";
+import { computed, reactive, useTemplateRef } from "vue";
+import { useLoader } from "@/composables/useLoader";
 import type { HFormInst } from "@/types/components/c/hForm";
 import HForm from "@/components/c/hForm.vue";
 import HFormItem from "@/components/c/hFormItem.vue";
@@ -21,7 +22,7 @@ const emit = defineEmits(["registered"]);
 const auth = useAuthStore();
 
 const formRef = useTemplateRef<HFormInst>("formRef");
-const loading = ref(false);
+const registering = useLoader();
 const registerForm = reactive({
   username: "",
   email: "",
@@ -38,13 +39,9 @@ const passwordFeedback = computed(() =>
 );
 
 async function handleSubmit() {
-  loading.value = true;
-  const response = await auth.register(
-    registerForm.email,
-    registerForm.password,
-    registerForm.username
+  const response = await registering.run(() =>
+    auth.register(registerForm.email, registerForm.password, registerForm.username)
   );
-  loading.value = false;
 
   if (response) {
     formRef.value?.reset();
@@ -78,7 +75,7 @@ async function handleSubmit() {
           type="password" />
       </h-form-item>
       <h-flex class="tw:mt-3" vertical>
-        <h-button :disabled="!formRef?.isValid" :loading="loading" attr-type="submit">
+        <h-button :disabled="!formRef?.isValid" :loading="registering.loading" attr-type="submit">
           S'inscrire
         </h-button>
         <h-text depth="3">

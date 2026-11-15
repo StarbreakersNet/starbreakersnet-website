@@ -28,6 +28,7 @@ import {
   WALLPAPER_VIDEOS,
 } from "@/models/wallpapers";
 import { normalizeUrl } from "@/models/widgets";
+import { useLoader } from "@/composables/useLoader";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import { useWidgetsStore } from "@/stores/widgets";
@@ -122,9 +123,9 @@ const unsplashForm = reactive({
 });
 
 const collectionError = ref("");
-const fetching = ref(false);
+const fetching = useLoader();
 const topics = ref<UnsplashTopic[]>([]);
-const loadingTopics = ref(false);
+const loadingTopics = useLoader();
 
 const topicOptions = computed(() => [
   { value: "", label: "Toutes les photos" },
@@ -206,16 +207,12 @@ async function nextPhoto() {
   const current = unsplash.value;
 
   if (current && store.unsplashKey) {
-    fetching.value = true;
-
     try {
-      const photo = await fetchRandomPhoto(current, store.unsplashKey);
+      const photo = await fetching.run(() => fetchRandomPhoto(current, store.unsplashKey));
 
       store.setWallpaper({ ...current, photo });
     } catch {
       message.error("Impossible de récupérer une photo Unsplash pour le moment");
-    } finally {
-      fetching.value = false;
     }
   }
 }
@@ -229,7 +226,7 @@ const keyForm = reactive({
 });
 
 const keyError = ref("");
-const checkingKey = ref(false);
+const checkingKey = useLoader();
 
 async function saveKey() {
   const key = normalizeUnsplashKey(keyForm.key);
@@ -237,9 +234,7 @@ async function saveKey() {
   keyError.value = key ? "" : "Clé d'accès invalide";
 
   if (key) {
-    checkingKey.value = true;
-    const status = await checkUnsplashKey(key);
-    checkingKey.value = false;
+    const status = await checkingKey.run(() => checkUnsplashKey(key));
 
     if (status === "invalid") {
       keyError.value = "Clé refusée par Unsplash";
@@ -268,14 +263,10 @@ function removeKey() {
 }
 
 async function loadTopics() {
-  loadingTopics.value = true;
-
   try {
-    topics.value = await fetchTopics(store.unsplashKey);
+    topics.value = await loadingTopics.run(() => fetchTopics(store.unsplashKey));
   } catch {
     message.error("Impossible de récupérer les thèmes Unsplash pour le moment");
-  } finally {
-    loadingTopics.value = false;
   }
 }
 
@@ -335,7 +326,7 @@ const customForm = reactive({
 });
 
 const urlError = ref("");
-const saving = ref(false);
+const saving = useLoader();
 const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
 
 const fileName = computed(() => (wallpaper.value.source === "file" ? wallpaper.value.name : ""));
@@ -374,10 +365,8 @@ function fileKind(file: File): MediaKind | null {
 }
 
 async function saveFile(file: File, kind: MediaKind) {
-  saving.value = true;
-
   try {
-    await saveWallpaperFile(file);
+    await saving.run(() => saveWallpaperFile(file));
 
     store.setWallpaper({
       source: "file",
@@ -387,8 +376,6 @@ async function saveFile(file: File, kind: MediaKind) {
     });
   } catch {
     message.error("Impossible d'enregistrer ce fichier dans le navigateur");
-  } finally {
-    saving.value = false;
   }
 }
 
@@ -479,7 +466,7 @@ watch(
             </h-form-item>
             <h-form-item v-if="hasKey && unsplashForm.selection === 'topic'" label="Thème">
               <h-select
-                :loading="loadingTopics"
+                :loading="loadingTopics.loading"
                 :options="topicOptions"
                 :value="topicValue"
                 @update:value="updateTopic" />
@@ -524,7 +511,7 @@ watch(
                 <h-button
                   v-else
                   :disabled="!keyForm.key.trim()"
-                  :loading="checkingKey"
+                  :loading="checkingKey.loading"
                   type="primary"
                   @click="saveKey">
                   Enregistrer
@@ -554,7 +541,7 @@ watch(
             <h-button v-if="!unsplash" :disabled="!hasKey" type="primary" @click="useUnsplash">
               Utiliser Unsplash
             </h-button>
-            <h-button v-else :disabled="!hasKey" :loading="fetching" @click="nextPhoto">
+            <h-button v-else :disabled="!hasKey" :loading="fetching.loading" @click="nextPhoto">
               <template #icon>
                 <font-awesome-icon icon="rotate" />
               </template>
@@ -625,7 +612,7 @@ watch(
           </h-form-item>
           <h-form-item label="Depuis votre ordinateur">
             <h-flex>
-              <h-button :loading="saving" @click="fileInput?.click()">
+              <h-button :loading="saving.loading" @click="fileInput?.click()">
                 <template #icon>
                   <font-awesome-icon icon="upload" />
                 </template>

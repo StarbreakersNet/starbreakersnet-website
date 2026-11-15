@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { FormItemRule, FormRules } from "naive-ui";
 import { computed, onMounted, reactive, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useLoader } from "@/composables/useLoader";
 import { useMessage } from "@/composables/useMessage";
 import { useUserStore } from "@/stores/user";
 import { useAuthStore } from "@/stores/auth";
@@ -43,7 +44,7 @@ const accountFormRef = useTemplateRef<HFormInst>("accountFormRef");
 const passwordFormRef = useTemplateRef<HFormInst>("passwordFormRef");
 const deleteFormRef = useTemplateRef<HFormInst>("deleteFormRef");
 
-const saving = ref(false);
+const saving = useLoader();
 const account = reactive({
   username: "",
   firstName: "",
@@ -82,7 +83,7 @@ const passwordRules = computed((): FormRules => {
 
 // Suppression du compte : confirmée par le mot de passe, dans une fenêtre dédiée
 const showDeleteModal = ref(false);
-const deleting = ref(false);
+const deleting = useLoader();
 const deleteForm = reactive({ password: "" });
 const deleteRules: FormRules = { password: currentPasswordRule };
 
@@ -92,17 +93,11 @@ function openDeleteModal() {
 }
 
 async function handleDelete() {
-  if (deleting.value || !(await isValid(deleteFormRef.value))) {
-    return;
-  }
-
-  deleting.value = true;
-  const deleted = await auth.deleteAccount(deleteForm.password);
-  deleting.value = false;
-
-  // Plus de session : AppLayout ramène à l'accueil depuis cette page protégée
-  if (deleted) {
-    showDeleteModal.value = false;
+  if (!deleting.loading && (await isValid(deleteFormRef.value))) {
+    // Plus de session : AppLayout ramène à l'accueil depuis cette page protégée
+    if (await deleting.run(() => auth.deleteAccount(deleteForm.password))) {
+      showDeleteModal.value = false;
+    }
   }
 }
 
@@ -142,27 +137,25 @@ async function isValid(form: HFormInst | null) {
   }
 }
 
-async function handleSubmit() {
-  if (saving.value || !user.infos.me) {
-    return;
-  }
+function isEmailChanged() {
+  return account.email !== user.infos.me?.email;
+}
 
+function hasChanges() {
+  return isProfileChanged() || isEmailChanged() || wantsPasswordChange.value;
+}
+
+// Valide les deux formulaires, pour que chacun affiche ses erreurs
+async function areFormsValid() {
   const accountValid = await isValid(accountFormRef.value);
   const passwordValid = !wantsPasswordChange.value || (await isValid(passwordFormRef.value));
 
-  if (!accountValid || !passwordValid) {
-    return;
-  }
+  return accountValid && passwordValid;
+}
 
+async function saveAccount() {
   const profileChanged = isProfileChanged();
-  const emailChanged = account.email !== user.infos.me.email;
-
-  if (!profileChanged && !emailChanged && !wantsPasswordChange.value) {
-    message.info("Aucune modification à enregistrer");
-    return;
-  }
-
-  saving.value = true;
+  const emailChanged = isEmailChanged();
   let saved = false;
 
   if (profileChanged) {
@@ -188,8 +181,16 @@ async function handleSubmit() {
   if (saved) {
     message.success("Modifications enregistrées");
   }
+}
 
-  saving.value = false;
+async function handleSubmit() {
+  if (!saving.loading && user.infos.me && (await areFormsValid())) {
+    if (hasChanges()) {
+      await saving.run(saveAccount);
+    } else {
+      message.info("Aucune modification à enregistrer");
+    }
+  }
 }
 
 onMounted(() => {
@@ -332,7 +333,7 @@ onMounted(() => {
               </h-form-item>
               <h-flex justify="end">
                 <h-button @click="showDeleteModal = false">Annuler</h-button>
-                <h-button :loading="deleting" attr-type="submit" type="error">
+                <h-button :loading="deleting.loading" attr-type="submit" type="error">
                   Supprimer définitivement
                 </h-button>
               </h-flex>
@@ -344,7 +345,7 @@ onMounted(() => {
     <template #action-float>
       <n-float-button-group>
         <n-float-button type="primary" @click="handleSubmit()">
-          <font-awesome-icon :icon="saving ? 'spinner' : 'save'" :spin="saving" />
+          <font-awesome-icon :icon="saving.loading ? 'spinner' : 'save'" :spin="saving.loading" />
         </n-float-button>
       </n-float-button-group>
     </template>
