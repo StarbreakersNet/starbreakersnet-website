@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive, ref, useTemplateRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import type { HFormInst } from "@/types/components/c/hForm.ts";
+import type { HFormInst } from "@/types/components/c/hForm";
 import HCard from "@/components/c/hCard.vue";
 import HAlert from "@/components/c/hAlert.vue";
 import HForm from "@/components/c/hForm.vue";

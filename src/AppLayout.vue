@@ -5,13 +5,8 @@ import { onMounted, ref, watch } from "vue";
 import MaintenanceView from "@/views/MaintenanceView.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useMessage, useNotification } from "naive-ui";
-import { useAuthStore } from "@/stores/auth.ts";
-import { useUserStore } from "@/stores/user.ts";
-
-const route = useRoute();
-const router = useRouter();
-const auth = useAuthStore();
-const user = useUserStore();
+import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
 
 const props = defineProps({
   maintenanceMode: {
@@ -19,6 +14,10 @@ const props = defineProps({
     default: false,
   },
 });
+const route = useRoute();
+const router = useRouter();
+const auth = useAuthStore();
+const user = useUserStore();
 
 const isHome = ref(true);
 const showHeader = ref(false);
@@ -72,7 +71,7 @@ onMounted(async () => {
     </div>
   </transition>
   <transition mode="out-in" name="scale">
-    <MaintenanceView v-if="props.maintenanceMode" />
+    <maintenance-view v-if="props.maintenanceMode" />
     <div v-else class="main-container">
       <transition name="shrink">
         <header v-if="showHeader">

@@ -1,58 +1,58 @@
 export const particlesOptions = {
   fpsLimit: 60,
   interactivity: {
-    detectsOn: 'canvas',
+    detectsOn: "canvas",
     events: {
       onClick: {
         enable: false,
-        mode: 'push'
+        mode: "push",
       },
       onHover: {
         enable: false,
-        mode: 'repulse'
+        mode: "repulse",
       },
-      resize: false
-    }
+      resize: false,
+    },
   },
   particles: {
     color: {
-      value: ['#8D1C1A', '#FAED4F']
+      value: ["#8D1C1A", "#FAED4F"],
     },
     links: {
-      color: 'random',
+      color: "random",
       distance: 150,
       enable: true,
       opacity: 0.4,
-      width: 1
+      width: 1,
     },
     collisions: {
-      enable: true
+      enable: true,
     },
     move: {
-      direction: 'top',
+      direction: "top",
       enable: true,
-      outMode: 'bounce',
+      outMode: "bounce",
       random: true,
       speed: 1,
-      straight: false
+      straight: false,
     },
     number: {
       density: {
         enable: true,
-        value_area: 800
+        value_area: 800,
       },
-      value: 80
+      value: 80,
     },
     opacity: {
-      value: 0.5
+      value: 0.5,
     },
     shape: {
-      type: 'circle'
+      type: "circle",
     },
     size: {
       random: true,
-      value: 3
-    }
+      value: 3,
+    },
   },
-  detectRetina: true
-}
+  detectRetina: true,
+};

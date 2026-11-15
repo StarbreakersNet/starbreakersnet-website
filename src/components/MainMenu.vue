@@ -22,7 +22,7 @@ function onClick(item: MenuItem) {
         :text-color="item.textColor ?? (item.color ? 'white' : '')"
         @click="onClick(item)">
         <n-flex :size="10" align="center" justify="center" vertical>
-          <FontAwesomeIcon v-if="item.icon" :icon="item.icon" class="fa-icon" />
+          <font-awesome-icon v-if="item.icon" :icon="item.icon" class="fa-icon" />
           <span v-if="item.label" class="label">{{ item.label }}</span>
         </n-flex>
       </n-button>

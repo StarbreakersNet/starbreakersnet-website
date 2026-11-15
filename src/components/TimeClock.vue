@@ -24,5 +24,3 @@ const time = computed(() => {
     </n-flex>
   </div>
 </template>
-
-<style lang="scss" scoped></style>

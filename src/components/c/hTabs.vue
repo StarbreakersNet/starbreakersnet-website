@@ -1,16 +1,3 @@
-<template>
-  <n-tabs
-    :animated="props.animated"
-    :justify-content="props.justifyContent"
-    :size="props.size"
-    :type="props.type"
-    :value="props.value"
-    v-bind="$attrs"
-    @update:value="$emit('update:value', $event)">
-    <slot />
-  </n-tabs>
-</template>
-
 <script lang="ts" setup>
 import { NTabs, type TabsProps } from "naive-ui";
 import { type PropType } from "vue";
@@ -40,3 +27,16 @@ const props = defineProps({
 
 defineEmits(["update:value"]);
 </script>
+
+<template>
+  <n-tabs
+    :animated="props.animated"
+    :justify-content="props.justifyContent"
+    :size="props.size"
+    :type="props.type"
+    :value="props.value"
+    v-bind="$attrs"
+    @update:value="$emit('update:value', $event)">
+    <slot />
+  </n-tabs>
+</template>

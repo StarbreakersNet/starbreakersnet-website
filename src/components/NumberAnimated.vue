@@ -44,8 +44,9 @@ const formatedValue = computed(() => {
     filter: blur(0);
   }
 
-  .slide-digit-enter-active, .slide-digit-leave-active {
-    transition: all .3s variables.$sn-default-timing;
+  .slide-digit-enter-active,
+  .slide-digit-leave-active {
+    transition: all 0.3s variables.$sn-default-timing;
   }
 
   .slide-digit-enter-from {

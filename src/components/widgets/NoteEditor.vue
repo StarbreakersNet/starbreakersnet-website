@@ -7,6 +7,11 @@ import HInput from "@/components/c/hInput.vue";
 import { markdownExtensions } from "@/utils/markdown";
 import { normalizeUrl } from "@/models/widgets";
 
+const markdown = defineModel({
+  type: String,
+  required: true,
+});
+
 // Éditeur du widget Note, sans Markdown à écrire (TipTap). Le texte reste enregistré en Markdown,
 // comme avant : les notes existantes s'ouvrent telles quelles. Mêmes extensions que l'affichage
 // du widget (utils/markdown.ts), pour que la note s'affiche comme on l'a écrite.
@@ -16,11 +21,6 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-});
-
-const markdown = defineModel({
-  type: String,
-  required: true,
 });
 
 const length = ref(markdown.value.length);

@@ -1,8 +1,8 @@
 <script setup>
 import { carouselListItems } from "@/models/CarouselItem";
-import { particlesOptions } from "@/models/ParticlesConfig.ts";
+import { particlesOptions } from "@/models/ParticlesConfig";
 
-const carouselItemsStyle = carouselListItems.map((item) => {
+const carouselItemsStyle = carouselListItems.map(item => {
   const align = item.style.align;
   const delay = calculateDelays(item);
 
@@ -28,24 +28,18 @@ function calculateDelays(item) {
 <template>
   <main class="fullscreen-container">
     <vue-particles id="tsparticles" :options="particlesOptions" />
-    <n-carousel
-      :interval="15000"
-      autoplay
-      dot-placement="top"
-      dot-type="line"
-      draggable
-      keyboard>
+    <n-carousel :interval="15000" autoplay dot-placement="top" dot-type="line" draggable keyboard>
       <div v-for="(item, itemIndex) in carouselListItems" :key="item.title.toLowerCase()">
         <n-flex :align="item.style.align" class="content-container" size="large" vertical>
           <div
             v-if="item.thumbnail"
-            :class="{absolute: item.style.align !== 'center'}"
-            :style="{transitionDelay: carouselItemsStyle[itemIndex].delay[0]}"
+            :class="{ absolute: item.style.align !== 'center' }"
+            :style="{ transitionDelay: carouselItemsStyle[itemIndex].delay[0] }"
             class="thumbnail-container">
             <img :alt="item.thumbnail.alt" :src="item.thumbnail.src" class="thumbnail" />
           </div>
           <div
-            :style="{transitionDelay: carouselItemsStyle[itemIndex].delay[1]}"
+            :style="{ transitionDelay: carouselItemsStyle[itemIndex].delay[1] }"
             class="title-container">
             <n-h1>
               {{ item.title }}
@@ -53,12 +47,12 @@ function calculateDelays(item) {
           </div>
           <n-card
             :bordered="false"
-            :style="{transitionDelay: carouselItemsStyle[itemIndex].delay[2]}"
+            :style="{ transitionDelay: carouselItemsStyle[itemIndex].delay[2] }"
             class="description-container card-blurred">
             <n-text>{{ item.description }}</n-text>
           </n-card>
           <n-flex
-            :style="{transitionDelay: carouselItemsStyle[itemIndex].delay[3]}"
+            :style="{ transitionDelay: carouselItemsStyle[itemIndex].delay[3] }"
             class="actions-container">
             <template v-for="action in item.actions">
               <n-button
@@ -131,12 +125,12 @@ main {
     }
 
     .n-card {
-      border-radius: .75rem;
+      border-radius: 0.75rem;
       width: unset;
     }
 
     .n-button {
-      border-radius: .75rem;
+      border-radius: 0.75rem;
       height: 3rem;
       width: unset;
     }
@@ -156,7 +150,8 @@ main {
     align-items: center;
     overflow: hidden;
 
-    video, img {
+    video,
+    img {
       width: 100%;
       height: 120%;
       object-fit: cover;
@@ -187,7 +182,7 @@ main {
       height: 3px;
       background: variables.$sn-primary-red;
       transition: left animations.$default-animation;
-      transition-delay: .1s;
+      transition-delay: 0.1s;
     }
 
     &:hover::after {

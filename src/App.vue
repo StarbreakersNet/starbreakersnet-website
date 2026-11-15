@@ -4,7 +4,7 @@ import { getNaiveOverrideTheme, getNaiveTheme } from "@/composables/appUtils";
 import { vKonami } from "vue-konami";
 import AppLayout from "@/AppLayout.vue";
 import { dateFrFR, frFR } from "naive-ui";
-import { useUserStore } from "@/stores/user.ts";
+import { useUserStore } from "@/stores/user";
 
 const user = useUserStore();
 
@@ -61,5 +61,3 @@ onMounted(async () => {
     </n-message-provider>
   </n-config-provider>
 </template>
-
-<style lang="scss" scoped></style>

@@ -1,18 +1,3 @@
-<template>
-  <n-grid
-    :collapsed="props.collapsed"
-    :collapsed-rows="props.collapsedRows"
-    :cols="props.cols"
-    :item-responsive="props.itemResponsive"
-    :layout-shift-disabled="props.layoutShiftDisabled"
-    :responsive="props.responsive"
-    :x-gap="props.xGap"
-    :y-gap="props.yGap"
-    v-bind="$attrs">
-    <slot />
-  </n-grid>
-</template>
-
 <script lang="ts" setup>
 import { type GridProps, NGrid } from "naive-ui";
 import { type PropType } from "vue";
@@ -52,3 +37,18 @@ const props = defineProps({
   },
 });
 </script>
+
+<template>
+  <n-grid
+    :collapsed="props.collapsed"
+    :collapsed-rows="props.collapsedRows"
+    :cols="props.cols"
+    :item-responsive="props.itemResponsive"
+    :layout-shift-disabled="props.layoutShiftDisabled"
+    :responsive="props.responsive"
+    :x-gap="props.xGap"
+    :y-gap="props.yGap"
+    v-bind="$attrs">
+    <slot />
+  </n-grid>
+</template>

@@ -6,11 +6,11 @@ import AppVersion from "@/components/AppVersion.vue";
 import { version } from "@/../package.json";
 import LoginView from "@/views/LoginView.vue";
 import HModal from "@/components/c/hModal.vue";
-import { useAuthStore } from "@/stores/auth.ts";
-import { useUserStore } from "@/stores/user.ts";
-import { useSettingsStore } from "@/stores/settings.ts";
-import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
-import { formatUserTag } from "@/utils/userTag.ts";
+import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
+import { useSettingsStore } from "@/stores/settings";
+import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils";
+import { formatUserTag } from "@/utils/userTag";
 
 const auth = useAuthStore();
 const user = useUserStore();

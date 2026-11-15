@@ -10,15 +10,15 @@ import HFormItem from "@/components/c/hFormItem.vue";
 import HButton from "@/components/c/hButton.vue";
 import HModal from "@/components/c/hModal.vue";
 import HText from "@/components/c/hText.vue";
-import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
+import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { FormItemRule, FormRules } from "naive-ui";
 import { computed, onMounted, reactive, ref, useTemplateRef, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useMessage } from "@/composables/useMessage";
-import { useUserStore } from "@/stores/user.ts";
-import { useAuthStore } from "@/stores/auth.ts";
-import type { HFormInst } from "@/types/components/c/hForm.ts";
+import { useUserStore } from "@/stores/user";
+import { useAuthStore } from "@/stores/auth";
+import type { HFormInst } from "@/types/components/c/hForm";
 import {
   emailRule,
   passwordConfirmationRule,
@@ -350,5 +350,3 @@ onMounted(() => {
     </template>
   </h-card>
 </template>
-
-<style lang="scss" scoped></style>

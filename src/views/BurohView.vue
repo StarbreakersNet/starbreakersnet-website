@@ -135,20 +135,6 @@ function wake() {
   idleTimer = setTimeout(() => (awake.value = false), TOOLBAR_IDLE_DELAY);
 }
 
-// Souris sortie de la fenêtre : la barre s'efface sans attendre
-function sleep() {
-  clearTimeout(idleTimer);
-
-  awake.value = false;
-  toolbarHovered.value = false;
-}
-
-// Seul le focus au clavier garde la barre affichée : après un clic, ou quand une fenêtre rend le
-// focus à son bouton en se fermant, elle s'efface comme d'habitude
-function onToolbarFocusIn(event: FocusEvent) {
-  toolbarFocused.value = (event.target as Element).matches(":focus-visible");
-}
-
 // --- Menu du clic droit sur le Buroh, comme sur macOS
 
 const menu = ref({ show: false, x: 0, y: 0 });
@@ -195,7 +181,6 @@ onMounted(() => {
 
   wake();
   ACTIVITY_EVENTS.forEach(event => window.addEventListener(event, wake, { passive: true }));
-  document.documentElement.addEventListener("mouseleave", sleep);
 });
 
 onBeforeUnmount(() => {
@@ -203,7 +188,6 @@ onBeforeUnmount(() => {
 
   clearTimeout(idleTimer);
   ACTIVITY_EVENTS.forEach(event => window.removeEventListener(event, wake));
-  document.documentElement.removeEventListener("mouseleave", sleep);
 });
 </script>
 
@@ -247,7 +231,7 @@ onBeforeUnmount(() => {
       <div
         :class="{ hidden: !toolbarVisible }"
         class="toolbar liquid-glass liquid-glass--overlay"
-        @focusin="onToolbarFocusIn"
+        @focusin="toolbarFocused = true"
         @focusout="toolbarFocused = false"
         @pointerenter="toolbarHovered = true"
         @pointerleave="toolbarHovered = false">

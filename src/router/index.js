@@ -3,8 +3,8 @@ import HomeView from "@/views/HomeView.vue";
 import ViewerDiscord from "@/components/ViewerDiscord.vue";
 import ViewerYoutube from "@/components/ViewerYoutube.vue";
 import AccountView from "@/views/AccountView.vue";
-import { useAuthStore } from "@/stores/auth.ts";
-import { useUserStore } from "@/stores/user.ts";
+import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

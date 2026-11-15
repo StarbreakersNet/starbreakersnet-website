@@ -1,5 +1,5 @@
 <script setup>
-import { particlesOptions } from "@/models/ParticlesConfig.ts";
+import { particlesOptions } from "@/models/ParticlesConfig";
 </script>
 
 <template>

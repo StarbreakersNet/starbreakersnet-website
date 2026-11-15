@@ -1,8 +1,6 @@
-import _ from "lodash";
-import { computed, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 
 export type LoaderInstance = ReturnType<typeof useLoader>;
-export type LoaderCollection = Record<string, LoaderInstance>;
 
 export function useLoader() {
   const count = ref(0);
@@ -23,39 +21,26 @@ export function useLoader() {
     count.value = 0;
   }
 
-  return {
-    count: count.value,
+  async function run<T>(task: () => Promise<T>): Promise<T> {
+    start();
+    try {
+      return await task();
+    } finally {
+      stop();
+    }
+  }
+
+  // reactive : un computed rangé dans un objet ordinaire ne serait pas déballé par le template
+  return reactive({
+    count,
     loading,
     start,
     stop,
     reset,
-  };
+    run,
+  });
 }
 
-function prepareLoadersFromArray(loadersCollections: LoaderCollection[]) {
-  let loadersFormated: Record<string, LoaderInstance> = {};
-
-  loadersCollections.forEach((loaders, index) => {
-    Object.entries(loaders).forEach(([key, loader]) => {
-      loadersFormated[key + "#" + index] = loader;
-    });
-  });
-
-  return loadersFormated;
-}
-
-export function getLoaderComputed(loaderCollection: LoaderCollection | LoaderCollection[]) {
-  let loaders: Record<string, LoaderInstance> = {};
-
-  if (Array.isArray(loaderCollection)) {
-    loaders = prepareLoadersFromArray(loaderCollection);
-  } else if (typeof loaderCollection === "object") {
-    loaders = prepareLoadersFromArray([loaderCollection]);
-  }
-
-  let loaderList = Object.values(loaders).map((loader: LoaderInstance) => {
-    return loader.loading.value;
-  });
-
-  return _.some(loaderList);
+export function isAnyLoading(...loaders: LoaderInstance[]) {
+  return loaders.some(loader => loader.loading);
 }

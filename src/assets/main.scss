@@ -32,7 +32,7 @@
 .apple-container {
   @extend .apple-blurred;
   border-radius: variables.$sn-apple-border-radius;
-  padding: .1em;
+  padding: 0.1em;
 }
 
 .apple-menu {
