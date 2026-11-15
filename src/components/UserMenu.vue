@@ -9,7 +9,7 @@ import HModal from "@/components/c/hModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";
-import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils";
+import { renderNaiveFontAwesomeIcon } from "@/utils/naiveIcons";
 import { formatUserTag } from "@/utils/userTag";
 
 const auth = useAuthStore();

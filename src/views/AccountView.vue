@@ -10,7 +10,7 @@ import HFormItem from "@/components/c/hFormItem.vue";
 import HButton from "@/components/c/hButton.vue";
 import HModal from "@/components/c/hModal.vue";
 import HText from "@/components/c/hText.vue";
-import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils";
+import { renderNaiveFontAwesomeIcon } from "@/utils/naiveIcons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import type { FormItemRule, FormRules } from "naive-ui";
 import { computed, onMounted, reactive, ref, useTemplateRef, watch } from "vue";

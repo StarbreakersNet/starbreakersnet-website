@@ -15,7 +15,7 @@ import type { HFormInst } from "@/types/components/c/hForm";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { emailRule } from "@/utils/validation";
-import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils";
+import { renderNaiveFontAwesomeIcon } from "@/utils/naiveIcons";
 
 const emit = defineEmits(["connected"]);
 const auth = useAuthStore();

@@ -1,15 +1,14 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import MimicBackend from "@/stores/MimicBackend";
+import { DISCORD_WIDGET_URL } from "@/utils/embeds";
 import AppContainer from "@/components/AppContainer.vue";
 
-const url: string = MimicBackend.getViewerDiscordUrl();
 const isIframeLoaded = ref(false);
 </script>
 
 <template>
   <app-container :loaded="isIframeLoaded" app="discord">
-    <iframe :src="url" allowtransparency="true" @load="isIframeLoaded = true" />
+    <iframe :src="DISCORD_WIDGET_URL" allowtransparency="true" @load="isIframeLoaded = true" />
   </app-container>
 </template>
 

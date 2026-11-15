@@ -1,4 +1,4 @@
-import { preferedOsTheme } from "@/composables/appUtils";
+import { getOsTheme } from "@/utils/naiveTheme";
 import type { ThemeType } from "@/types/User";
 
 const STORAGE_KEY = "theme";
@@ -15,7 +15,7 @@ export function readLocalTheme(): ThemeType {
     // Stockage indisponible (navigation privée stricte…) : préférence du système
   }
 
-  return preferedOsTheme();
+  return getOsTheme();
 }
 
 export function writeLocalTheme(theme: ThemeType) {

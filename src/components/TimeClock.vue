@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCurrentTime } from "@/composables/currentTime";
+import { useCurrentTime } from "@/composables/useCurrentTime";
 import NumberAnimated from "@/components/NumberAnimated.vue";
 import { computed } from "vue";
 

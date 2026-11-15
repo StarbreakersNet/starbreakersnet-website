@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import { menuItems } from "@/models/MenuItem";
-import _ from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const props = defineProps({
@@ -15,7 +14,7 @@ const props = defineProps({
 });
 
 const appFind = computed(() => {
-  return _.find(menuItems, { routeName: props.app });
+  return menuItems.find(item => item.routeName === props.app);
 });
 const icon = computed(() => appFind.value?.icon);
 const componentStyle = {

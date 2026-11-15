@@ -1,6 +1,6 @@
 import hButton from "@/components/c/hButton.vue";
 import hFlex from "@/components/c/hFlex.vue";
-import { renderedFontAwesomeIcon } from "@/composables/fontAwesomeUtils";
+import { renderedFontAwesomeIcon } from "@/utils/naiveIcons";
 import type {
   NaiveNotificationType,
   NotificationOptions,

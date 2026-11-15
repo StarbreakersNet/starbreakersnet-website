@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref, watch } from "vue";
-import { getNaiveOverrideTheme, getNaiveTheme } from "@/composables/appUtils";
+import { getNaiveOverrideTheme, getNaiveTheme } from "@/utils/naiveTheme";
 import { vKonami } from "vue-konami";
 import AppLayout from "@/AppLayout.vue";
 import { dateFrFR, frFR } from "naive-ui";
