@@ -11,15 +11,14 @@ import HUl from "@/components/c/hUl.vue";
 import HLi from "@/components/c/hLi.vue";
 import HGridItem from "@/components/c/hGridItem.vue";
 import HA from "@/components/c/hA.vue";
+import { CONTACT_EMAIL } from "@/utils/contact";
 
 // Dernière mise à jour du texte, à changer à chaque modification
 const UPDATED_AT = "9 novembre 2026";
 
 // Éditeur : particulier, à titre non professionnel, sous pseudonyme (art. 6, III-2 de la LCEN).
-// Son identité est connue de l'hébergeur. Cette adresse doit recevoir les messages : c'est aussi
-// celle des demandes liées aux données personnelles.
+// Son identité est connue de l'hébergeur.
 const EDITOR = "TheRedfoox";
-const CONTACT_EMAIL = "contact@starbreakers.net";
 
 // Coordonnées de l'hébergeur du serveur, reprises de https://www.ovhcloud.com/fr/terms-and-conditions/
 const HOST = {

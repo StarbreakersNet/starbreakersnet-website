@@ -11,7 +11,7 @@ Les règles ont été adoptées en novembre 2026. Le formatage (Prettier), l'ord
 - [x] Sorties anticipées : 10 `return;` vides dans `AccountView`, `LoginView`, `composables/useFitContent.ts`, `stores/auth.ts` et `stores/settings.ts` (`no-restricted-syntax`), et 2 `continue` dans `models/widgets.ts` (`no-continue`). Dans `hForm`, `computeIsValidSilently` a un `continue` et 5 niveaux d'imbrication (`no-continue`, `max-depth`)
 - [x] JavaScript vers TypeScript : `main.js` et `router/index.js`
 - [x] Rangement : supprimer `stores/counter.js` (reste du scaffold Vue) ; déplacer `stores/MimicBackend.ts` (pas un store), `composables/appUtils.ts` et `composables/fontAwesomeUtils.ts` (pas des composables) dans `utils/`, en découpant `appUtils.ts` par sujet ; remplacer lodash par le natif
-- [ ] `composables/useNotification.ts` : l'adresse de support affichée vient d'un autre projet
+- [x] `composables/useNotification.ts` : l'adresse de support affichée vient d'un autre projet
 - [x] Commentaires : relire ceux de l'existant avec la règle de [Langue, textes et commentaires](../../AGENTS.md#langue-textes-et-commentaires), et passer en guillemets droits les `« »` de 26 commentaires
 
 Une fois la liste terminée : passer les avertissements de `eslint.config.ts` en erreurs, puis supprimer ce fichier et son lien dans le sommaire.

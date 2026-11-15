@@ -1,6 +1,7 @@
 import hButton from "@/components/c/hButton.vue";
 import hFlex from "@/components/c/hFlex.vue";
 import { renderedFontAwesomeIcon } from "@/utils/naiveIcons";
+import { CONTACT_EMAIL } from "@/utils/contact";
 import type {
   NaiveNotificationType,
   NotificationOptions,
@@ -15,8 +16,7 @@ import { computed, h } from "vue";
 
 type SentryWindow = Window & { Sentry?: { captureMessage: (message: string) => void } };
 
-const ERROR_DESCRIPTION =
-  "Si le problème persiste, veuillez contacter supporthermes@investissement.valority.com";
+const ERROR_DESCRIPTION = `Si le problème persiste, écrivez-nous à ${CONTACT_EMAIL}`;
 
 function getNaiveType(type: NotificationType): NaiveNotificationType {
   switch (type) {
