@@ -17,7 +17,9 @@ import {
   usernameRule,
 } from "@/utils/validation";
 
-const emit = defineEmits(["registered"]);
+const emit = defineEmits<{
+  registered: [];
+}>();
 
 const auth = useAuthStore();
 

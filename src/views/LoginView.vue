@@ -18,7 +18,9 @@ import { useUserStore } from "@/stores/user";
 import { emailRule } from "@/utils/validation";
 import { renderNaiveFontAwesomeIcon } from "@/utils/naiveIcons";
 
-const emit = defineEmits(["connected"]);
+const emit = defineEmits<{
+  connected: [];
+}>();
 const auth = useAuthStore();
 const user = useUserStore();
 

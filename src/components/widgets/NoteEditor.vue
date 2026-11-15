@@ -16,16 +16,13 @@ const markdown = defineModel({
 // comme avant : les notes existantes s'ouvrent telles quelles. Mêmes extensions que l'affichage
 // du widget (utils/markdown.ts), pour que la note s'affiche comme on l'a écrite.
 
-const props = defineProps({
-  maxLength: {
-    type: Number,
-    required: true,
-  },
-});
+const { maxLength } = defineProps<{
+  maxLength: number;
+}>();
 
 const length = ref(markdown.value.length);
 
-const tooLong = computed(() => length.value > props.maxLength);
+const tooLong = computed(() => length.value > maxLength);
 
 const editor = useEditor({
   content: markdown.value,
@@ -44,7 +41,7 @@ const editor = useEditor({
     length.value = next.length;
 
     // Au-delà de la limite, le texte n'est plus enregistré tant qu'il n'est pas raccourci
-    if (next.length <= props.maxLength) {
+    if (next.length <= maxLength) {
       markdown.value = next;
     }
   },
@@ -206,7 +203,7 @@ onBeforeUnmount(() => editor.value?.destroy());
     <editor-content :editor="editor" class="content" />
     <p :class="{ error: tooLong }" class="count">
       <template v-if="tooLong">Texte trop long : il n'est plus enregistré.</template>
-      {{ length }} / {{ props.maxLength }}
+      {{ length }} / {{ maxLength }}
     </p>
   </div>
 </template>

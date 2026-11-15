@@ -3,35 +3,26 @@ import HButton from "@/components/c/hButton.vue";
 
 // Cadre commun des widgets : verre Liquid Glass et, en mode édition, boutons Supprimer et Réglages.
 
-const props = defineProps({
-  label: {
-    type: String,
-    required: true,
-  },
-  editing: {
-    type: Boolean,
-    default: false,
-  },
-});
+const { label, editing = false } = defineProps<{
+  label: string;
+  editing?: boolean;
+}>();
 
 const emit = defineEmits<{
-  (e: "remove"): void;
-  (e: "configure"): void;
+  remove: [];
+  configure: [];
 }>();
 </script>
 
 <template>
-  <article
-    :aria-label="props.label"
-    :class="{ editing: props.editing }"
-    class="widget liquid-glass">
+  <article :aria-label="label" :class="{ editing: editing }" class="widget liquid-glass">
     <div class="content">
       <slot />
     </div>
     <transition name="pop">
       <h-button
-        v-if="props.editing"
-        :aria-label="`Supprimer le widget ${props.label}`"
+        v-if="editing"
+        :aria-label="`Supprimer le widget ${label}`"
         :bordered="false"
         circle
         class="remove no-drag"
@@ -44,8 +35,8 @@ const emit = defineEmits<{
     </transition>
     <transition name="pop">
       <h-button
-        v-if="props.editing"
-        :aria-label="`Régler le widget ${props.label}`"
+        v-if="editing"
+        :aria-label="`Régler le widget ${label}`"
         circle
         class="configure no-drag"
         glass

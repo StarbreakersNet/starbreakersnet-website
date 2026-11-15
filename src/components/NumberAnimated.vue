@@ -1,19 +1,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-const props = defineProps({
-  value: {
-    type: [String, Number],
-    required: true,
-  },
-  digits: {
-    type: Number,
-    default: 1,
-  },
-});
+const { value, digits = 1 } = defineProps<{
+  value: string | number;
+  digits?: number;
+}>();
 
 const formatedValue = computed(() => {
-  return props.value.toString().padStart(props.digits, "0");
+  return value.toString().padStart(digits, "0");
 });
 </script>
 

@@ -10,7 +10,7 @@ import type { WidgetSize, WidgetType } from "@/types/Widget";
 // Galerie du mode édition, comme celle des widgets de macOS : un type, une taille, Ajouter.
 
 const emit = defineEmits<{
-  (e: "add", type: WidgetType, size: WidgetSize): void;
+  add: [type: WidgetType, size: WidgetSize];
 }>();
 
 // Une carte par colonne sur mobile, jusqu'à trois sur un grand écran

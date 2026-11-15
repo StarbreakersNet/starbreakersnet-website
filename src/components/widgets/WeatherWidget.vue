@@ -1,19 +1,13 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, type PropType, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { DateTime } from "luxon";
 import { describeWeather, fetchForecast, type Forecast } from "@/utils/weather";
 import type { WeatherSettings, WidgetSize } from "@/types/Widget";
 
-const props = defineProps({
-  settings: {
-    type: Object as PropType<WeatherSettings>,
-    required: true,
-  },
-  size: {
-    type: String as PropType<WidgetSize>,
-    required: true,
-  },
-});
+const { settings, size } = defineProps<{
+  settings: WeatherSettings;
+  size: WidgetSize;
+}>();
 
 const REFRESH_INTERVAL = 15 * 60 * 1000;
 
@@ -22,7 +16,7 @@ const failed = ref(false);
 
 async function load() {
   try {
-    forecast.value = await fetchForecast(props.settings);
+    forecast.value = await fetchForecast(settings);
     failed.value = false;
   } catch {
     failed.value = true;
@@ -75,9 +69,9 @@ const days = computed(() => {
 });
 
 const location = computed(() => {
-  const { latitude, longitude } = props.settings.location;
+  const { latitude, longitude } = settings.location;
 
-  return [latitude, longitude, props.settings.unit];
+  return [latitude, longitude, settings.unit];
 });
 
 watch(location, reload, { immediate: true });
@@ -88,10 +82,10 @@ onBeforeUnmount(() => clearInterval(timer));
 </script>
 
 <template>
-  <div :class="props.size" class="weather">
+  <div :class="size" class="weather">
     <section class="now">
       <header class="place">
-        <span class="name">{{ props.settings.location.name }}</span>
+        <span class="name">{{ settings.location.name }}</span>
         <font-awesome-icon class="arrow" icon="location-arrow" />
       </header>
       <template v-if="current">
@@ -104,7 +98,7 @@ onBeforeUnmount(() => clearInterval(timer));
       </template>
       <p v-else class="status">{{ status }}</p>
     </section>
-    <ol v-if="props.size === 'medium' && days.length" class="days">
+    <ol v-if="size === 'medium' && days.length" class="days">
       <li v-for="day in days" :key="day.date" class="day">
         <span class="day-label">{{ day.label }}</span>
         <font-awesome-icon :class="day.icon" :icon="day.icon" class="icon" />

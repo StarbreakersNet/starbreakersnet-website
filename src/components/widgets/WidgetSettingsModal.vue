@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, type PropType } from "vue";
+import { computed } from "vue";
 import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HFormItem from "@/components/c/hFormItem.vue";
@@ -12,21 +12,18 @@ import { useWidgetsStore } from "@/stores/widgets";
 import type { WidgetSize } from "@/types/Widget";
 
 // Réglages d'un widget, appliqués en direct (comme sur macOS) : pas de bouton Enregistrer
-const props = defineProps({
-  widgetId: {
-    type: String as PropType<string | null>,
-    default: null,
-  },
-});
+const { widgetId = null } = defineProps<{
+  widgetId?: string | null;
+}>();
 
 const emit = defineEmits<{
-  (e: "close"): void;
+  close: [];
 }>();
 
 const store = useWidgetsStore();
 
 const widget = computed(() => {
-  const found = store.widgets.find(item => item.id === props.widgetId);
+  const found = store.widgets.find(item => item.id === widgetId);
 
   return found ?? null;
 });

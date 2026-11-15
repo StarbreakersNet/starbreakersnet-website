@@ -19,7 +19,7 @@ import type {
 // pendant le chargement d'une photo ou d'une vidéo, et en cas d'échec.
 
 const emit = defineEmits<{
-  (e: "appearance", appearance: WallpaperAppearance): void;
+  appearance: [appearance: WallpaperAppearance];
 }>();
 
 const store = useWidgetsStore();

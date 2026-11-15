@@ -11,21 +11,20 @@ import HText from "@/components/c/hText.vue";
 import { useAuthStore } from "@/stores/auth";
 import { emailRule } from "@/utils/validation";
 
-const props = defineProps({
-  email: {
-    type: String,
-    default: "",
-  },
-});
+const { email = "" } = defineProps<{
+  email?: string;
+}>();
 
-const emit = defineEmits(["sent"]);
+const emit = defineEmits<{
+  sent: [];
+}>();
 
 const auth = useAuthStore();
 
 const formRef = useTemplateRef<HFormInst>("formRef");
 const sending = useLoader();
 const form = reactive({
-  email: props.email,
+  email: email,
 });
 const rules = {
   email: emailRule,

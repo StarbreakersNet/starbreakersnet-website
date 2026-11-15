@@ -3,18 +3,13 @@ import { computed } from "vue";
 import { menuItems } from "@/models/MenuItem";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-const props = defineProps({
-  app: {
-    type: String,
-  },
-  loaded: {
-    type: Boolean,
-    default: false,
-  },
-});
+const { app, loaded = false } = defineProps<{
+  app?: string;
+  loaded?: boolean;
+}>();
 
 const appFind = computed(() => {
-  return menuItems.find(item => item.routeName === props.app);
+  return menuItems.find(item => item.routeName === app);
 });
 const icon = computed(() => appFind.value?.icon);
 const componentStyle = {
@@ -24,10 +19,10 @@ const componentStyle = {
 
 <template>
   <transition-group :style="componentStyle" class="app-container" tag="div">
-    <div v-if="!props.loaded" key="icon" class="icon-wrapper">
+    <div v-if="!loaded" key="icon" class="icon-wrapper">
       <font-awesome-icon :icon="icon ?? 'user'" class="icon" />
     </div>
-    <div v-show="props.loaded" key="app" class="app-wrapper">
+    <div v-show="loaded" key="app" class="app-wrapper">
       <slot name="default" />
     </div>
   </transition-group>

@@ -8,12 +8,9 @@ import { useMessage, useNotification } from "naive-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 
-const props = defineProps({
-  maintenanceMode: {
-    type: Boolean,
-    default: false,
-  },
-});
+const { maintenanceMode = false } = defineProps<{
+  maintenanceMode?: boolean;
+}>();
 const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
@@ -71,7 +68,7 @@ onMounted(async () => {
     </div>
   </transition>
   <transition mode="out-in" name="scale">
-    <maintenance-view v-if="props.maintenanceMode" />
+    <maintenance-view v-if="maintenanceMode" />
     <div v-else class="main-container">
       <transition name="shrink">
         <header v-if="showHeader">

@@ -1,25 +1,22 @@
 <script lang="ts" setup>
-import { type PropType, useTemplateRef, watch } from "vue";
+import { useTemplateRef, watch } from "vue";
 import { EditorContent, useEditor } from "@tiptap/vue-3";
 import { markdownExtensions } from "@/utils/markdown";
 import { type FitState, useFitContent } from "@/composables/useFitContent";
 import type { MarkdownSettings } from "@/types/Widget";
 
-const props = defineProps({
-  settings: {
-    type: Object as PropType<MarkdownSettings>,
-    required: true,
-  },
-});
+const { settings } = defineProps<{
+  settings: MarkdownSettings;
+}>();
 
 const emit = defineEmits<{
-  (e: "fit", state: FitState): void;
+  fit: [state: FitState];
 }>();
 
 // Note affichée par TipTap en lecture seule, avec les mêmes extensions que son éditeur
 // (utils/markdown.ts) : même rendu, et pas d'injection de HTML possible.
 const editor = useEditor({
-  content: props.settings.content,
+  content: settings.content,
   contentType: "markdown",
   editable: false,
   extensions: markdownExtensions(),
@@ -30,7 +27,7 @@ const editor = useEditor({
 // Pas d'ascenseur : texte réduit pour tenir (voir useFitContent)
 const rootRef = useTemplateRef<HTMLElement>("rootRef");
 
-const { overflowing, fit } = useFitContent(rootRef, [() => props.settings.content], {
+const { overflowing, fit } = useFitContent(rootRef, [() => settings.content], {
   onFit: state => emit("fit", state),
 });
 
@@ -38,7 +35,7 @@ function showContent(content: string) {
   editor.value?.commands.setContent(content, { contentType: "markdown", emitUpdate: false });
 }
 
-watch(() => props.settings.content, showContent);
+watch(() => settings.content, showContent);
 </script>
 
 <template>
