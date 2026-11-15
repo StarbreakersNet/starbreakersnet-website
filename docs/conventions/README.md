@@ -11,7 +11,6 @@ Les règles marquées **`lint`** sont vérifiées par `yarn lint` (config dans `
 - [Wrappers `components/c/`](wrappers.md)
 - [Styles](styles.md)
 - [Organisation du code](organisation.md) : dossiers de `src/`, stores, composables et `utils/`
-- [Mise en conformité de l'existant](mise-en-conformite.md)
 
 ## Outils
 

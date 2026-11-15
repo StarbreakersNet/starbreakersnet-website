@@ -61,23 +61,22 @@ export default defineConfigWithVueTs(
         { paths: [NAIVE_FEEDBACK_IMPORTS], patterns: [NO_TS_EXTENSION] },
       ],
 
-      // Avertissements tant que l'existant n'est pas converti (docs/conventions/mise-en-conformite.md)
-      "vue/prefer-use-template-ref": "warn",
-      "vue/no-unused-refs": "warn",
-      "vue/define-props-declaration": ["warn", "type-based"],
-      "vue/define-props-destructuring": "warn",
-      "vue/define-emits-declaration": ["warn", "type-literal"],
-      "func-style": ["warn", "declaration"],
+      "vue/prefer-use-template-ref": "error",
+      "vue/no-unused-refs": "error",
+      "vue/define-props-declaration": ["error", "type-based"],
+      "vue/define-props-destructuring": "error",
+      "vue/define-emits-declaration": ["error", "type-literal"],
+      "func-style": ["error", "declaration"],
       "no-restricted-syntax": [
-        "warn",
+        "error",
         {
           selector: "ReturnStatement[argument=null]",
           message:
             "Pas de return vide : écrire la condition en positif, avec la suite dans le if (voir docs/conventions/composants.md)",
         },
       ],
-      "no-continue": "warn",
-      "max-depth": ["warn", 3],
+      "no-continue": "error",
+      "max-depth": ["error", 3],
     },
   },
 
@@ -88,7 +87,7 @@ export default defineConfigWithVueTs(
     ignores: ["src/components/c/**", "src/App.vue"],
     rules: {
       "vue/no-undef-components": [
-        "warn",
+        "error",
         // Composants globaux qui ne viennent pas de Naive UI
         { ignorePatterns: ["^router-(view|link)$", "^font-awesome-icon$", "^vue-particles$"] },
       ],

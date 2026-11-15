@@ -14,7 +14,6 @@ Lire d'abord le fichier de [`docs/conventions/`](docs/conventions/README.md) qui
 | Un wrapper de `src/components/c/`, ou un composant Naive UI sans wrapper | [`wrappers.md`](docs/conventions/wrappers.md) |
 | Des styles : classes Tailwind, bloc `<style>`, `src/assets/` | [`styles.md`](docs/conventions/styles.md) |
 | Un store, un composable, `src/utils/`, ou un nouveau fichier | [`organisation.md`](docs/conventions/organisation.md) |
-| La mise en conformité de l'existant | [`mise-en-conformite.md`](docs/conventions/mise-en-conformite.md) |
 
 ## Avant de rendre la main
 
