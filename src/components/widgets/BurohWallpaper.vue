@@ -138,7 +138,7 @@ function onError() {
   message.error("Impossible d'afficher ce fond d'écran : retour au dégradé");
 }
 
-// Vidéo avec « Réduire les animations » : première image, sans lecture
+// Vidéo avec "Réduire les animations" : première image, sans lecture
 function onVideoMetadata(event: Event) {
   if (reducedMotion) {
     (event.target as HTMLVideoElement).currentTime = 0.1;

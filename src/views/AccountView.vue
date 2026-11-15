@@ -104,7 +104,7 @@ async function handleDelete() {
 }
 
 const pendingEmail = computed(() => user.infos.me?.pendingEmail ?? null);
-// Numéro du pseudo enregistré (« #0421 »), recalculé par la base quand le pseudo change
+// Numéro du pseudo enregistré ("#0421"), recalculé par la base quand le pseudo change
 const userTag = computed(() => formatUserTag(user.infos.me?.tag));
 
 function resetAccountForm() {

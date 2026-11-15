@@ -17,7 +17,7 @@ import type { UserType } from "@/types/User";
 
 type ProfileUpdate = Pick<UserType, "username" | "firstName" | "lastName">;
 
-// Résultat de la connexion : « unconfirmed » permet de proposer le renvoi du mail de confirmation
+// Résultat de la connexion : "unconfirmed" permet de proposer le renvoi du mail de confirmation
 export type LoginResult = "ok" | "unconfirmed" | "error";
 
 const CONFIRMATION_TEXT =

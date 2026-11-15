@@ -104,7 +104,6 @@ export function useNotification() {
       type: "error",
     });
 
-    // Sentry logging si disponible
     if (typeof window !== "undefined") {
       (window as SentryWindow).Sentry?.captureMessage(message);
     }

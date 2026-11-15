@@ -185,8 +185,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
                   </h-text>
                   <h-text depth="3">
                     Les pages Discord et Le Zap affichent des contenus de services tiers, qui
-                    peuvent déposer leurs propres cookies. La vidéo YouTube est intégrée en mode «
-                    confidentialité renforcée ». Sur Buroh, les icônes du widget Liens viennent de
+                    peuvent déposer leurs propres cookies. La vidéo YouTube est intégrée en mode
+                    "confidentialité renforcée". Sur Buroh, les icônes du widget Liens viennent de
                     DuckDuckGo, qui ne reçoit que le nom de domaine de chaque lien, et la météo
                     d'Open-Meteo, qui ne reçoit que les coordonnées de la ville choisie, ou de votre
                     position arrondies à environ 1 km si vous l'utilisez. Les photos de fond d'écran
@@ -210,8 +210,8 @@ const CNIL_COMPLAINT_URL = "https://www.cnil.fr/fr/plaintes";
           <template #default>
             <h-flex vertical>
               <h-text>
-                Vous pouvez consulter, modifier et supprimer votre compte depuis la page « Mon
-                compte ». Pour toute autre demande (accès, rectification, opposition, portabilité),
+                Vous pouvez consulter, modifier et supprimer votre compte depuis la page "Mon
+                compte". Pour toute autre demande (accès, rectification, opposition, portabilité),
                 écrivez-nous. Si vous estimez que vos droits ne sont pas respectés, vous pouvez
                 saisir la CNIL (Commission nationale de l'informatique et des libertés).
               </h-text>

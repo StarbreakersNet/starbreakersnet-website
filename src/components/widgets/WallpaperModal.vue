@@ -69,7 +69,7 @@ const wallpaper = computed(() => store.wallpaper);
 
 const tab = ref("presets");
 
-// Onglet « Photos et vidéos » : photos Unsplash ou vidéos de la sélection, mêmes options
+// Onglet "Photos et vidéos" : photos Unsplash ou vidéos de la sélection, mêmes options
 const rotationKind = ref<"photos" | "videos">("photos");
 
 // À l'ouverture, onglet et options du fond d'écran actuel
@@ -524,7 +524,7 @@ watch(
             <a href="https://unsplash.com/developers" rel="noopener" target="_blank">
               unsplash.com/developers
             </a>
-            (« Access Key », jamais la « Secret Key »). Elle est enregistrée avec votre Buroh. Vous
+            ("Access Key", jamais la "Secret Key"). Elle est enregistrée avec votre Buroh. Vous
             choisissez ensuite un thème d'Unsplash ou l'une de ses collections.
           </h-text>
           <h-flex justify="space-between">

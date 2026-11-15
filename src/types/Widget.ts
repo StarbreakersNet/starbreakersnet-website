@@ -10,7 +10,7 @@ export type WidgetSize = "small" | "medium" | "large";
 export interface ClockSettings {
   style: "analog" | "digital";
   seconds: boolean;
-  // Fuseau IANA (« Europe/Paris »), null pour l'heure de l'appareil
+  // Fuseau IANA ("Europe/Paris"), null pour l'heure de l'appareil
   timezone: string | null;
   // Nom affiché sous l'horloge, vide pour celui déduit du fuseau
   label: string;
@@ -33,7 +33,7 @@ export interface LinksSettings {
 
 export interface WeatherLocation {
   name: string;
-  // Région et pays, pour distinguer les homonymes (« Paris, Texas »)
+  // Région et pays, pour distinguer les homonymes ("Paris, Texas")
   detail: string;
   latitude: number;
   longitude: number;

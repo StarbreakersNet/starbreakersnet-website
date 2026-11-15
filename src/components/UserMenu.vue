@@ -31,7 +31,7 @@ const options = computed(() => {
   const me = user.infos.me;
 
   if (user.infos.connected) {
-    // Membre connecté, en tête du menu : « Renard#0421 »
+    // Membre connecté, en tête du menu : "Renard#0421"
     if (me) {
       items.push({
         key: "identity",
@@ -87,7 +87,7 @@ const options = computed(() => {
 const showModal = ref(false);
 
 // La modale de connexion est pilotée par l'URL (?login=1&redirect=/account) :
-// le guard du router peut l'ouvrir, et le bouton « précédent » la referme.
+// le guard du router peut l'ouvrir, et le bouton "précédent" la referme.
 const showLoginModal = computed(() => route.query.login === "1");
 
 function getRedirect() {

@@ -1,4 +1,4 @@
-// Verre « Liquid Glass » à la manière de macOS, pour Buroh (views/BurohView.vue).
+// Verre "Liquid Glass" à la manière de macOS, pour Buroh (views/BurohView.vue).
 //
 // Choix de performance : pas de backdrop-filter sur les widgets. Ils reposent sur un fond en
 // dégradé lisse, que le flou ne modifierait presque pas, alors que chaque élément flouté coûte une
@@ -9,8 +9,8 @@
 // - une ombre portée douce.
 // Seuls les panneaux posés au-dessus de vrais contenus (barre d'outils, galerie) gardent un flou.
 //
-// Réglages d'accessibilité du système respectés : « Réduire la transparence » (surfaces opaques) et
-// « Augmenter le contraste » (bord marqué).
+// Réglages d'accessibilité du système respectés : "Réduire la transparence" (surfaces opaques) et
+// "Augmenter le contraste" (bord marqué).
 
 :root {
   --glass-radius: 26px;

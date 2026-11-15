@@ -44,7 +44,7 @@ const time = computed(() => {
 
 const date = computed(() => zoned.value.toFormat("cccc d LLLL"));
 
-// Décalage avec l'heure de l'appareil, affiché pour un autre fuseau : « +6 h », « −9 h 30 »
+// Décalage avec l'heure de l'appareil, affiché pour un autre fuseau : "+6 h", "−9 h 30"
 function formatOffset(difference: number) {
   const sign = difference > 0 ? "+" : "−";
   const hours = Math.floor(Math.abs(difference) / 60);

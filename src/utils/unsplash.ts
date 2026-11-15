@@ -72,7 +72,7 @@ export async function fetchTopics(key: string): Promise<UnsplashTopic[]> {
   return topics.map(({ id, title }) => ({ id, title }));
 }
 
-// « invalid » : clé refusée par Unsplash ; « unavailable » : pas de réponse, ou limite atteinte
+// "invalid" : clé refusée par Unsplash ; "unavailable" : pas de réponse, ou limite atteinte
 export async function checkUnsplashKey(key: string): Promise<"ok" | "invalid" | "unavailable"> {
   let result: "ok" | "invalid" | "unavailable" = "unavailable";
 

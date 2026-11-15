@@ -15,7 +15,7 @@ const settings = defineModel("settings", {
   required: true,
 });
 
-// Valeur de la liste pour « Heure de l'appareil », enregistrée comme fuseau null
+// Valeur de la liste pour "Heure de l'appareil", enregistrée comme fuseau null
 const DEVICE_TIMEZONE = "device";
 
 // Intl.supportedValuesOf (ES2022) absent des types du projet, ciblés ES2020

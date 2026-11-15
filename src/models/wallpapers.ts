@@ -192,7 +192,7 @@ export function normalizeUnsplashKey(raw: unknown) {
 const PAGE_LOADED_AT = Date.now();
 
 // Photo ou vidéo à renouveler selon le rythme choisi, d'après la date où elle a été choisie
-// (« à chaque visite » : une fois par chargement du site)
+// ("à chaque visite" : une fois par chargement du site)
 export function isStale(chosenAt: string | undefined, frequency: RotationFrequency) {
   if (!chosenAt) return true;
   const time = new Date(chosenAt).getTime();

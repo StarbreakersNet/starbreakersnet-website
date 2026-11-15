@@ -8,7 +8,7 @@ import type { GridItem, GridPosition } from "@/types/Widget";
 // Au toucher, un widget se saisit par un appui long (300 ms) : un doigt qui glisse tout de suite fait
 // défiler la page.
 // Vue affiche les widgets ; gridstack les place. Les changements venus du store (ajout, suppression,
-// nouvelle taille) lui sont transmis ici, et ses glisser-déposer remontent par l'événement « moved ».
+// nouvelle taille) lui sont transmis ici, et ses glisser-déposer remontent par l'événement "moved".
 
 const {
   items,

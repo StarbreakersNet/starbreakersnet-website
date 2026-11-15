@@ -184,7 +184,7 @@ export function createId() {
   return crypto.randomUUID();
 }
 
-// « Europe/Paris » → « Paris », « America/New_York » → « New York »
+// "Europe/Paris" → "Paris", "America/New_York" → "New York"
 export function timezoneCity(timezone: string) {
   return (timezone.split("/").pop() ?? timezone).replace(/_/g, " ");
 }

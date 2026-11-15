@@ -94,7 +94,6 @@ watch(
   { deep: true }
 );
 
-// Provide de la référence du formulaire pour les enfants
 provide("naiveFormRef", naiveFormRef);
 
 defineExpose({

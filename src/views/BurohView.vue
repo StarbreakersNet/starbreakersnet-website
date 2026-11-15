@@ -72,7 +72,7 @@ function onMoved(positions: GridPosition[]) {
 
 // --- Édition
 
-// Sur mobile, la galerie couvrirait les widgets à déplacer : elle s'ouvre avec le bouton « + »,
+// Sur mobile, la galerie couvrirait les widgets à déplacer : elle s'ouvre avec le bouton "+",
 // comme sur iPhone, et se referme après un ajout
 const galleryOpen = ref(false);
 
@@ -390,7 +390,7 @@ onBeforeUnmount(() => {
     pointer-events: none;
   }
 
-  // Petit écran : icônes seules (libellés gardés pour les lecteurs d'écran), sauf « Terminé »
+  // Petit écran : icônes seules (libellés gardés pour les lecteurs d'écran), sauf "Terminé"
   @media (max-width: 720px) {
     .h-button--glass:not(.n-button--primary-type) {
       width: 2.25rem;

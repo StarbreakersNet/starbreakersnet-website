@@ -41,7 +41,7 @@ Lire d'abord le fichier de [`docs/conventions/`](docs/conventions/README.md) qui
 
 ## Langue, textes et commentaires
 
-- Identifiants en anglais. Textes affichés et commentaires en français. Dans les commentaires, guillemets droits : `"Retirer"`, pas `« Retirer »`.
+- Identifiants en anglais. Textes affichés et commentaires en français, avec des guillemets droits : `"Retirer"`, pas `« Retirer »`.
 - **Par défaut, pas de commentaire.** Un commentaire n'existe que si, sans lui, quelqu'un qui lit ou modifie le code mergé se tromperait : une contrainte qui ne se voit pas dans le code, un comportement surprenant de Supabase, de GoTrue ou du navigateur, un choix de sécurité. Par exemple, dans `LoginView.vue` : pas de bouton désactivé, parce que les champs remplis par le gestionnaire de mots de passe ne sont visibles du script qu'après une interaction.
 - **Le test : servira-t-il dans six mois à quelqu'un qui découvre le fichier ?** Un commentaire qui n'a servi que pendant le développement ou le débogage est retiré avant la PR.
 - **Jamais de commentaire pour** :
