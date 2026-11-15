@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, type PropType, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import { useLoader } from "@/composables/useLoader";
 import _ from "lodash";
 import HButton from "@/components/c/hButton.vue";
@@ -13,10 +13,7 @@ import HText from "@/components/c/hText.vue";
 import { locateDevice, searchCities } from "@/utils/weather";
 import type { WeatherLocation, WeatherSettings } from "@/types/Widget";
 
-const settings = defineModel("settings", {
-  type: Object as PropType<WeatherSettings>,
-  required: true,
-});
+const settings = defineModel<WeatherSettings>("settings", { required: true });
 
 // Attente après la dernière frappe avant de chercher la ville
 const SEARCH_DELAY = 300;

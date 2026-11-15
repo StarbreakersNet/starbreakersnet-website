@@ -39,10 +39,7 @@ import type {
   WallpaperSource,
 } from "@/types/Wallpaper";
 
-const show = defineModel("show", {
-  type: Boolean,
-  required: true,
-});
+const show = defineModel<boolean>("show", { required: true });
 
 const store = useWidgetsStore();
 const user = useUserStore();

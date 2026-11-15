@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, type PropType } from "vue";
+import { computed } from "vue";
 import HForm from "@/components/c/hForm.vue";
 import HFormItem from "@/components/c/hFormItem.vue";
 import HInput from "@/components/c/hInput.vue";
@@ -10,10 +10,7 @@ import HSwitch from "@/components/c/hSwitch.vue";
 import { localTimezone, timezoneCity } from "@/utils/timezone";
 import type { ClockSettings } from "@/types/Widget";
 
-const settings = defineModel("settings", {
-  type: Object as PropType<ClockSettings>,
-  required: true,
-});
+const settings = defineModel<ClockSettings>("settings", { required: true });
 
 // Valeur de la liste pour "Heure de l'appareil", enregistrée comme fuseau null
 const DEVICE_TIMEZONE = "device";

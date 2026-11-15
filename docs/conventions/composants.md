@@ -110,7 +110,7 @@ const { size = "medium", disabled = false, tooltip } = defineProps<{
 }>();
 ```
 
-- Le type est la seule source de vérité : pas de `PropType`. Le compilateur génère la déclaration runtime.
+- Le type est la seule source de vérité : pas de `PropType` **`lint`**. Le compilateur génère la déclaration runtime.
 - Les **valeurs par défaut** s'écrivent dans la déstructuration. Une prop obligatoire n'a pas de `?`.
 - Au-delà de quelques props, ou pour étendre un type, on déclare une `interface Props` au-dessus des macros.
 - Un commentaire `/** … */` sur chaque prop dont le nom ne suffit pas : l'IDE l'affiche au survol, côté parent.
@@ -138,7 +138,7 @@ const emit = defineEmits<{
 ### v-model
 
 - `defineModel` plutôt qu'une prop et un événement `update:xxx` écrits à la main. **`lint`**
-- Composant de l'application : `defineModel()` donne `v-model`, `defineModel("expanded")` donne `v-model:expanded`.
+- Composant de l'application : `defineModel()` donne `v-model`, `defineModel("expanded")` donne `v-model:expanded`. Le type se passe en paramètre, `defineModel<boolean>("expanded")`, jamais par l'option `type`. **`lint`**
 - Dans un wrapper, v-model passe tout seul par `$attrs` ([voir wrappers.md](wrappers.md)). On ne déclare `defineModel("value")` que si le wrapper doit lire ou modifier la valeur, et on garde alors le nom de Naive UI (`value`, `show`, `checked`).
 
 ### État et réactivité

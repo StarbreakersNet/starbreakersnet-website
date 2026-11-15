@@ -7,10 +7,7 @@ import HInput from "@/components/c/hInput.vue";
 import { markdownExtensions } from "@/utils/markdown";
 import { normalizeUrl } from "@/utils/url";
 
-const markdown = defineModel({
-  type: String,
-  required: true,
-});
+const markdown = defineModel<string>({ required: true });
 
 // Éditeur du widget Note, sans Markdown à écrire (TipTap). Le texte reste enregistré en Markdown,
 // comme avant : les notes existantes s'ouvrent telles quelles. Mêmes extensions que l'affichage

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { type PropType, ref } from "vue";
+import { ref } from "vue";
 import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HForm from "@/components/c/hForm.vue";
@@ -13,10 +13,7 @@ import { LINKS_MAX } from "@/models/WidgetDefinition";
 import { normalizeUrl } from "@/utils/url";
 import type { LinkItem, LinksSettings } from "@/types/Widget";
 
-const settings = defineModel("settings", {
-  type: Object as PropType<LinksSettings>,
-  required: true,
-});
+const settings = defineModel<LinksSettings>("settings", { required: true });
 
 const newTitle = ref("");
 const newUrl = ref("");

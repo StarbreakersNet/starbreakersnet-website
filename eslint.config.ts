@@ -35,8 +35,8 @@ const NAIVE_FEEDBACK_IMPORTS = {
 
 const VUE_IMPORTS = {
   name: "vue",
-  importNames: ["toRefs", "useAttrs"],
-  message: `toRefs : un ref d'objet à la place du reactive. useAttrs : v-bind="$attrs" dans le template (${COMPONENTS_DOC})`,
+  importNames: ["toRefs", "useAttrs", "PropType"],
+  message: `toRefs : un ref d'objet à la place du reactive. useAttrs : v-bind="$attrs" dans le template. PropType : le type en paramètre, defineProps<…>() ou defineModel<…>() (${COMPONENTS_DOC})`,
 };
 
 const SUPABASE_CLIENT_IMPORT = {
@@ -98,6 +98,11 @@ const SCRIPT_SYNTAX = [
     selector:
       "CallExpression[callee.name='defineEmits'] TSPropertySignature > Literal.key[value=/^update:/], CallExpression[callee.name='emit'] > Literal:first-child[value=/^update:/]",
     message: `defineModel à la place d'un événement update:xxx écrit à la main (${COMPONENTS_DOC})`,
+  },
+  {
+    selector:
+      "CallExpression[callee.name='defineModel'] > ObjectExpression > Property[key.name='type']",
+    message: `Le type en paramètre : defineModel<boolean>("show", { required: true }) (${COMPONENTS_DOC})`,
   },
   {
     selector:
