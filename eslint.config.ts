@@ -1,24 +1,96 @@
-import { globalIgnores } from 'eslint/config'
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
-import pluginVue from 'eslint-plugin-vue'
-import pluginOxlint from 'eslint-plugin-oxlint'
-import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
+import { globalIgnores } from "eslint/config";
+import { defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescript";
+import pluginVue from "eslint-plugin-vue";
+import pluginOxlint from "eslint-plugin-oxlint";
+import skipFormatting from "@vue/eslint-config-prettier/skip-formatting";
 
 // To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
 // import { configureVueProject } from '@vue/eslint-config-typescript'
 // configureVueProject({ scriptLangs: ['ts', 'tsx'] })
 // More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
 
+const NO_TS_EXTENSION = {
+  regex: "^@/.*\\.ts$",
+  message: "Importer sans l'extension .ts (voir docs/conventions/composants.md)",
+};
+
 export default defineConfigWithVueTs(
   {
-    name: 'app/files-to-lint',
-    files: ['**/*.{ts,mts,tsx,vue}'],
+    name: "app/files-to-lint",
+    files: ["**/*.{ts,mts,tsx,vue}"],
   },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
+  // supabase/docker : copie du dossier officiel de Supabase, on ne touche pas à ses fichiers
+  globalIgnores(["**/dist/**", "**/dist-ssr/**", "**/coverage/**", "supabase/docker/**"]),
 
-  pluginVue.configs['flat/essential'],
+  pluginVue.configs["flat/essential"],
   vueTsConfigs.recommended,
-  ...pluginOxlint.configs['flat/recommended'],
-  skipFormatting,
-)
+  ...pluginOxlint.configs["flat/recommended"],
+
+  // Règles de docs/conventions/, après oxlint qui désactive les règles ESLint qu'il vérifie déjà
+  {
+    name: "app/conventions",
+    files: ["src/**/*.{ts,vue}"],
+    rules: {
+      "vue/block-order": ["error", { order: ["script", "template", "style"] }],
+      "vue/define-macros-order": [
+        "error",
+        { order: ["defineOptions", "defineModel", "defineProps", "defineEmits", "defineSlots"] },
+      ],
+      "vue/component-api-style": ["error", ["script-setup"]],
+      "vue/component-name-in-template-casing": ["error", "kebab-case"],
+      "vue/no-empty-component-block": "error",
+      "vue/require-macro-variable-name": "error",
+      "no-restricted-imports": ["error", { patterns: [NO_TS_EXTENSION] }],
+
+      // Avertissements tant que l'existant n'est pas converti (docs/conventions/mise-en-conformite.md)
+      "vue/prefer-use-template-ref": "warn",
+      "vue/no-unused-refs": "warn",
+      "vue/define-props-declaration": ["warn", "type-based"],
+      "vue/define-props-destructuring": "warn",
+      "vue/define-emits-declaration": ["warn", "type-literal"],
+      "func-style": ["warn", "declaration"],
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "ReturnStatement[argument=null]",
+          message:
+            "Pas de return vide : écrire la condition en positif, avec la suite dans le if (voir docs/conventions/composants.md)",
+        },
+      ],
+      "no-continue": "warn",
+      "max-depth": ["warn", 3],
+    },
+  },
+
+  // App.vue garde les providers Naive UI (n-config-provider…)
+  {
+    name: "app/wrappers-only",
+    files: ["src/**/*.vue"],
+    ignores: ["src/components/c/**", "src/App.vue"],
+    rules: {
+      "vue/no-undef-components": [
+        "warn",
+        // Composants globaux qui ne viennent pas de Naive UI
+        { ignorePatterns: ["^router-(view|link)$", "^font-awesome-icon$", "^vue-particles$"] },
+      ],
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            NO_TS_EXTENSION,
+            {
+              group: ["naive-ui"],
+              importNamePattern: "^N[A-Z]",
+              allowTypeImports: true,
+              message:
+                "Utiliser le wrapper h-* de components/c/, à créer s'il n'existe pas (voir docs/conventions/wrappers.md)",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  skipFormatting
+);

@@ -12,6 +12,7 @@ Aucun service tiers : tout tourne sur nos serveurs.
 - [Base de données et migrations](#base-de-données-et-migrations)
 - [Mettre à jour Supabase](#mettre-à-jour-supabase)
 - [Build du front](#build-du-front)
+- [Conventions de code](#conventions-de-code)
 - [Déploiement (staging / prod)](#déploiement-staging--prod)
 - [Exploitation](#exploitation)
 
@@ -20,6 +21,8 @@ Aucun service tiers : tout tourne sur nos serveurs.
 | Chemin | Rôle |
 |---|---|
 | `src/`, `public/`… | Front Vue |
+| `docs/conventions/` | Conventions de code du front (voir [ci-dessous](#conventions-de-code)) |
+| `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` | Consignes des agents de code : `AGENTS.md`, que les deux autres importent |
 | `supabase/config.toml`, `supabase/migrations/` | Projet de la [CLI Supabase](https://supabase.com/docs/guides/cli) : le schéma de la base, en migrations SQL |
 | `supabase/templates/` | Modèles des mails d'authentification, en français et en anglais (voir [son README](supabase/templates/README.md)) |
 | `supabase/docker/` | Stack Supabase self-hosted : **copie du dossier [`docker/` officiel](https://github.com/supabase/supabase/tree/master/docker)**, version notée dans `.supabase-version` |
@@ -176,6 +179,16 @@ docker build -f Dockerfile.prod -t starbreakersnet-front \
   --build-arg VITE_SUPABASE_PUBLISHABLE_KEY=<clé> .
 docker run --rm -p 127.0.0.1:8080:80 starbreakersnet-front
 ```
+
+## Conventions de code
+
+Les conventions du front (structure d'un composant, syntaxes à préférer, wrappers `h-*`, styles…) sont dans [`docs/conventions/`](docs/conventions/README.md). Les agents de code (Claude, Codex, Copilot, Gemini…) y arrivent par [`AGENTS.md`](AGENTS.md), qui contient les règles communes et dit quel fichier lire selon ce qu'on modifie. `yarn lint` vérifie toutes les règles qui peuvent l'être. Avant d'ouvrir une PR :
+
+```bash
+yarn format && yarn lint && yarn type-check
+```
+
+La CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) refait ces vérifications sur chaque PR et chaque push sur `main`, sans corriger : format, oxlint, ESLint, types et build. Une erreur la fait échouer ; les avertissements de la [mise en conformité](docs/conventions/mise-en-conformite.md) ne la bloquent pas.
 
 ## Déploiement (staging / prod)
 
