@@ -9,7 +9,7 @@ Les règles ont été adoptées en novembre 2026. Le formatage (Prettier), l'ord
 - [ ] Indicateurs de chargement : remplacer par `useLoader()` et `run()` les 13 `ref(false)` passés à `true` puis à `false` : 7 dans les vues (`AccountView`, `ForgotPasswordView`, `LoginView`, `RegisterView`, `ResetPasswordView`) et 6 dans les widgets (`WallpaperModal`, `WeatherSettingsForm`)
 - [ ] `useTemplateRef` (7), refs inutilisées (3), fonctions fléchées (4)
 - [ ] Sorties anticipées : 10 `return;` vides dans `AccountView`, `LoginView`, `composables/useFitContent.ts`, `stores/auth.ts` et `stores/settings.ts` (`no-restricted-syntax`), et 2 `continue` dans `models/widgets.ts` (`no-continue`). Dans `hForm`, `computeIsValidSilently` a un `continue` et 5 niveaux d'imbrication (`no-continue`, `max-depth`)
-- [ ] JavaScript vers TypeScript : `main.js` et `router/index.js`
+- [x] JavaScript vers TypeScript : `main.js` et `router/index.js`
 - [x] Rangement : supprimer `stores/counter.js` (reste du scaffold Vue) ; déplacer `stores/MimicBackend.ts` (pas un store), `composables/appUtils.ts` et `composables/fontAwesomeUtils.ts` (pas des composables) dans `utils/`, en découpant `appUtils.ts` par sujet ; remplacer lodash par le natif
 - [ ] `composables/useNotification.ts` : l'adresse de support affichée vient d'un autre projet
 - [ ] Commentaires : relire ceux de l'existant avec la règle de [Langue, textes et commentaires](../../AGENTS.md#langue-textes-et-commentaires), et passer en guillemets droits les `« »` de 26 commentaires
