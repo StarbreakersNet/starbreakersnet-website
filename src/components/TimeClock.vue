@@ -1,5 +1,5 @@
-<script setup>
-import { useCurrentTime } from "@/composables/currentTime.js";
+<script setup lang="ts">
+import { useCurrentTime } from "@/composables/currentTime";
 import NumberAnimated from "@/components/NumberAnimated.vue";
 import { computed } from "vue";
 
@@ -24,5 +24,3 @@ const time = computed(() => {
     </n-flex>
   </div>
 </template>
-
-<style lang="scss" scoped></style>

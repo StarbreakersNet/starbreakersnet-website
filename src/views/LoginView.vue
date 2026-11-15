@@ -11,16 +11,15 @@ import HFlex from "@/components/c/hFlex.vue";
 import HButton from "@/components/c/hButton.vue";
 import HText from "@/components/c/hText.vue";
 import HAlert from "@/components/c/hAlert.vue";
-import type { HFormInst } from "@/types/components/c/hForm.ts";
+import type { HFormInst } from "@/types/components/c/hForm";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { emailRule } from "@/utils/validation";
-import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils.ts";
-
-const auth = useAuthStore();
-const user = useUserStore();
+import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils";
 
 const emit = defineEmits(["connected"]);
+const auth = useAuthStore();
+const user = useUserStore();
 
 const formRef = useTemplateRef<HFormInst>("formRef");
 const form = reactive({
@@ -143,5 +142,3 @@ function handleRegistered() {
     </h-modal>
   </div>
 </template>
-
-<style lang="scss" scoped></style>

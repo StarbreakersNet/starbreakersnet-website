@@ -1,17 +1,3 @@
-<template>
-  <n-table
-    :bordered="props.bordered"
-    :bottom-bordered="props.bottomBordered"
-    :single-column="props.singleColumn"
-    :single-line="props.singleLine"
-    :size="props.size"
-    :striped="props.striped"
-    :theme-overrides="props.themeOverrides"
-    v-bind="$attrs">
-    <slot />
-  </n-table>
-</template>
-
 <script lang="ts" setup>
 import { NTable, type TableProps } from "naive-ui";
 import { type PropType } from "vue";
@@ -50,3 +36,17 @@ const props = defineProps({
   },
 });
 </script>
+
+<template>
+  <n-table
+    :bordered="props.bordered"
+    :bottom-bordered="props.bottomBordered"
+    :single-column="props.singleColumn"
+    :single-line="props.singleLine"
+    :size="props.size"
+    :striped="props.striped"
+    :theme-overrides="props.themeOverrides"
+    v-bind="$attrs">
+    <slot />
+  </n-table>
+</template>

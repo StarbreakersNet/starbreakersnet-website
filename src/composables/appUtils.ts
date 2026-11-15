@@ -1,6 +1,6 @@
 import { darkTheme, lightTheme } from "naive-ui";
-import naiveDark from "@/assets/themes/naive.dark.ts";
-import naiveLight from "@/assets/themes/naive.light.ts";
+import naiveDark from "@/assets/themes/naive.dark";
+import naiveLight from "@/assets/themes/naive.light";
 
 type themeType = "dark" | "light" | "system";
 type themeNaiveType = "naive" | "naiveOverride";

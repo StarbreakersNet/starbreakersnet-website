@@ -1,28 +1,6 @@
-<template>
-  <n-select
-    :clearable="props.clearable"
-    :disabled="props.disabled"
-    :filterable="props.filterable"
-    :loading="props.loading"
-    :options="props.options"
-    :placeholder="props.placeholder"
-    :remote="props.remote"
-    :size="props.size"
-    :value="props.value"
-    v-bind="$attrs"
-    @search="$emit('search', $event)"
-    @update:value="$emit('update:value', $event)">
-    <template v-if="slots.empty" #empty>
-      <slot name="empty" />
-    </template>
-  </n-select>
-</template>
-
 <script lang="ts" setup>
 import { NSelect, type SelectProps } from "naive-ui";
 import { type PropType, useSlots } from "vue";
-
-const slots = useSlots();
 
 const props = defineProps({
   value: {
@@ -64,4 +42,26 @@ const props = defineProps({
 });
 
 defineEmits(["update:value", "search"]);
+
+const slots = useSlots();
 </script>
+
+<template>
+  <n-select
+    :clearable="props.clearable"
+    :disabled="props.disabled"
+    :filterable="props.filterable"
+    :loading="props.loading"
+    :options="props.options"
+    :placeholder="props.placeholder"
+    :remote="props.remote"
+    :size="props.size"
+    :value="props.value"
+    v-bind="$attrs"
+    @search="$emit('search', $event)"
+    @update:value="$emit('update:value', $event)">
+    <template v-if="slots.empty" #empty>
+      <slot name="empty" />
+    </template>
+  </n-select>
+</template>

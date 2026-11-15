@@ -1,4 +1,4 @@
-import commonTheme from "@/assets/themes/naive.common.ts";
+import commonTheme from "@/assets/themes/naive.common";
 import type { GlobalThemeOverrides } from "naive-ui";
 
 export default <GlobalThemeOverrides>{

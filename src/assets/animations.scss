@@ -1,5 +1,5 @@
-$timing-function: cubic-bezier(.9, 0, .1, 1);
-$default-duration: .25s;
+$timing-function: cubic-bezier(0.9, 0, 0.1, 1);
+$default-duration: 0.25s;
 $default-animation: $default-duration $timing-function;
 
 *:has(> .fade-x-enter-active),
@@ -27,7 +27,9 @@ $default-animation: $default-duration $timing-function;
 
 .scale-enter-active,
 .scale-leave-active {
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .scale-enter-from,
@@ -38,7 +40,9 @@ $default-animation: $default-duration $timing-function;
 
 .shrink-enter-active,
 .shrink-leave-active {
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .shrink-enter-from,
@@ -49,7 +53,9 @@ $default-animation: $default-duration $timing-function;
 
 .flip-enter-active,
 .flip-leave-active {
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .flip-enter-from,
@@ -60,7 +66,9 @@ $default-animation: $default-duration $timing-function;
 
 .fade-x-enter-active,
 .fade-x-leave-to {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .fade-x-enter-from,
@@ -71,7 +79,9 @@ $default-animation: $default-duration $timing-function;
 
 .fade-y-enter-active,
 .fade-y-leave-to {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .fade-y-enter-from,
@@ -82,7 +92,7 @@ $default-animation: $default-duration $timing-function;
 
 .insert-enter-active,
 .insert-leave-active {
-  transition: all .5s $timing-function;
+  transition: all 0.5s $timing-function;
   max-height: 100em;
   max-width: 100em;
 }
@@ -97,7 +107,7 @@ $default-animation: $default-duration $timing-function;
 
 .insert-side-enter-active,
 .insert-side-leave-active {
-  transition: all .5s $timing-function;
+  transition: all 0.5s $timing-function;
   max-height: 100em;
   max-width: 100em;
 }

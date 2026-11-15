@@ -1,9 +1,3 @@
-<template>
-  <n-radio-button :disabled="props.disabled" :value="props.value" v-bind="$attrs">
-    <slot />
-  </n-radio-button>
-</template>
-
 <script lang="ts" setup>
 import { NRadioButton, type RadioButtonProps } from "naive-ui";
 import { type PropType } from "vue";
@@ -19,3 +13,9 @@ const props = defineProps({
   },
 });
 </script>
+
+<template>
+  <n-radio-button :disabled="props.disabled" :value="props.value" v-bind="$attrs">
+    <slot />
+  </n-radio-button>
+</template>

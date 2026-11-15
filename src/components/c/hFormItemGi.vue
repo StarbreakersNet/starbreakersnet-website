@@ -3,7 +3,9 @@ import type { FormItemInst } from "naive-ui";
 import { type FormItemRule, type GridItemProps } from "naive-ui";
 import { type PropType, ref } from "vue";
 
-const formItemRef = ref<FormItemInst>();
+defineOptions({
+  __GRID_ITEM__: true,
+});
 
 const props = defineProps({
   // NFormItemProps
@@ -114,13 +116,11 @@ const props = defineProps({
   },
 });
 
-defineExpose({
-  validate: (...args: any[]) => formItemRef.value?.validate(...args),
-  restoreValidation: () => formItemRef.value?.restoreValidation(),
-});
+const formItemRef = ref<FormItemInst>();
 
-defineOptions({
-  __GRID_ITEM__: true,
+defineExpose({
+  validate: (...args: Parameters<FormItemInst["validate"]>) => formItemRef.value?.validate(...args),
+  restoreValidation: () => formItemRef.value?.restoreValidation(),
 });
 </script>
 

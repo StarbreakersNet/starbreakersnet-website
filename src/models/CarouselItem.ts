@@ -4,14 +4,14 @@ export type CarouselAction = {
   routeName?: string;
   externalLink?: string;
   type: "default" | "tertiary" | "primary" | "success" | "info" | "warning" | "error";
-}
+};
 
 export type CarouselItem = {
   title: string;
   description?: string;
   style: {
     align: "flex-start" | "center" | "flex-end";
-  },
+  };
   background?: {
     videoSrc?: string;
     imageSrc?: string;
@@ -23,7 +23,7 @@ export type CarouselItem = {
     alt: string;
   };
   actions?: CarouselAction[];
-}
+};
 
 export const carouselListItems: CarouselItem[] = [
   {
@@ -47,12 +47,14 @@ export const carouselListItems: CarouselItem[] = [
   },
   {
     title: "Valorant",
-    description: "Prouvez la supériorité de votre expérience avec style dans une compétition mondiale. Alternez les phases d'attaque et de défense, et remportez 13 manches à l'aide de mécaniques de tir précises et de compétences tactiques. Avec une seule vie par manche, vous devrez réfléchir plus vite que votre adversaire pour survivre. Affrontez d'autres joueurs dans les modes Compétition et Non classé, mais aussi en Combat à mort et Spike Rush.",
+    description:
+      "Prouvez la supériorité de votre expérience avec style dans une compétition mondiale. Alternez les phases d'attaque et de défense, et remportez 13 manches à l'aide de mécaniques de tir précises et de compétences tactiques. Avec une seule vie par manche, vous devrez réfléchir plus vite que votre adversaire pour survivre. Affrontez d'autres joueurs dans les modes Compétition et Non classé, mais aussi en Combat à mort et Spike Rush.",
     style: {
       align: "flex-end",
     },
     background: {
-      videoSrc: "https://cmsassets.rgpub.io/sanity/files/dsfx7636/news/409ab2fc369ba5e1fe50bac10c6676d7d1365a9f.mp4",
+      videoSrc:
+        "https://cmsassets.rgpub.io/sanity/files/dsfx7636/news/409ab2fc369ba5e1fe50bac10c6676d7d1365a9f.mp4",
       alt: "Trailer de Valorant",
     },
     thumbnail: {
@@ -76,12 +78,14 @@ export const carouselListItems: CarouselItem[] = [
   },
   {
     title: "Battlefield 2042",
-    description: "Retournez au combat, maintenant ! Emmenez votre meilleure escouade et replongez dans Contrôle, un mode de combat interarmées à 24 contre 24, où votre mission consiste à sécuriser tous les objectifs en rotations et à éliminer tous les adversaires qui se mettent sur votre chemin.",
+    description:
+      "Retournez au combat, maintenant ! Emmenez votre meilleure escouade et replongez dans Contrôle, un mode de combat interarmées à 24 contre 24, où votre mission consiste à sécuriser tous les objectifs en rotations et à éliminer tous les adversaires qui se mettent sur votre chemin.",
     style: {
       align: "flex-end",
     },
     background: {
-      videoSrc: "https://media.contentapi.ea.com/content/dam/battlefield/battlefield-2042/season-5/homepage/videos/2023/06/bf-2042-s5-mse-section-hero-video-s-xs.webm",
+      videoSrc:
+        "https://media.contentapi.ea.com/content/dam/battlefield/battlefield-2042/season-5/homepage/videos/2023/06/bf-2042-s5-mse-section-hero-video-s-xs.webm",
       alt: "Trailer de Battlefield 2042",
     },
     actions: [
@@ -101,7 +105,8 @@ export const carouselListItems: CarouselItem[] = [
   },
   {
     title: "League of Legends",
-    description: "Un jeu de stratégie en équipe, où chaque joueur incarne un champion aux pouvoirs uniques.",
+    description:
+      "Un jeu de stratégie en équipe, où chaque joueur incarne un champion aux pouvoirs uniques.",
     style: {
       align: "flex-start",
     },
@@ -126,7 +131,8 @@ export const carouselListItems: CarouselItem[] = [
   },
   {
     title: "GTA Online",
-    description: "Un jeu d'action-aventure en monde ouvert, fondez votre empire criminel et devenez le plus grand entrepreneur de Los Santos.",
+    description:
+      "Un jeu d'action-aventure en monde ouvert, fondez votre empire criminel et devenez le plus grand entrepreneur de Los Santos.",
     style: {
       align: "flex-end",
     },
@@ -152,5 +158,5 @@ export const carouselListItems: CarouselItem[] = [
         type: "info",
       },
     ],
-  }
+  },
 ];

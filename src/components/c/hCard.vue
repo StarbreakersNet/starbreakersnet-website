@@ -1,58 +1,3 @@
-<template>
-  <n-card
-    :action="props.action"
-    :bordered="props.bordered"
-    :closable="props.closable"
-    :content="props.content"
-    :content-class="props.contentClass"
-    :content-style="props.contentStyle"
-    :cover="props.cover"
-    :embedded="props.embedded"
-    :footer="props.footer"
-    :footer-class="props.footerClass"
-    :footer-style="props.footerStyle"
-    :header-class="props.headerClass"
-    :header-extra="props.headerExtra"
-    :header-extra-class="props.headerExtraClass"
-    :header-extra-style="props.headerExtraStyle"
-    :header-style="props.headerStyle"
-    :hoverable="props.hoverable"
-    :segmented="props.segmented"
-    :size="props.size"
-    :tag="props.tag"
-    :theme-overrides="props.themeOverrides"
-    :title="props.title"
-    v-bind="$attrs">
-    <template v-if="slots.header" #header>
-      <slot name="header" />
-    </template>
-    <template v-if="slots['header-extra']" #header-extra>
-      <slot name="header-extra" />
-    </template>
-    <template #default>
-      <slot name="default" />
-      <template v-if="slots['action-float']">
-        <h-flex align="end" class="tw:flex-1 tw:sticky tw:bottom-[2rem]" justify="end">
-          <h-card embedded size="small">
-            <h-flex justify="end">
-              <slot name="action-float" />
-            </h-flex>
-          </h-card>
-        </h-flex>
-      </template>
-    </template>
-    <template v-if="slots.footer" #footer>
-      <slot name="footer" />
-    </template>
-    <template v-if="slots.action" #action>
-      <slot name="action" />
-    </template>
-    <template v-if="slots.cover" #cover>
-      <slot name="cover" />
-    </template>
-  </n-card>
-</template>
-
 <script lang="ts" setup>
 import { type CardProps, NCard } from "naive-ui";
 import type { CardSegmented } from "naive-ui/es/card/src/Card";
@@ -152,6 +97,61 @@ const props = defineProps({
 
 const slots = useSlots();
 </script>
+
+<template>
+  <n-card
+    :action="props.action"
+    :bordered="props.bordered"
+    :closable="props.closable"
+    :content="props.content"
+    :content-class="props.contentClass"
+    :content-style="props.contentStyle"
+    :cover="props.cover"
+    :embedded="props.embedded"
+    :footer="props.footer"
+    :footer-class="props.footerClass"
+    :footer-style="props.footerStyle"
+    :header-class="props.headerClass"
+    :header-extra="props.headerExtra"
+    :header-extra-class="props.headerExtraClass"
+    :header-extra-style="props.headerExtraStyle"
+    :header-style="props.headerStyle"
+    :hoverable="props.hoverable"
+    :segmented="props.segmented"
+    :size="props.size"
+    :tag="props.tag"
+    :theme-overrides="props.themeOverrides"
+    :title="props.title"
+    v-bind="$attrs">
+    <template v-if="slots.header" #header>
+      <slot name="header" />
+    </template>
+    <template v-if="slots['header-extra']" #header-extra>
+      <slot name="header-extra" />
+    </template>
+    <template #default>
+      <slot name="default" />
+      <template v-if="slots['action-float']">
+        <h-flex align="end" class="tw:flex-1 tw:sticky tw:bottom-[2rem]" justify="end">
+          <h-card embedded size="small">
+            <h-flex justify="end">
+              <slot name="action-float" />
+            </h-flex>
+          </h-card>
+        </h-flex>
+      </template>
+    </template>
+    <template v-if="slots.footer" #footer>
+      <slot name="footer" />
+    </template>
+    <template v-if="slots.action" #action>
+      <slot name="action" />
+    </template>
+    <template v-if="slots.cover" #cover>
+      <slot name="cover" />
+    </template>
+  </n-card>
+</template>
 
 <style lang="scss" scoped>
 .n-card {

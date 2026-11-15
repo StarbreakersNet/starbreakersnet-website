@@ -1,0 +1,22 @@
+# Réglages de base des éditeurs, alignés avec .prettierrc.yaml (voir docs/conventions/README.md)
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+# Copie du dossier docker/ officiel de Supabase : on ne touche pas à ses fichiers (voir README.md)
+[supabase/docker/**]
+charset = unset
+end_of_line = unset
+indent_style = unset
+indent_size = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset

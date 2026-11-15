@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { NIcon } from "naive-ui";
 import { h } from "vue";
 
-export function renderNaiveFontAwesomeIcon(option: any) {
+export function renderNaiveFontAwesomeIcon(option: { fas?: string; far?: string; fab?: string }) {
   if (option.fas) {
     return h(NIcon, null, () => h(FontAwesomeIcon, { icon: ["fas", option.fas] }));
   } else if (option.far) {

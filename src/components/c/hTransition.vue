@@ -1,124 +1,137 @@
-<template>
-    <transition
-        v-bind="$attrs"
-        @enter="enter"
-        @leave="leave"
-        @before-enter="beforeEnter"
-        @after-enter="afterEnter"
-        @before-leave="beforeLeave"
-        @after-leave="afterLeave">
-        <slot></slot>
-    </transition>
-</template>
-
 <script lang="ts" setup>
 import { computed, nextTick, type PropType } from "vue";
 
 type ModeType = "width" | "height";
 
 const props = defineProps({
-    mode: {
-        type: String as PropType<ModeType>,
-        default: "height",
-    },
-    raw: {
-        type: Boolean,
-        default: false,
-    }
+  mode: {
+    type: String as PropType<ModeType>,
+    default: "height",
+  },
+  raw: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const elementSizes = new Map();
+const elementSizes = new Map<string, number>();
 const maxDimension = computed(() => `max-${props.mode}`);
 let transitionId = 0;
 
 function generateTransitionId() {
-    return `transition-${++transitionId}-${Date.now()}`;
+  return `transition-${++transitionId}-${Date.now()}`;
 }
 
-function getElementId(el: any) {
-    if (!el.dataset.transitionId) {
-        el.dataset.transitionId = generateTransitionId();
-    }
-    return el.dataset.transitionId;
+function getElementId(el: HTMLElement) {
+  if (!el.dataset.transitionId) {
+    el.dataset.transitionId = generateTransitionId();
+  }
+  return el.dataset.transitionId;
 }
 
-async function beforeEnter(el: any) {
-    if (props.mode != null && !props.raw) {
-        await nextTick();
-        const naturalSize = el[`scroll${props.mode.charAt(0).toUpperCase() + props.mode.slice(1)}`];
-
-        el.style[maxDimension.value] = "none";
-        el.style.visibility = "hidden";
-
-        elementSizes.set(getElementId(el), naturalSize);
-
-        el.style[maxDimension.value] = "0";
-        el.style.visibility = "visible";
-    }
+function getNaturalSize(el: HTMLElement) {
+  return props.mode === "width" ? el.scrollWidth : el.scrollHeight;
 }
 
-async function enter(el: any) {
-    if (props.mode != null && !props.raw) {
-        await nextTick();
-        const naturalSize = elementSizes.get(getElementId(el));
+async function beforeEnter(el: Element) {
+  const element = el as HTMLElement;
 
-        if (naturalSize) {
-            void el.offsetHeight; // Forcer un reflow
+  if (props.mode != null && !props.raw) {
+    await nextTick();
+    const naturalSize = getNaturalSize(element);
 
-            el.style[maxDimension.value] = naturalSize + "px";
-            el.style.overflow = "hidden";
-        } else {
-            // Sert uniquement pour du debug
-            // console.warn("[hTransition] enter - Taille non trouvée pour ID:", getElementId(el));
-        }
-    }
+    element.style.setProperty(maxDimension.value, "none");
+    element.style.visibility = "hidden";
+
+    elementSizes.set(getElementId(element), naturalSize);
+
+    element.style.setProperty(maxDimension.value, "0");
+    element.style.visibility = "visible";
+  }
 }
 
-async function afterEnter(el: any) {
-    if (props.mode != null && !props.raw) {
-        await nextTick();
+async function enter(el: Element) {
+  const element = el as HTMLElement;
 
-        el.style[maxDimension.value] = "";
-        el.style.overflow = "";
+  if (props.mode != null && !props.raw) {
+    await nextTick();
+    const naturalSize = elementSizes.get(getElementId(element));
 
-        elementSizes.delete(getElementId(el));
+    if (naturalSize) {
+      void element.offsetHeight; // Forcer un reflow
 
-        delete el.dataset.transitionId;
+      element.style.setProperty(maxDimension.value, naturalSize + "px");
+      element.style.overflow = "hidden";
     }
+  }
 }
 
-async function beforeLeave(el: any) {
-    if (props.mode != null && !props.raw) {
-        await nextTick();
-        const naturalSize = el[`scroll${props.mode.charAt(0).toUpperCase() + props.mode.slice(1)}`];
+async function afterEnter(el: Element) {
+  const element = el as HTMLElement;
 
-        elementSizes.set(getElementId(el), naturalSize);
+  if (props.mode != null && !props.raw) {
+    await nextTick();
 
-        el.style[maxDimension.value] = naturalSize + "px";
-        el.style.overflow = "hidden";
-    }
+    element.style.setProperty(maxDimension.value, "");
+    element.style.overflow = "";
+
+    elementSizes.delete(getElementId(element));
+
+    delete element.dataset.transitionId;
+  }
 }
 
-async function leave(el: any) {
-    if (props.mode != null && !props.raw) {
-        await nextTick();
+async function beforeLeave(el: Element) {
+  const element = el as HTMLElement;
 
-        void el.offsetHeight; // Forcer un reflow
+  if (props.mode != null && !props.raw) {
+    await nextTick();
+    const naturalSize = getNaturalSize(element);
 
-        el.style[maxDimension.value] = "0";
-    }
+    elementSizes.set(getElementId(element), naturalSize);
+
+    element.style.setProperty(maxDimension.value, naturalSize + "px");
+    element.style.overflow = "hidden";
+  }
 }
 
-async function afterLeave(el: any) {
-    if (props.mode != null && !props.raw) {
-        await nextTick();
+async function leave(el: Element) {
+  const element = el as HTMLElement;
 
-        el.style[maxDimension.value] = "";
-        el.style.overflow = "";
+  if (props.mode != null && !props.raw) {
+    await nextTick();
 
-        elementSizes.delete(getElementId(el));
+    void element.offsetHeight; // Forcer un reflow
 
-        delete el.dataset.transitionId;
-    }
+    element.style.setProperty(maxDimension.value, "0");
+  }
+}
+
+async function afterLeave(el: Element) {
+  const element = el as HTMLElement;
+
+  if (props.mode != null && !props.raw) {
+    await nextTick();
+
+    element.style.setProperty(maxDimension.value, "");
+    element.style.overflow = "";
+
+    elementSizes.delete(getElementId(element));
+
+    delete element.dataset.transitionId;
+  }
 }
 </script>
+
+<template>
+  <transition
+    v-bind="$attrs"
+    @enter="enter"
+    @leave="leave"
+    @before-enter="beforeEnter"
+    @after-enter="afterEnter"
+    @before-leave="beforeLeave"
+    @after-leave="afterLeave">
+    <slot></slot>
+  </transition>
+</template>

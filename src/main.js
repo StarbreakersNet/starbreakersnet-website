@@ -18,7 +18,7 @@ app.use(router);
 app.use(VueParticles, {
   init: async engine => {
     await loadSlim(engine);
-  }
+  },
 });
 app.component("FontAwesomeIcon", FontAwesomeIcon);
 

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useAuthStore } from "@/stores/auth";
 import { computed, reactive, ref, useTemplateRef } from "vue";
-import type { HFormInst } from "@/types/components/c/hForm.ts";
+import type { HFormInst } from "@/types/components/c/hForm";
 import HForm from "@/components/c/hForm.vue";
 import HFormItem from "@/components/c/hFormItem.vue";
 import HInput from "@/components/c/hInput.vue";
@@ -16,9 +16,9 @@ import {
   usernameRule,
 } from "@/utils/validation";
 
-const auth = useAuthStore();
-
 const emit = defineEmits(["registered"]);
+
+const auth = useAuthStore();
 
 const formRef = useTemplateRef<HFormInst>("formRef");
 const loading = ref(false);
@@ -89,5 +89,3 @@ async function handleSubmit() {
     </h-form>
   </div>
 </template>
-
-<style lang="css" scoped></style>

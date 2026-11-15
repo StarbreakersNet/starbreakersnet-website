@@ -1,11 +1,11 @@
 import { onBeforeUnmount, ref } from "vue";
 
-export const useCurrentTime = () => {
+export function useCurrentTime() {
   const currentTime = ref(new Date());
 
-  const updateCurrentTime = () => {
+  function updateCurrentTime() {
     currentTime.value = new Date();
-  };
+  }
 
   const updateTimeInterval = setInterval(updateCurrentTime, 1000);
 
@@ -14,4 +14,4 @@ export const useCurrentTime = () => {
   });
 
   return currentTime;
-};
+}

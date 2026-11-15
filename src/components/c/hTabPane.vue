@@ -1,12 +1,10 @@
-<template>
-  <n-tab-pane :disabled="props.disabled" :name="props.name" :tab="props.tab" v-bind="$attrs">
-    <slot />
-  </n-tab-pane>
-</template>
-
 <script lang="ts" setup>
 import { NTabPane } from "naive-ui";
 import { type PropType } from "vue";
+
+defineOptions({
+  __TAB_PANE__: true,
+});
 
 const props = defineProps({
   name: {
@@ -22,8 +20,10 @@ const props = defineProps({
     default: false,
   },
 });
-
-defineOptions({
-  __TAB_PANE__: true,
-});
 </script>
+
+<template>
+  <n-tab-pane :disabled="props.disabled" :name="props.name" :tab="props.tab" v-bind="$attrs">
+    <slot />
+  </n-tab-pane>
+</template>
