@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import type { WallpaperMotion } from "@/models/wallpapers";
+import type { WallpaperMotion } from "@/models/WallpaperPreset";
 
 const { motion, light = false } = defineProps<{
   motion: WallpaperMotion;

@@ -264,5 +264,25 @@ export default defineConfigWithVueTs(
     },
   },
 
+  {
+    name: "app/models",
+    files: ["src/models/**/*.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        ...SCRIPT_SYNTAX,
+        {
+          selector:
+            "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > Identifier.id[name!=/^[A-Z][A-Z0-9_]*$/]",
+          message: `Constantes de models/ en UPPER_SNAKE_CASE : MENU_ITEMS (${ORGANISATION_DOC})`,
+        },
+        {
+          selector: "Program > FunctionDeclaration, ExportNamedDeclaration > FunctionDeclaration",
+          message: `Pas de fonction dans models/ : elle va dans utils/ (${ORGANISATION_DOC})`,
+        },
+      ],
+    },
+  },
+
   skipFormatting
 );

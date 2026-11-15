@@ -4,7 +4,8 @@ import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HGrid from "@/components/c/hGrid.vue";
 import HGridItem from "@/components/c/hGridItem.vue";
-import { WIDGET_DEFINITIONS, WIDGET_SIZES, WIDGET_TYPES } from "@/models/widgets";
+import { WIDGET_DEFINITIONS, WIDGET_TYPES } from "@/models/WidgetDefinition";
+import { WIDGET_SIZES } from "@/models/WidgetSize";
 import type { NewWidget, WidgetSize, WidgetType } from "@/types/Widget";
 
 // Galerie du mode édition, comme celle des widgets de macOS : un type, une taille, Ajouter.

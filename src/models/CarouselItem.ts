@@ -25,7 +25,7 @@ export interface CarouselItem {
   actions?: CarouselAction[];
 }
 
-export const carouselListItems: CarouselItem[] = [
+export const CAROUSEL_ITEMS: CarouselItem[] = [
   {
     title: "Les Starbreakers",
     description: "Une grande famille ouverte à tous, surtout aux plus marrants !",

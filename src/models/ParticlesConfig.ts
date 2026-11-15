@@ -1,4 +1,4 @@
-export const particlesOptions = {
+export const PARTICLES_OPTIONS = {
   fpsLimit: 60,
   interactivity: {
     detectsOn: "canvas",

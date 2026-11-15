@@ -5,7 +5,7 @@ import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HInput from "@/components/c/hInput.vue";
 import { markdownExtensions } from "@/utils/markdown";
-import { normalizeUrl } from "@/models/widgets";
+import { normalizeUrl } from "@/utils/url";
 
 const markdown = defineModel({
   type: String,

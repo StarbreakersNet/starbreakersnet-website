@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { type CarouselItem, carouselListItems } from "@/models/CarouselItem";
-import { particlesOptions } from "@/models/ParticlesConfig";
+import { type CarouselItem, CAROUSEL_ITEMS } from "@/models/CarouselItem";
+import { PARTICLES_OPTIONS } from "@/models/ParticlesConfig";
 import HCarousel from "@/components/c/hCarousel.vue";
 import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
@@ -8,7 +8,7 @@ import HText from "@/components/c/hText.vue";
 import HCard from "@/components/c/hCard.vue";
 import HH1 from "@/components/c/hH1.vue";
 
-const carouselItemsStyle = carouselListItems.map(item => {
+const carouselItemsStyle = CAROUSEL_ITEMS.map(item => {
   const align = item.style.align;
   const delay = calculateDelays(item);
 
@@ -33,9 +33,9 @@ function calculateDelays(item: CarouselItem) {
 
 <template>
   <main class="fullscreen-container">
-    <vue-particles id="tsparticles" :options="particlesOptions" />
+    <vue-particles id="tsparticles" :options="PARTICLES_OPTIONS" />
     <h-carousel :interval="15000" autoplay dot-placement="top" dot-type="line" draggable keyboard>
-      <div v-for="(item, itemIndex) in carouselListItems" :key="item.title.toLowerCase()">
+      <div v-for="(item, itemIndex) in CAROUSEL_ITEMS" :key="item.title.toLowerCase()">
         <h-flex wrap :align="item.style.align" class="content-container" size="large" vertical>
           <div
             v-if="item.thumbnail"

@@ -7,7 +7,7 @@ export interface MenuItem {
   textColor?: string;
 }
 
-export const menuItems: MenuItem[] = [
+export const MENU_ITEMS: MenuItem[] = [
   {
     routeName: "buroh",
     label: "Buroh",

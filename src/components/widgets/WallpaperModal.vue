@@ -16,18 +16,17 @@ import HTabs from "@/components/c/hTabs.vue";
 import HText from "@/components/c/hText.vue";
 import { checkUnsplashKey, fetchRandomPhoto, fetchTopics, withReferral } from "@/utils/unsplash";
 import { saveWallpaperFile } from "@/utils/wallpaperFile";
+import { DEFAULT_WALLPAPER, WALLPAPER_PRESETS } from "@/models/WallpaperPreset";
 import {
-  DEFAULT_WALLPAPER,
   guessMediaKind,
   normalizeUnsplashKey,
   parseUnsplashCollection,
   pickVideo,
-  ROTATION_FREQUENCIES,
-  WALLPAPER_FILE_MAX_SIZE,
-  WALLPAPER_PRESETS,
-  WALLPAPER_VIDEOS,
-} from "@/models/wallpapers";
-import { normalizeUrl } from "@/models/widgets";
+} from "@/utils/wallpaper";
+import { ROTATION_FREQUENCIES } from "@/models/RotationFrequencyOption";
+import { WALLPAPER_FILE_MAX_SIZE } from "@/utils/wallpaperFile";
+import { WALLPAPER_VIDEOS } from "@/models/WallpaperVideo";
+import { normalizeUrl } from "@/utils/url";
 import { useLoader } from "@/composables/useLoader";
 import { useAppMessage } from "@/composables/useAppMessage";
 import { useUserStore } from "@/stores/user";

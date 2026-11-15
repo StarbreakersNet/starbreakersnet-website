@@ -48,6 +48,12 @@ const RULES = [
     expected: "camelCase, au nom du sujet (jamais utils.ts ni helpers.ts) : userTag.ts",
   },
   {
+    dir: "models",
+    ext: ".ts",
+    pattern: /^[A-Z][A-Za-z0-9]*$/,
+    expected: "PascalCase, au nom du type : MenuItem.ts",
+  },
+  {
     dir: "types",
     ext: ".ts",
     exclude: "types/components/c",

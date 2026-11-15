@@ -7,7 +7,7 @@ import HRadioButton from "@/components/c/hRadioButton.vue";
 import HRadioGroup from "@/components/c/hRadioGroup.vue";
 import HSelect from "@/components/c/hSelect.vue";
 import HSwitch from "@/components/c/hSwitch.vue";
-import { localTimezone, timezoneCity } from "@/models/widgets";
+import { localTimezone, timezoneCity } from "@/utils/timezone";
 import type { ClockSettings } from "@/types/Widget";
 
 const settings = defineModel("settings", {

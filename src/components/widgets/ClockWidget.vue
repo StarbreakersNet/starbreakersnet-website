@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { DateTime } from "luxon";
-import { localTimezone, timezoneCity } from "@/models/widgets";
+import { localTimezone, timezoneCity } from "@/utils/timezone";
 import type { ClockSettings, WidgetSize } from "@/types/Widget";
 
 const { settings, size } = defineProps<{

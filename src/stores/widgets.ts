@@ -3,18 +3,13 @@ import { ref } from "vue";
 import _ from "lodash";
 import { supabase } from "@/utils/supabaseClient";
 import { useAppMessage } from "@/composables/useAppMessage";
-import {
-  createId,
-  defaultWidgets,
-  findFreeSpot,
-  fits,
-  normalizeDocument,
-  toDocument,
-  WIDGET_DEFINITIONS,
-  WIDGET_SIZES,
-  widgetRect,
-} from "@/models/widgets";
-import { DEFAULT_WALLPAPER, normalizeUnsplashKey, normalizeWallpaper } from "@/models/wallpapers";
+import { createId } from "@/utils/id";
+import { defaultWidgets, normalizeDocument, toDocument } from "@/utils/widgetDocument";
+import { findFreeSpot, fits, widgetRect } from "@/utils/widgetGrid";
+import { WIDGET_DEFINITIONS } from "@/models/WidgetDefinition";
+import { WIDGET_SIZES } from "@/models/WidgetSize";
+import { DEFAULT_WALLPAPER } from "@/models/WallpaperPreset";
+import { normalizeUnsplashKey, normalizeWallpaper } from "@/utils/wallpaper";
 import { deleteWallpaperFile } from "@/utils/wallpaperFile";
 import type { FitState } from "@/composables/useFitContent";
 import type { Wallpaper } from "@/types/Wallpaper";

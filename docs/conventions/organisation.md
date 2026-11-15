@@ -13,11 +13,11 @@ Les règles marquées **`lint`** sont vérifiées par `yarn lint`.
 | `composables/` | Fonctions `useXxx()` liées à l'application en cours : état, service (messages, notifications), réactivité ou cycle de vie de Vue | `useXxx.ts` |
 | `utils/` | Fonctions et constantes TypeScript indépendantes de l'application en cours (calculs, formats, constantes), clients (Supabase). Un fichier par sujet | camelCase, au nom du sujet : `userTag.ts`, jamais `utils.ts` ni `helpers.ts` |
 | `types/` | Types partagés ; `types/components/` pour les types publics des composants (`HFormInst`) | PascalCase : `User.ts` |
-| `models/` | Données statiques et leur type (menus, carrousel) | PascalCase : `MenuItem.ts` |
+| `models/` | Données statiques et leur type (menus, carrousel, fonds d'écran, définitions des widgets). Pas de fonction : elles vont dans `utils/` **`lint`** | PascalCase, au nom du type : `MenuItem.ts`. Constantes en UPPER_SNAKE_CASE : `MENU_ITEMS` **`lint`** |
 | `assets/` | Styles globaux (`variables.scss`, `main.scss`), thèmes Naive UI | |
 | `router/` | Routes et garde de navigation | |
 
-Les noms de fichiers de ces dossiers, sauf `models/`, sont vérifiés par `yarn lint` (`scripts/check-names.mjs`). **`lint`**
+Les noms de fichiers de ces dossiers sont vérifiés par `yarn lint` (`scripts/check-names.mjs`). **`lint`**
 
 ## Stores, composables et `utils/`
 

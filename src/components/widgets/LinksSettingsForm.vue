@@ -8,7 +8,9 @@ import HInput from "@/components/c/hInput.vue";
 import HInputGroup from "@/components/c/hInputGroup.vue";
 import HSwitch from "@/components/c/hSwitch.vue";
 import HText from "@/components/c/hText.vue";
-import { createId, LINKS_MAX, normalizeUrl } from "@/models/widgets";
+import { createId } from "@/utils/id";
+import { LINKS_MAX } from "@/models/WidgetDefinition";
+import { normalizeUrl } from "@/utils/url";
 import type { LinkItem, LinksSettings } from "@/types/Widget";
 
 const settings = defineModel("settings", {

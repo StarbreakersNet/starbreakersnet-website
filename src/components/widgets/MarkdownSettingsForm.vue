@@ -3,7 +3,7 @@ import { type PropType } from "vue";
 import HForm from "@/components/c/hForm.vue";
 import HFormItem from "@/components/c/hFormItem.vue";
 import NoteEditor from "@/components/widgets/NoteEditor.vue";
-import { MARKDOWN_MAX_LENGTH } from "@/models/widgets";
+import { MARKDOWN_MAX_LENGTH } from "@/models/WidgetDefinition";
 import type { MarkdownSettings } from "@/types/Widget";
 
 const settings = defineModel("settings", {

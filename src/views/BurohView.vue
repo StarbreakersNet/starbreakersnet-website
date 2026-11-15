@@ -10,13 +10,9 @@ import WidgetGallery from "@/components/widgets/WidgetGallery.vue";
 import WidgetGrid from "@/components/widgets/WidgetGrid.vue";
 import WidgetSettingsModal from "@/components/widgets/WidgetSettingsModal.vue";
 import { WIDGET_COMPONENTS } from "@/components/widgets/registry";
-import {
-  GRID_COLUMNS,
-  MOBILE_COLUMNS,
-  mobileLayout,
-  WIDGET_DEFINITIONS,
-  WIDGET_SIZES,
-} from "@/models/widgets";
+import { GRID_COLUMNS, MOBILE_COLUMNS, WIDGET_SIZES } from "@/models/WidgetSize";
+import { mobileLayout } from "@/utils/widgetGrid";
+import { WIDGET_DEFINITIONS } from "@/models/WidgetDefinition";
 import { useWidgetsStore } from "@/stores/widgets";
 import type { WallpaperAppearance } from "@/types/Wallpaper";
 import type { GridItem, GridPosition, NewWidget } from "@/types/Widget";

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { type MenuItem, menuItems } from "@/models/MenuItem";
+import { type MenuItem, MENU_ITEMS } from "@/models/MenuItem";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useRouter } from "vue-router";
 import HButton from "@/components/c/hButton.vue";
@@ -18,7 +18,7 @@ function handleClick(item: MenuItem) {
 
 <template>
   <h-flex wrap :size="30" align="center" class="component apple-blurred" justify="center">
-    <div v-for="item in menuItems" :key="item.label" class="item">
+    <div v-for="item in MENU_ITEMS" :key="item.label" class="item">
       <h-button
         :color="item.color"
         :text-color="item.textColor ?? (item.color ? 'white' : '')"
