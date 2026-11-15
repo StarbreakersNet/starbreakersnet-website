@@ -1,12 +1,8 @@
-import hButton from "@/components/c/hButton.vue";
-import hFlex from "@/components/c/hFlex.vue";
+import HButton from "@/components/c/hButton.vue";
+import HFlex from "@/components/c/hFlex.vue";
 import { renderedFontAwesomeIcon } from "@/utils/naiveIcons";
 import { CONTACT_EMAIL } from "@/utils/contact";
-import type {
-  NaiveNotificationType,
-  NotificationOptions,
-  NotificationType,
-} from "@/types/components/AppNotification";
+import type { NotificationOptions } from "@/types/components/AppNotification";
 import { DateTime } from "luxon";
 import type {
   NotificationApi,
@@ -14,8 +10,6 @@ import type {
   NotificationReactive,
 } from "naive-ui";
 import { h } from "vue";
-
-type SentryWindow = Window & { Sentry?: { captureMessage: (message: string) => void } };
 
 const ERROR_DESCRIPTION = `Si le problème persiste, écrivez-nous à ${CONTACT_EMAIL}`;
 
@@ -35,19 +29,6 @@ function getNotificationApi() {
   );
 }
 
-function getNaiveType(type: NotificationType): NaiveNotificationType {
-  switch (type) {
-    case undefined:
-      return undefined;
-    case "primary":
-      return "default";
-    case "accent":
-      return "default";
-    default:
-      return type as NaiveNotificationType;
-  }
-}
-
 export function useAppNotification() {
   function custom(options: NotificationOptions): NotificationReactive {
     const clickIcon = options.clickIcon || "arrow-up-right-from-square";
@@ -63,14 +44,13 @@ export function useAppNotification() {
     }
 
     function getPreparedContent() {
-      return h(hFlex, { justify: "space-between" }, () => [
-        h(hFlex, { vertical: true }, getMinimalContent),
+      return h(HFlex, { justify: "space-between" }, () => [
+        h(HFlex, { vertical: true }, getMinimalContent),
         options.onClick &&
           h(
-            hButton,
+            HButton,
             {
               circle: true,
-              color: "default",
               secondary: true,
               onClick: options.onClick,
             },
@@ -91,7 +71,7 @@ export function useAppNotification() {
           options.title
         ),
       content: getPreparedContent,
-      type: getNaiveType(options.type) ?? "default",
+      type: options.type ?? "default",
       duration: options.duration || 2000,
       closable: options.closable ?? true,
       keepAliveOnHover: options.keepAliveOnHover ?? true,
@@ -111,17 +91,13 @@ export function useAppNotification() {
     });
   }
 
-  function error(message: string, error?: Error, duration = 10000): NotificationReactive | void {
+  function error(message: string, error?: Error, duration = 10000): void {
     custom({
       title: message,
       content: ERROR_DESCRIPTION,
       duration,
       type: "error",
     });
-
-    if (typeof window !== "undefined") {
-      (window as SentryWindow).Sentry?.captureMessage(message);
-    }
 
     if (error instanceof Error) {
       error.message = error.message + " (" + message + ")";
@@ -163,12 +139,11 @@ export function useAppNotification() {
     return custom({
       title,
       content: () =>
-        h(hFlex, { vertical: true }, () => [
+        h(HFlex, { vertical: true }, () => [
           h("div", { class: "tw:font-medium" }, "De : " + from),
           h("div", {}, "Objet : " + content),
         ]),
       duration,
-      type: "accent",
       avatar: renderedFontAwesomeIcon(["fas", "message"]),
       onClick: onClickAction,
       clickIcon: "arrow-up-right-from-square",
