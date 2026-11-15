@@ -26,7 +26,6 @@ const slots = useSlots();
 
 <template>
   <n-collapse-item
-    ref="collapseItem"
     :disabled="props.disabled"
     :display-directive="props.displayDirective"
     :name="props.name"

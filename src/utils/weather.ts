@@ -23,7 +23,9 @@ const LOCATE_MAX_AGE = 10 * 60 * 1000;
 const cache = new Map<string, { at: number; promise: Promise<Forecast> }>();
 
 export function roundCoordinates({ latitude, longitude }: { latitude: number; longitude: number }) {
-  const round = (value: number) => Math.round(value * 100) / 100;
+  function round(value: number) {
+    return Math.round(value * 100) / 100;
+  }
 
   return { latitude: round(latitude), longitude: round(longitude) };
 }

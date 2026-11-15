@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { FormItemInst, FormItemRule } from "naive-ui";
-import { type PropType, ref } from "vue";
+import { type PropType, useTemplateRef } from "vue";
 
 const props = defineProps({
   contentClass: {
@@ -97,7 +97,7 @@ const props = defineProps({
   },
 });
 
-const formItemRef = ref<FormItemInst>();
+const formItemRef = useTemplateRef<FormItemInst>("formItemRef");
 
 defineExpose({
   validate: (...args: Parameters<FormItemInst["validate"]>) => formItemRef.value?.validate(...args),

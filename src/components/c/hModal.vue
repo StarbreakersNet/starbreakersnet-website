@@ -81,7 +81,6 @@ const slots = useSlots();
 
 <template>
   <n-modal
-    ref="modal"
     :auto-focus="props.autoFocus"
     :block-scroll="props.blockScroll"
     :closable="props.closable"

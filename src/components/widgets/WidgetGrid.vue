@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, onMounted, type PropType, ref, watch } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, type PropType, useTemplateRef, watch } from "vue";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.min.css";
 import type { GridItem, GridPosition } from "@/types/Widget";
@@ -44,7 +44,7 @@ defineSlots<{
   item(props: { id: string }): unknown;
 }>();
 
-const root = ref<HTMLElement | null>(null);
+const rootRef = useTemplateRef<HTMLElement>("rootRef");
 const elements = new Map<string, HTMLElement>();
 
 let grid: GridStack | null = null;
@@ -151,7 +151,7 @@ watch(
 watch(() => props.items, sync, { deep: true });
 
 onMounted(() => {
-  grid = root.value ? createGrid(root.value) : null;
+  grid = rootRef.value ? createGrid(rootRef.value) : null;
 
   if (grid) {
     remember(props.items);
@@ -166,7 +166,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="root" class="grid-stack">
+  <div ref="rootRef" class="grid-stack">
     <div
       v-for="item in props.items"
       :key="item.id"

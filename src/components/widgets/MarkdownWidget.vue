@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { type PropType, ref, watch } from "vue";
+import { type PropType, useTemplateRef, watch } from "vue";
 import { EditorContent, useEditor } from "@tiptap/vue-3";
 import { markdownExtensions } from "@/utils/markdown";
 import { type FitState, useFitContent } from "@/composables/useFitContent";
@@ -28,9 +28,9 @@ const editor = useEditor({
 });
 
 // Pas d'ascenseur : texte réduit pour tenir (voir useFitContent)
-const root = ref<HTMLElement | null>(null);
+const rootRef = useTemplateRef<HTMLElement>("rootRef");
 
-const { overflowing, fit } = useFitContent(root, [() => props.settings.content], {
+const { overflowing, fit } = useFitContent(rootRef, [() => props.settings.content], {
   onFit: state => emit("fit", state),
 });
 
@@ -42,7 +42,7 @@ watch(() => props.settings.content, showContent);
 </script>
 
 <template>
-  <div ref="root" :class="{ clipped: overflowing }" class="markdown">
+  <div ref="rootRef" :class="{ clipped: overflowing }" class="markdown">
     <editor-content :editor="editor" />
   </div>
 </template>

@@ -13,7 +13,7 @@ export interface FitState {
 }
 
 export function useFitContent(
-  element: Ref<HTMLElement | null>,
+  element: Readonly<Ref<HTMLElement | null>>,
   sources: WatchSource[],
   // onFit : appelé après chaque calcul, même si l'échelle n'a pas changé (contenu modifié)
   { minScale = 0.6, onFit }: { minScale?: number; onFit?: (state: FitState) => void } = {}

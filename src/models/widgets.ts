@@ -275,10 +275,10 @@ export function findFreeSpot(size: WidgetSize, others: Rect[], columns = GRID_CO
 export function mobileLayout(widgets: Widget[]): Map<string, { x: number; y: number }> {
   const positions = new Map<string, { x: number; y: number }>();
   const placed: Rect[] = [];
-  const place = (widget: Widget, position: { x: number; y: number }) => {
+  function place(widget: Widget, position: { x: number; y: number }) {
     positions.set(widget.id, position);
     placed.push({ ...position, ...WIDGET_SIZES[widget.size] });
-  };
+  }
 
   for (const widget of widgets) {
     if (

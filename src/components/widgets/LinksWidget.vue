@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, type PropType, reactive, ref } from "vue";
+import { computed, type PropType, reactive, useTemplateRef } from "vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HGrid from "@/components/c/hGrid.vue";
 import HGridItem from "@/components/c/hGridItem.vue";
@@ -50,15 +50,15 @@ const target = computed(() => (props.settings.newTab ? "_blank" : undefined));
 const rel = computed(() => (props.settings.newTab ? "noopener noreferrer" : undefined));
 
 // Pas d'ascenseur : icônes réduites pour que tous les liens tiennent (voir useFitContent)
-const root = ref<HTMLElement | null>(null);
+const rootRef = useTemplateRef<HTMLElement>("rootRef");
 
-const { overflowing } = useFitContent(root, [links], {
+const { overflowing } = useFitContent(rootRef, [links], {
   onFit: state => emit("fit", state),
 });
 </script>
 
 <template>
-  <div ref="root" :class="{ clipped: overflowing }" class="links">
+  <div ref="rootRef" :class="{ clipped: overflowing }" class="links">
     <h-flex v-if="links.length === 0" class="empty" justify="center">
       Aucun lien pour l'instant. Ajoutez-en dans les réglages du widget.
     </h-flex>

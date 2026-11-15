@@ -3,7 +3,15 @@ import HFlex from "@/components/c/hFlex.vue";
 import HThing from "@/components/c/hThing.vue";
 import HTransition from "@/components/c/hTransition.vue";
 import { useUserStore } from "@/stores/user";
-import { computed, onBeforeUnmount, type PropType, ref, useSlots, watch } from "vue";
+import {
+  computed,
+  onBeforeUnmount,
+  type PropType,
+  ref,
+  useSlots,
+  useTemplateRef,
+  watch,
+} from "vue";
 
 const props = defineProps({
   text: {
@@ -107,7 +115,7 @@ const user = useUserStore();
 
 const slots = useSlots();
 
-const refSkeleton = ref<HTMLElement | null>(null);
+const skeletonRef = useTemplateRef<HTMLElement>("skeletonRef");
 const defaultSlotWidth = ref(DEFAULT_WIDTH);
 const shouldShowSkeleton = ref(false);
 let showTimeoutId: number | null = null;
@@ -136,7 +144,7 @@ watch(
           skeletonShowTime = Date.now();
 
           if (slots.default) {
-            defaultSlotWidth.value = `${refSkeleton.value?.getBoundingClientRect().width}px`;
+            defaultSlotWidth.value = `${skeletonRef.value?.getBoundingClientRect().width}px`;
           }
         }
       }, MIN_DISPLAY_TIME);
@@ -169,7 +177,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="refSkeleton" class="app-skeleton">
+  <div ref="skeletonRef" class="app-skeleton">
     <h-transition name="fade">
       <h-flex
         v-if="shouldShowSkeleton"

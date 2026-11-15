@@ -36,7 +36,6 @@ const slots = useSlots();
 
 <template>
   <n-collapse
-    ref="collapse"
     :accordion="props.accordion"
     :arrow-placement="props.arrowPlacement"
     :default-expanded-names="props.defaultExpandedNames"

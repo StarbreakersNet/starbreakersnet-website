@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { FormItemInst } from "naive-ui";
 import { type FormItemRule, type GridItemProps } from "naive-ui";
-import { type PropType, ref } from "vue";
+import { type PropType, useTemplateRef } from "vue";
 
 defineOptions({
   __GRID_ITEM__: true,
@@ -116,7 +116,7 @@ const props = defineProps({
   },
 });
 
-const formItemRef = ref<FormItemInst>();
+const formItemRef = useTemplateRef<FormItemInst>("formItemRef");
 
 defineExpose({
   validate: (...args: Parameters<FormItemInst["validate"]>) => formItemRef.value?.validate(...args),

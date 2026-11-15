@@ -35,7 +35,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   // Passe à true quand on sait s'il y a une session (et que le profil est chargé s'il y en a une)
   const isReady = ref(false);
-  let resolveReady: () => void = () => {};
+  let resolveReady!: () => void;
   const readyPromise = new Promise<void>(resolve => {
     resolveReady = resolve;
   });
