@@ -2,6 +2,7 @@
 import HFlex from "@/components/c/hFlex.vue";
 import HThing from "@/components/c/hThing.vue";
 import HTransition from "@/components/c/hTransition.vue";
+import { useThemeVars } from "naive-ui";
 import { computed, onBeforeUnmount, ref, useSlots, useTemplateRef, watch } from "vue";
 
 const {
@@ -34,6 +35,7 @@ const MIN_DISPLAY_TIME = 300; // Temps minimal avant d'afficher le skeleton
 const MIN_HIDE_TIME = 500; // Temps minimal avant de masquer le skeleton
 
 const slots = useSlots();
+const themeVars = useThemeVars();
 
 const skeletonRef = useTemplateRef<HTMLElement>("skeletonRef");
 const defaultSlotWidth = ref(DEFAULT_WIDTH);
@@ -235,8 +237,6 @@ interface Props {
 </template>
 
 <style lang="scss" scoped>
-@use "@/assets/colors";
-
 .app-skeleton {
   position: relative;
   width: 100%;
@@ -281,32 +281,32 @@ interface Props {
 
   &.forced-primary {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$primary-light};
+    --skeleton-main-color: v-bind("themeVars.primaryColor");
   }
 
   &.forced-accent {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$accent};
+    --skeleton-main-color: v-bind("themeVars.accentColor");
   }
 
   &.forced-info {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$info};
+    --skeleton-main-color: v-bind("themeVars.infoColor");
   }
 
   &.forced-success {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$success};
+    --skeleton-main-color: v-bind("themeVars.successColor");
   }
 
   &.forced-warning {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$warning};
+    --skeleton-main-color: v-bind("themeVars.warningColor");
   }
 
   &.forced-danger {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$danger};
+    --skeleton-main-color: v-bind("themeVars.errorColor");
   }
 
   :deep(> .n-thing-main) {
