@@ -1,46 +1,32 @@
 <script generic="T = any" lang="ts" setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { NList, type ListProps } from "naive-ui";
+import { computed, type VNode } from "vue";
 import HAlert from "@/components/c/hAlert.vue";
 import HListItem from "@/components/c/hListItem.vue";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { type ListProps, NList } from "naive-ui";
-import { computed, type PropType, useSlots, type VNode } from "vue";
+import { slotsExcept } from "@/utils/slots";
 
-const props = defineProps({
-  showDivider: {
-    type: Boolean as PropType<ListProps["showDivider"]>,
-    default: false,
-  },
-  hoverable: {
-    type: Boolean as PropType<ListProps["hoverable"]>,
-    default: false,
-  },
-  clickable: {
-    type: Boolean as PropType<ListProps["clickable"]>,
-    default: false,
-  },
-  bordered: {
-    type: Boolean as PropType<ListProps["bordered"]>,
-    default: false,
-  },
-  size: {
-    type: String as PropType<ListProps["size"]>,
-    default: "medium",
-  },
-  themeOverrides: {
-    type: Object as PropType<ListProps["themeOverrides"]>,
-  },
-  items: {
-    type: Array as PropType<T[]>,
-    default: null,
-  },
-  animated: {
-    type: Boolean,
-    default: false,
-  },
-});
+interface Props extends /* @vue-ignore */ ListProps {
+  /** Éléments affichés un par un (slot item), avec un message quand la liste est vide */
+  items?: T[] | null;
+  clickable?: boolean;
+  hoverable?: boolean;
+  showDivider?: boolean;
+}
+
+type ForwardedSlot = "header" | "footer";
+
+defineOptions({ inheritAttrs: false });
+
+const {
+  items = null,
+  clickable = false,
+  hoverable = false,
+  showDivider = false,
+} = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: "itemClick", item: T): void;
+  itemClick: [item: T];
 }>();
 
 defineSlots<{
@@ -52,16 +38,10 @@ defineSlots<{
   suffix: (props: { index: number; item: T }) => VNode[];
 }>();
 
-const slots = useSlots();
-
-const isHoverable = computed(() => props.hoverable && (!props.items || props.items.length > 0));
+const isHoverable = computed(() => hoverable && (!items || items.length > 0));
 
 function getItemHref(item: T): string | undefined {
-  if (props.clickable) {
-    return (item as { href?: string } | undefined)?.href;
-  } else {
-    return undefined;
-  }
+  return clickable ? (item as { href?: string } | undefined)?.href : undefined;
 }
 
 function getItemKey(item: T, index: number): string | number {
@@ -69,7 +49,7 @@ function getItemKey(item: T, index: number): string | number {
 }
 
 function handleItemClick(item: T) {
-  if (props.clickable) {
+  if (clickable) {
     emit("itemClick", item);
   }
 }
@@ -77,18 +57,17 @@ function handleItemClick(item: T) {
 
 <template>
   <n-list
-    :bordered="props.bordered"
-    :clickable="props.clickable"
+    :clickable="clickable"
     :hoverable="isHoverable"
-    :show-divider="props.showDivider"
-    :size="props.size"
-    :theme-overrides="props.themeOverrides"
+    :show-divider="showDivider"
     v-bind="$attrs">
-    <template v-if="slots.header" #header>
-      <slot name="header" />
+    <template
+      v-for="(_, name) in slotsExcept($slots, 'default', 'item', 'empty', 'suffix')"
+      #[name]>
+      <slot :name="name as ForwardedSlot" />
     </template>
     <template #default>
-      <template v-if="props.items">
+      <template v-if="items">
         <slot v-if="items.length <= 0" name="empty">
           <h-list-item>
             <h-alert :show-icon="false" type="info">
@@ -110,18 +89,13 @@ function handleItemClick(item: T) {
                 <div>{{ item }}</div>
               </slot>
             </template>
-            <template v-if="slots.suffix" #suffix>
+            <template v-if="$slots.suffix" #suffix>
               <slot :index="index" :item="item" name="suffix" />
             </template>
           </h-list-item>
         </template>
       </template>
-      <template v-else-if="slots.default">
-        <slot name="default" />
-      </template>
-    </template>
-    <template v-if="slots.footer" #footer>
-      <slot name="footer" />
+      <slot v-else-if="$slots.default" name="default" />
     </template>
   </n-list>
 </template>

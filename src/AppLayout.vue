@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import { RouterView, useRoute, useRouter } from "vue-router";
 import MainMenu from "@/components/MainMenu.vue";
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import MaintenanceView from "@/views/MaintenanceView.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useMessage, useNotification } from "naive-ui";
+import { registerMessageApi } from "@/composables/useAppMessage";
+import { registerNotificationApi } from "@/composables/useAppNotification";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
+import HButton from "@/components/c/hButton.vue";
+import HFlex from "@/components/c/hFlex.vue";
+import HSpin from "@/components/c/hSpin.vue";
 
-const props = defineProps({
-  maintenanceMode: {
-    type: Boolean,
-    default: false,
-  },
-});
+const { maintenanceMode = false } = defineProps<{
+  maintenanceMode?: boolean;
+}>();
+
+registerMessageApi(useMessage());
+registerNotificationApi(useNotification());
+
 const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
@@ -26,6 +32,10 @@ const showFooter = ref(false);
 function setUiVisibility(isHome: boolean) {
   showHeader.value = true;
   showFooter.value = isHome;
+}
+
+function handleHomeClick() {
+  router.push({ name: "home" });
 }
 
 watch(
@@ -57,47 +67,42 @@ watch(
     }
   }
 );
-
-onMounted(async () => {
-  window.$message = useMessage();
-  window.$notification = useNotification();
-});
 </script>
 
 <template>
   <transition>
     <div v-if="!auth.isReady" class="app-loader">
-      <n-spin size="large" />
+      <h-spin size="large" />
     </div>
   </transition>
   <transition mode="out-in" name="scale">
-    <maintenance-view v-if="props.maintenanceMode" />
+    <maintenance-view v-if="maintenanceMode" />
     <div v-else class="main-container">
       <transition name="shrink">
         <header v-if="showHeader">
           <transition-group name="fade-y">
-            <n-button
+            <h-button
               v-if="!isHome"
               key="home"
               :bordered="false"
               class="apple-blurred"
-              @click="$router.push({ name: 'home' })">
-              <n-flex align="center">
+              @click="handleHomeClick()">
+              <h-flex wrap align="center">
                 <font-awesome-icon icon="arrow-left" />
                 Accueil
-              </n-flex>
-            </n-button>
+              </h-flex>
+            </h-button>
           </transition-group>
           <user-menu />
         </header>
       </transition>
-      <n-flex class="router-view" justify="center">
+      <h-flex wrap align="stretch" class="router-view" justify="center">
         <router-view #default="{ Component }">
           <transition mode="out-in" name="scale">
             <component :is="Component" />
           </transition>
         </router-view>
-      </n-flex>
+      </h-flex>
       <transition name="fade-y">
         <footer v-if="showFooter">
           <main-menu />

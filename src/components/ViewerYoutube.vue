@@ -1,16 +1,15 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import MimicBackend from "@/stores/MimicBackend";
+import { YOUTUBE_ZAP_URL } from "@/utils/embeds";
 import AppContainer from "@/components/AppContainer.vue";
 
-const url: string = MimicBackend.getViewerYoutubeZapUrl();
 const isIframeLoaded = ref(false);
 </script>
 
 <template>
   <app-container :loaded="isIframeLoaded" app="youtube">
     <iframe
-      :src="url"
+      :src="YOUTUBE_ZAP_URL"
       allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
       allowfullscreen
       @load="isIframeLoaded = true" />

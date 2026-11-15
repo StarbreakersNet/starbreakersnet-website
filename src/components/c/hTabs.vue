@@ -1,42 +1,17 @@
-<script lang="ts" setup>
-import { NTabs, type TabsProps } from "naive-ui";
-import { type PropType } from "vue";
+<script setup lang="ts">
+import { NTabs, type TabsProps, type TabsSlots } from "naive-ui";
 
-const props = defineProps({
-  value: {
-    type: [String, Number] as PropType<TabsProps["value"]>,
-    default: undefined,
-  },
-  type: {
-    type: String as PropType<TabsProps["type"]>,
-    default: "bar",
-  },
-  size: {
-    type: String as PropType<TabsProps["size"]>,
-    default: undefined,
-  },
-  justifyContent: {
-    type: String as PropType<TabsProps["justifyContent"]>,
-    default: undefined,
-  },
-  animated: {
-    type: Boolean,
-    default: false,
-  },
-});
+defineOptions({ inheritAttrs: false });
 
-defineEmits(["update:value"]);
+defineProps</* @vue-ignore */ TabsProps>();
+
+defineSlots<TabsSlots>();
 </script>
 
 <template>
-  <n-tabs
-    :animated="props.animated"
-    :justify-content="props.justifyContent"
-    :size="props.size"
-    :type="props.type"
-    :value="props.value"
-    v-bind="$attrs"
-    @update:value="$emit('update:value', $event)">
-    <slot />
+  <n-tabs v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof TabsSlots" v-bind="slotProps ?? {}" />
+    </template>
   </n-tabs>
 </template>

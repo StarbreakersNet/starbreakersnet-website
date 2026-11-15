@@ -1,54 +1,21 @@
-<script lang="ts" setup>
-import { type GridProps, NGrid } from "naive-ui";
-import { type PropType } from "vue";
+<script setup lang="ts">
+import { NGrid, type GridProps } from "naive-ui";
 
-const props = defineProps({
-  cols: {
-    type: [Number, String] as PropType<GridProps["cols"]>,
-    default: 12,
-  },
-  collapsed: {
-    type: Boolean as PropType<GridProps["collapsed"]>,
-    default: undefined,
-  },
-  collapsedRows: {
-    type: Number as PropType<GridProps["collapsedRows"]>,
-    default: undefined,
-  },
-  layoutShiftDisabled: {
-    type: Boolean as PropType<GridProps["layoutShiftDisabled"]>,
-    default: undefined,
-  },
-  responsive: {
-    type: String as PropType<GridProps["responsive"]>,
-    default: undefined,
-  },
-  itemResponsive: {
-    type: Boolean as PropType<GridProps["itemResponsive"]>,
-    default: undefined,
-  },
-  xGap: {
-    type: [Number, String] as PropType<GridProps["xGap"]>,
-    default: 24,
-  },
-  yGap: {
-    type: [Number, String] as PropType<GridProps["yGap"]>,
-    default: 24,
-  },
-});
+interface Props extends /* @vue-ignore */ GridProps {
+  cols?: GridProps["cols"];
+  xGap?: GridProps["xGap"];
+  yGap?: GridProps["yGap"];
+}
+
+defineOptions({ inheritAttrs: false });
+
+const { cols = 12, xGap = 24, yGap = 24 } = defineProps<Props>();
 </script>
 
 <template>
-  <n-grid
-    :collapsed="props.collapsed"
-    :collapsed-rows="props.collapsedRows"
-    :cols="props.cols"
-    :item-responsive="props.itemResponsive"
-    :layout-shift-disabled="props.layoutShiftDisabled"
-    :responsive="props.responsive"
-    :x-gap="props.xGap"
-    :y-gap="props.yGap"
-    v-bind="$attrs">
-    <slot />
+  <n-grid :cols="cols" :x-gap="xGap" :y-gap="yGap" v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps ?? {}" />
+    </template>
   </n-grid>
 </template>

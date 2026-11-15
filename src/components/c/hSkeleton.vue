@@ -2,123 +2,52 @@
 import HFlex from "@/components/c/hFlex.vue";
 import HThing from "@/components/c/hThing.vue";
 import HTransition from "@/components/c/hTransition.vue";
-import { useUserStore } from "@/stores/user";
-import { computed, onBeforeUnmount, type PropType, ref, useSlots, watch } from "vue";
+import { useThemeVars } from "naive-ui";
+import { computed, onBeforeUnmount, ref, useSlots, useTemplateRef, watch } from "vue";
 
-const props = defineProps({
-  text: {
-    type: Boolean,
-    default: true,
-  },
-  round: {
-    type: Boolean,
-    default: false,
-  },
-  circle: {
-    type: Boolean,
-    default: false,
-  },
-  height: {
-    type: [String, Number],
-    default: undefined,
-  },
-  width: {
-    type: [String, Number],
-    default: undefined,
-  },
-  size: {
-    type: String as PropType<"small" | "medium" | "large">,
-    default: undefined,
-  },
-  repeat: {
-    type: [String, Number],
-    default: 1,
-  },
-  sharp: {
-    type: Boolean,
-    default: false,
-  },
-  show: {
-    type: Boolean,
-    default: true,
-  },
-  loading: {
-    type: Boolean,
-    default: true,
-  },
-  autoWidth: {
-    type: Boolean,
-    default: false,
-  },
-  blockCount: {
-    type: [String, Number],
-    default: 1,
-  },
-  background: {
-    type: Boolean,
-    default: false,
-  },
-  avatar: {
-    type: Boolean,
-    default: false,
-  },
-  title: {
-    type: Boolean,
-    default: false,
-  },
-  titleExtra: {
-    type: Boolean,
-    default: false,
-  },
-  description: {
-    type: Boolean,
-    default: false,
-  },
-  footer: {
-    type: Boolean,
-    default: false,
-  },
-  action: {
-    type: Boolean,
-    default: false,
-  },
-  type: {
-    type: String,
-    default: "default",
-  },
-  inline: {
-    type: Boolean,
-    default: false,
-  },
-  skeletonClass: {
-    type: String,
-    default: undefined,
-  },
-  columns: {
-    type: [String, Number],
-    default: undefined,
-  },
-});
+const {
+  text = true,
+  round = false,
+  circle = false,
+  height,
+  width,
+  size,
+  repeat = 1,
+  sharp = false,
+  show = true,
+  loading = true,
+  autoWidth = false,
+  blockCount = 1,
+  background = false,
+  avatar = false,
+  title = false,
+  titleExtra = false,
+  description = false,
+  footer = false,
+  action = false,
+  type = "default",
+  inline = false,
+  skeletonClass,
+  columns,
+} = defineProps<Props>();
 const DEFAULT_WIDTH = "2em";
 const MIN_DISPLAY_TIME = 300; // Temps minimal avant d'afficher le skeleton
 const MIN_HIDE_TIME = 500; // Temps minimal avant de masquer le skeleton
 
-const user = useUserStore();
-
 const slots = useSlots();
+const themeVars = useThemeVars();
 
-const refSkeleton = ref<HTMLElement | null>(null);
+const skeletonRef = useTemplateRef<HTMLElement>("skeletonRef");
 const defaultSlotWidth = ref(DEFAULT_WIDTH);
 const shouldShowSkeleton = ref(false);
 let showTimeoutId: number | null = null;
 let hideTimeoutId: number | null = null;
 let skeletonShowTime: number | null = null;
 
-const computedWidth = computed(() => props.width ?? defaultSlotWidth.value);
-const isDarkTheme = computed(() => user.settings.theme === "dark");
+const computedWidth = computed(() => width ?? defaultSlotWidth.value);
 
 watch(
-  () => props.show,
+  () => show,
   async newValue => {
     if (showTimeoutId) {
       clearTimeout(showTimeoutId);
@@ -131,12 +60,12 @@ watch(
 
     if (newValue) {
       showTimeoutId = setTimeout(() => {
-        if (props.show) {
+        if (show) {
           shouldShowSkeleton.value = true;
           skeletonShowTime = Date.now();
 
           if (slots.default) {
-            defaultSlotWidth.value = `${refSkeleton.value?.getBoundingClientRect().width}px`;
+            defaultSlotWidth.value = `${skeletonRef.value?.getBoundingClientRect().width}px`;
           }
         }
       }, MIN_DISPLAY_TIME);
@@ -166,112 +95,135 @@ onBeforeUnmount(() => {
     clearTimeout(hideTimeoutId);
   }
 });
+interface Props {
+  text?: boolean;
+  round?: boolean;
+  circle?: boolean;
+  height?: string | number;
+  width?: string | number;
+  size?: "small" | "medium" | "large";
+  repeat?: string | number;
+  sharp?: boolean;
+  show?: boolean;
+  loading?: boolean;
+  autoWidth?: boolean;
+  blockCount?: string | number;
+  background?: boolean;
+  avatar?: boolean;
+  title?: boolean;
+  titleExtra?: boolean;
+  description?: boolean;
+  footer?: boolean;
+  action?: boolean;
+  type?: string;
+  inline?: boolean;
+  skeletonClass?: string;
+  columns?: string | number;
+}
 </script>
 
 <template>
-  <div ref="refSkeleton" class="app-skeleton">
+  <div ref="skeletonRef" class="app-skeleton">
     <h-transition name="fade">
       <h-flex
         v-if="shouldShowSkeleton"
         :class="[
-          props.skeletonClass,
+          skeletonClass,
           {
-            'skeleton-grid': props.columns,
+            'skeleton-grid': columns,
           },
         ]"
-        :style="props.columns ? { '--skeleton-columns': props.columns } : undefined"
-        :vertical="!props.inline">
+        :style="columns ? { '--skeleton-columns': columns } : undefined"
+        :vertical="!inline">
         <h-thing
           v-for="block in blockCount"
           :key="block"
           :class="{
-            'skeleton-dark': isDarkTheme,
-            'skeleton-background': props.background,
-            'forced-primary': props.type === 'primary',
-            'forced-accent': props.type === 'accent',
-            'forced-info': props.type === 'info',
-            'forced-success': props.type === 'success',
-            'forced-warning': props.type === 'warning',
-            'forced-danger': props.type === 'danger',
+            'skeleton-background': background,
+            'forced-primary': type === 'primary',
+            'forced-info': type === 'info',
+            'forced-success': type === 'success',
+            'forced-warning': type === 'warning',
+            'forced-danger': type === 'danger',
           }"
           class="skeleton-thing tw:flex-grow">
-          <template v-if="props.avatar" #avatar>
+          <template v-if="avatar" #avatar>
             <n-skeleton
-              :animated="props.loading"
-              :circle="props.circle"
-              :height="props.height"
-              :round="props.round"
-              :sharp="props.sharp"
-              :size="props.size"
-              :text="props.text"
+              :animated="loading"
+              :circle="circle"
+              :height="height"
+              :round="round"
+              :sharp="sharp"
+              :size="size"
+              :text="text"
               class="tw:!w-[3em] tw:!h-[3em]" />
           </template>
-          <template v-if="props.title" #header>
+          <template v-if="title" #header>
             <n-skeleton
-              :animated="props.loading"
-              :circle="props.circle"
-              :height="props.height"
-              :round="props.round"
-              :sharp="props.sharp"
-              :size="props.size"
-              :text="props.text" />
+              :animated="loading"
+              :circle="circle"
+              :height="height"
+              :round="round"
+              :sharp="sharp"
+              :size="size"
+              :text="text" />
           </template>
-          <template v-if="props.titleExtra" #header-extra>
+          <template v-if="titleExtra" #header-extra>
             <n-skeleton
-              :animated="props.loading"
-              :circle="props.circle"
-              :height="props.height"
-              :round="props.round"
-              :sharp="props.sharp"
-              :size="props.size"
-              :text="props.text" />
+              :animated="loading"
+              :circle="circle"
+              :height="height"
+              :round="round"
+              :sharp="sharp"
+              :size="size"
+              :text="text" />
           </template>
-          <template v-if="props.description" #description>
+          <template v-if="description" #description>
             <h-flex>
               <n-skeleton
-                :animated="props.loading"
-                :circle="props.circle"
-                :height="props.height"
+                :animated="loading"
+                :circle="circle"
+                :height="height"
                 :repeat="3"
-                :round="props.round"
-                :sharp="props.sharp"
-                :size="props.size"
-                :text="props.text" />
+                :round="round"
+                :sharp="sharp"
+                :size="size"
+                :text="text" />
             </h-flex>
           </template>
           <template #default>
             <n-skeleton
-              :animated="props.loading"
-              :circle="props.circle"
-              :height="props.height"
-              :repeat="props.repeat"
-              :round="props.round"
-              :sharp="props.sharp"
-              :size="props.size"
-              :text="props.text"
-              :width="props.autoWidth ? computedWidth : props.width" />
+              :animated="loading"
+              :circle="circle"
+              :height="height"
+              :repeat="repeat"
+              :round="round"
+              :sharp="sharp"
+              :size="size"
+              :text="text"
+              :width="autoWidth ? computedWidth : width" />
           </template>
-          <template v-if="props.footer" #footer>
+          <template v-if="footer" #footer>
             <n-skeleton
-              :animated="props.loading"
-              :circle="props.circle"
-              :height="props.height"
-              :round="props.round"
-              :sharp="props.sharp"
-              :size="props.size"
-              :text="props.text" />
+              :animated="loading"
+              :circle="circle"
+              :height="height"
+              :round="round"
+              :sharp="sharp"
+              :size="size"
+              :text="text" />
           </template>
-          <template v-if="props.action" #action>
+          <template v-if="action" #action>
             <h-flex>
               <n-skeleton
-                :animated="props.loading"
-                :circle="props.circle"
-                :height="props.height"
+                :animated="loading"
+                :circle="circle"
+                :height="height"
                 :repeat="3"
-                :round="props.round"
-                :sharp="props.sharp"
-                :size="props.size"
-                :text="props.text" />
+                :round="round"
+                :sharp="sharp"
+                :size="size"
+                :text="text" />
             </h-flex>
           </template>
         </h-thing>
@@ -284,8 +236,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="scss" scoped>
-@use "@/assets/colors";
-
 .app-skeleton {
   position: relative;
   width: 100%;
@@ -316,7 +266,7 @@ onBeforeUnmount(() => {
 .skeleton-thing {
   @include set-skeleton-colors();
 
-  &.skeleton-dark {
+  :root[data-theme="dark"] & {
     --skeleton-container-calc: calc(l - 40) !important;
     --skeleton-background-calc: calc(l - 30) !important;
     --skeleton-color-calc: calc(l - 20) !important;
@@ -330,32 +280,27 @@ onBeforeUnmount(() => {
 
   &.forced-primary {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$primary-light};
-  }
-
-  &.forced-accent {
-    @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$accent};
+    --skeleton-main-color: v-bind("themeVars.primaryColor");
   }
 
   &.forced-info {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$info};
+    --skeleton-main-color: v-bind("themeVars.infoColor");
   }
 
   &.forced-success {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$success};
+    --skeleton-main-color: v-bind("themeVars.successColor");
   }
 
   &.forced-warning {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$warning};
+    --skeleton-main-color: v-bind("themeVars.warningColor");
   }
 
   &.forced-danger {
     @include set-skeleton-colors();
-    --skeleton-main-color: #{colors.$danger};
+    --skeleton-main-color: v-bind("themeVars.errorColor");
   }
 
   :deep(> .n-thing-main) {

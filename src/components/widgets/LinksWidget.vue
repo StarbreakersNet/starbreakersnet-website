@@ -1,20 +1,17 @@
 <script lang="ts" setup>
-import { computed, type PropType, reactive, ref } from "vue";
+import { computed, reactive, useTemplateRef } from "vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HGrid from "@/components/c/hGrid.vue";
 import HGridItem from "@/components/c/hGridItem.vue";
 import { type FitState, useFitContent } from "@/composables/useFitContent";
 import type { LinksSettings } from "@/types/Widget";
 
-const props = defineProps({
-  settings: {
-    type: Object as PropType<LinksSettings>,
-    required: true,
-  },
-});
+const { settings } = defineProps<{
+  settings: LinksSettings;
+}>();
 
 const emit = defineEmits<{
-  (e: "fit", state: FitState): void;
+  fit: [state: FitState];
 }>();
 
 // Colonnes selon la largeur du widget : petit, moyen et grand
@@ -31,7 +28,7 @@ function hueOf(host: string) {
 }
 
 const links = computed(() =>
-  props.settings.links.map(link => {
+  settings.links.map(link => {
     const host = new URL(link.url).hostname;
     const title = link.title || host.replace(/^www\./, "");
 
@@ -45,20 +42,20 @@ const links = computed(() =>
   })
 );
 
-const target = computed(() => (props.settings.newTab ? "_blank" : undefined));
+const target = computed(() => (settings.newTab ? "_blank" : undefined));
 
-const rel = computed(() => (props.settings.newTab ? "noopener noreferrer" : undefined));
+const rel = computed(() => (settings.newTab ? "noopener noreferrer" : undefined));
 
 // Pas d'ascenseur : icônes réduites pour que tous les liens tiennent (voir useFitContent)
-const root = ref<HTMLElement | null>(null);
+const rootRef = useTemplateRef<HTMLElement>("rootRef");
 
-const { overflowing } = useFitContent(root, [links], {
+const { overflowing } = useFitContent(rootRef, [links], {
   onFit: state => emit("fit", state),
 });
 </script>
 
 <template>
-  <div ref="root" :class="{ clipped: overflowing }" class="links">
+  <div ref="rootRef" :class="{ clipped: overflowing }" class="links">
     <h-flex v-if="links.length === 0" class="empty" justify="center">
       Aucun lien pour l'instant. Ajoutez-en dans les réglages du widget.
     </h-flex>

@@ -1,67 +1,14 @@
-<script lang="ts" setup>
-import { type InputProps, NInput } from "naive-ui";
-import { type PropType, useSlots, useTemplateRef } from "vue";
+<script setup lang="ts">
+import { NInput, type InputProps, type InputSlots, type InputInst } from "naive-ui";
+import { useTemplateRef } from "vue";
 
-const props = defineProps({
-  value: {
-    type: [String, Array] as PropType<InputProps["value"]>,
-    default: undefined,
-  },
-  defaultValue: {
-    type: [String, Array] as PropType<InputProps["defaultValue"]>,
-    default: undefined,
-  },
-  placeholder: {
-    type: String,
-    default: undefined,
-  },
-  type: {
-    type: String as PropType<InputProps["type"]>,
-    default: undefined,
-  },
-  size: {
-    type: String as PropType<"small" | "medium" | "large">,
-    default: undefined,
-  },
-  disabled: {
-    type: Boolean,
-    default: undefined,
-  },
-  clearable: {
-    type: Boolean,
-    default: undefined,
-  },
-  minlength: {
-    type: Number,
-    default: undefined,
-  },
-  maxlength: {
-    type: Number,
-    default: undefined,
-  },
-  autosize: {
-    type: [Boolean, Object] as PropType<boolean | { minRows?: number; maxRows?: number }>,
-    default: undefined,
-  },
-  round: {
-    type: Boolean,
-    default: false,
-  },
-  allowInput: {
-    type: Function as PropType<InputProps["allowInput"]>,
-    default: undefined,
-  },
-  inputProps: {
-    type: Object as PropType<InputProps["inputProps"]>,
-    default: undefined,
-  },
-});
+defineOptions({ inheritAttrs: false });
 
-defineEmits(["update:value"]);
+defineProps</* @vue-ignore */ InputProps>();
 
-const inputRef = useTemplateRef("inputRef");
+defineSlots<InputSlots>();
 
-const slots = useSlots();
+const inputRef = useTemplateRef<InputInst>("inputRef");
 
 function blur() {
   inputRef.value?.blur();
@@ -83,49 +30,18 @@ function select() {
   inputRef.value?.select();
 }
 
-defineExpose({
-  blur,
-  clear,
-  focus,
-  scrollTo,
-  select,
-});
+defineExpose({ blur, clear, focus, scrollTo, select });
 </script>
 
 <template>
-  <n-input
-    ref="inputRef"
-    :allow-input="props.allowInput"
-    :autosize="props.autosize"
-    :clearable="props.clearable"
-    :default-value="props.defaultValue"
-    :disabled="props.disabled"
-    :input-props="props.inputProps"
-    :maxlength="props.maxlength"
-    :minlength="props.minlength"
-    :placeholder="props.placeholder"
-    :round="props.round"
-    :size="props.size"
-    :type="props.type"
-    :value="props.value"
-    v-bind="$attrs"
-    @update:value="$emit('update:value', $event)">
-    <template v-if="slots.prefix" #prefix>
-      <slot name="prefix" />
-    </template>
-    <template v-if="slots.suffix" #suffix>
-      <slot name="suffix" />
-    </template>
-    <template v-if="slots['clear-icon']" #clear-icon>
-      <slot name="clear-icon" />
-    </template>
-    <template v-if="slots.count" #count>
-      <slot name="count" />
+  <n-input ref="inputRef" v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof InputSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-input>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 :deep(.n-input) {
   width: 100%;
 }

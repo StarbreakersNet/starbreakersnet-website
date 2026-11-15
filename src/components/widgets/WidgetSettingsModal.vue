@@ -1,32 +1,30 @@
 <script lang="ts" setup>
-import { computed, type PropType } from "vue";
+import { computed } from "vue";
 import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HFormItem from "@/components/c/hFormItem.vue";
 import HModal from "@/components/c/hModal.vue";
 import HRadioButton from "@/components/c/hRadioButton.vue";
 import HRadioGroup from "@/components/c/hRadioGroup.vue";
-import { WIDGET_DEFINITIONS, WIDGET_SIZES } from "@/models/widgets";
+import { WIDGET_DEFINITIONS } from "@/models/WidgetDefinition";
+import { WIDGET_SIZES } from "@/models/WidgetSize";
 import { WIDGET_COMPONENTS } from "@/components/widgets/registry";
 import { useWidgetsStore } from "@/stores/widgets";
 import type { WidgetSize } from "@/types/Widget";
 
 // Réglages d'un widget, appliqués en direct (comme sur macOS) : pas de bouton Enregistrer
-const props = defineProps({
-  widgetId: {
-    type: String as PropType<string | null>,
-    default: null,
-  },
-});
+const { widgetId = null } = defineProps<{
+  widgetId?: string | null;
+}>();
 
 const emit = defineEmits<{
-  (e: "close"): void;
+  close: [];
 }>();
 
 const store = useWidgetsStore();
 
 const widget = computed(() => {
-  const found = store.widgets.find(item => item.id === props.widgetId);
+  const found = store.widgets.find(item => item.id === widgetId);
 
   return found ?? null;
 });
@@ -55,7 +53,7 @@ function updateSize(size: WidgetSize) {
   }
 }
 
-function onUpdateShow(show: boolean) {
+function handleUpdateShow(show: boolean) {
   if (!show) {
     emit("close");
   }
@@ -67,7 +65,7 @@ function onUpdateShow(show: boolean) {
     :show="!!widget"
     class="widget-settings apple-menu"
     preset="card"
-    @update:show="onUpdateShow">
+    @update:show="handleUpdateShow($event)">
     <template #header>
       <h-flex size="small">
         <font-awesome-icon v-if="definition" :icon="definition.icon" />
@@ -76,13 +74,13 @@ function onUpdateShow(show: boolean) {
     </template>
     <template v-if="widget && form" #default>
       <h-form-item v-if="sizeOptions.length > 1" label="Taille" label-placement="top">
-        <h-radio-group :value="widget.size" @update:value="updateSize">
+        <h-radio-group :value="widget.size" @update:value="updateSize($event)">
           <h-radio-button v-for="option in sizeOptions" :key="option.value" :value="option.value">
             {{ option.label }}
           </h-radio-button>
         </h-radio-group>
       </h-form-item>
-      <component :is="form" :settings="widget.settings" @update:settings="updateSettings" />
+      <component :is="form" :settings="widget.settings" @update:settings="updateSettings($event)" />
     </template>
     <template #footer>
       <h-flex justify="end">

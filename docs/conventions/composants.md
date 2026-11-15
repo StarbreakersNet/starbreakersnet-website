@@ -74,7 +74,7 @@ async function handleRemove() {
 - **Ordre des blocs** : `<script setup lang="ts">`, puis `<template>`, puis `<style lang="scss" scoped>`. **`lint`**
 - **Pas de bloc vide** : un composant sans style n'a pas de `<style>`. **`lint`**
 - **Ordre dans le script** :
-  1. imports ;
+  1. imports **`lint`** ;
   2. types locaux (`interface Props`…) ;
   3. macros, dans l'ordre `defineOptions`, `defineModel`, `defineProps`, `defineEmits`, `defineSlots` **`lint`** ;
   4. constantes du module (`EMAIL_CHANGE_TEXT`) ;
@@ -83,7 +83,7 @@ async function handleRemove() {
   7. fonctions ;
   8. `watch` ;
   9. hooks de cycle de vie (`onMounted`…) ;
-  10. `defineExpose`.
+  10. `defineExpose` **`lint`**.
 
   Dans un composant long, on regroupe plutôt par fonctionnalité (état, `computed` et fonctions de la modale de suppression ensemble), avec un commentaire en tête de groupe.
 
@@ -110,7 +110,7 @@ const { size = "medium", disabled = false, tooltip } = defineProps<{
 }>();
 ```
 
-- Le type est la seule source de vérité : pas de `PropType`. Le compilateur génère la déclaration runtime.
+- Le type est la seule source de vérité : pas de `PropType` **`lint`**. Le compilateur génère la déclaration runtime.
 - Les **valeurs par défaut** s'écrivent dans la déstructuration. Une prop obligatoire n'a pas de `?`.
 - Au-delà de quelques props, ou pour étendre un type, on déclare une `interface Props` au-dessus des macros.
 - Un commentaire `/** … */` sur chaque prop dont le nom ne suffit pas : l'IDE l'affiche au survol, côté parent.
@@ -131,14 +131,14 @@ const emit = defineEmits<{
 
 - Déclaration typée, avec la syntaxe en tuples nommés ci-dessus. **`lint`**
 - Le nom dit ce qui s'est passé, pas ce que le parent doit faire : `registered`, `sent`, `removed`.
-- Noms en camelCase dans le script (`emit("itemClick")`), écoutés en kebab-case dans le template (`@item-click`).
-- On émet avec la constante `emit`, y compris dans le template, plutôt qu'avec `$emit`.
+- Noms en camelCase dans le script (`emit("itemClick")`), écoutés en kebab-case dans le template (`@item-click`). **`lint`**
+- On émet avec la constante `emit`, y compris dans le template, plutôt qu'avec `$emit`. **`lint`**
 - **Dans un wrapper**, on ne redéclare pas les événements Naive : ils passent par `$attrs`, typés. `defineEmits` ne sert qu'aux événements que le wrapper ajoute ou intercepte. Voir [wrappers.md](wrappers.md).
 
 ### v-model
 
-- `defineModel` plutôt qu'une prop et un événement `update:xxx` écrits à la main.
-- Composant de l'application : `defineModel()` donne `v-model`, `defineModel("expanded")` donne `v-model:expanded`.
+- `defineModel` plutôt qu'une prop et un événement `update:xxx` écrits à la main. **`lint`**
+- Composant de l'application : `defineModel()` donne `v-model`, `defineModel("expanded")` donne `v-model:expanded`. Le type se passe en paramètre, `defineModel<boolean>("expanded")`, jamais par l'option `type`. **`lint`**
 - Dans un wrapper, v-model passe tout seul par `$attrs` ([voir wrappers.md](wrappers.md)). On ne déclare `defineModel("value")` que si le wrapper doit lire ou modifier la valeur, et on garde alors le nom de Naive UI (`value`, `show`, `checked`).
 
 ### État et réactivité
@@ -147,23 +147,23 @@ const emit = defineEmits<{
   - un objet qui les regroupe : modèle de formulaire passé à `<h-form :model>`, filtres, options d'affichage ;
   - une liste qu'on modifie sur place, avec `push` ou `splice`.
 - `ref` pour une valeur seule (booléen, texte, nombre, élément sélectionné), et pour une liste qu'on remplace d'un bloc (`items.value = await …`).
-- Un `reactive` se modifie **champ par champ, et seulement comme ça** : ni `Object.assign`, ni déstructuration, ni `toRefs`. Si on a besoin de le remplacer d'un bloc (valeurs rechargées depuis le serveur, remise à zéro) ou d'en extraire des morceaux, c'est qu'il fallait un `ref` d'objet : `const filters = ref({ … })`, puis `filters.value = { … }`.
+- Un `reactive` se modifie **champ par champ, et seulement comme ça** : ni `Object.assign` **`lint`**, ni déstructuration, ni `toRefs` **`lint`**. Si on a besoin de le remplacer d'un bloc (valeurs rechargées depuis le serveur, remise à zéro) ou d'en extraire des morceaux, c'est qu'il fallait un `ref` d'objet : `const filters = ref({ … })`, puis `filters.value = { … }`.
 - Une valeur qui se déduit d'une autre est un `computed`, jamais un `watch` qui recopie.
 - Un `watch` qui doit aussi s'exécuter au montage prend `{ immediate: true }` : on ne recopie pas son code dans `onMounted`.
-- Refs de template : `useTemplateRef<Type>("formRef")` **`lint`**, avec un nom qui finit par `Ref`. Un `ref="…"` inutilisé est retiré. **`lint`**
-- Tout ce qui est démarré au montage (`setInterval`, écouteur sur `window`) est arrêté dans `onBeforeUnmount` (voir `composables/currentTime.ts`).
+- Refs de template : `useTemplateRef<Type>("formRef")` **`lint`**, avec un nom qui finit par `Ref` **`lint`**. Un `ref="…"` inutilisé est retiré. **`lint`**
+- Tout ce qui est démarré au montage (`setInterval`, écouteur sur `window`) est arrêté dans `onBeforeUnmount` (voir `composables/useCurrentTime.ts`).
 - Pas d'état partagé dans une variable de module (`let x` hors du composant) : c'est le rôle d'un store.
 
 ### Fonctions
 
 - Déclarées avec `function` **`lint`**. Les fonctions fléchées restent pour les callbacks en ligne (`items.filter(item => …)`).
-- Gestionnaires d'événements : `handleXxx` (`handleSubmit`, `handleSelect`). Pour une modale : `openXxx` et `closeXxx`.
-- `async` / `await`. Les indicateurs de chargement passent par `useLoader()` (voir [Chargements](#chargements)).
+- Gestionnaires d'événements : `handleXxx` (`handleSubmit`, `handleSelect`), ou le verbe de l'action quand la fonction ne fait que ça (`addLink`, `saveKey`). Jamais `onXxx` **`lint`**. Pour une modale : `openXxx` et `closeXxx`.
+- `async` / `await`, pas `.then()` **`lint`**. Les indicateurs de chargement passent par `useLoader()` (voir [Chargements](#chargements)).
 - **Courtes et unitaires** : une fonction fait une seule chose, et son nom dit laquelle (`areFormsValid`, `saveAccount`). Un gestionnaire `handleXxx` se lit comme un résumé : il vérifie les conditions et confie le travail à des fonctions nommées.
 - **Conditions en positif, et le code qui en dépend dans le `if`** : l'indentation montre ce qui ne s'exécute qu'à cette condition. Pas de sortie anticipée : ni `return;` vide **`lint`**, ni `continue` dans une boucle **`lint`**.
 - **Au plus trois niveaux de blocs imbriqués** **`lint`**. Tous les blocs comptent (`if`, `for`, `switch`, `try`…), mais `else` et `else if` n'ajoutent pas de niveau, et un callback (`.some(item => …)`, `saving.run(async () => …)`) repart de zéro. Au-delà, on extrait une fonction nommée : l'imbrication qui grandit est le signal qu'une fonction fait trop de choses.
 - **Deux autres signaux qu'il faut extraire** : un nom de fonction qui demanderait un « et », ou un bloc qu'on voudrait précéder d'un commentaire pour dire ce qu'il fait. Le bloc devient une fonction, et le commentaire son nom.
-- **`return valeur`** dès que le résultat est connu, y compris dans chaque `case` d'un `switch` (`getAuthErrorMessage`) et dans la branche d'erreur d'une action de store (`return false`). Dans une fonction qui ne renvoie rien, chaque `case` se termine par `break`.
+- **`return valeur`** dès que le résultat est connu, y compris dans chaque `case` d'un `switch` (`getAuthErrorMessage`) et dans la branche d'erreur d'une action de store (`return false`). Dans une fonction qui ne renvoie rien, chaque `case` se termine par `break`. **`lint`**
 
 Le `handleSubmit` de `AccountView`, une fois découpé :
 
@@ -211,24 +211,24 @@ async function handleDelete() {
 <h-button :loading="deleting.loading" type="error" @click="handleDelete()">Supprimer</h-button>
 ```
 
-- **`run()` par défaut** : le loader reste actif le temps de la tâche et s'arrête même si elle lève une exception. `run()` renvoie le résultat de la tâche, typé. On écrit toujours `await` devant.
+- **`run()` par défaut** : le loader reste actif le temps de la tâche et s'arrête même si elle lève une exception. `run()` renvoie le résultat de la tâche, typé. On écrit toujours `await` devant. **`lint`**
 - Pour plusieurs `await` à la suite : `await saving.run(async () => { … })`.
 - **Appels qui se chevauchent** : le loader compte les appels en cours, et il reste actif jusqu'à la fin du dernier.
-- `saving.loading` (booléen) et `saving.count` (nombre) se lisent **sans `.value`**, dans le script comme dans le template. Le loader est un objet `reactive` : on ne le déstructure pas.
+- `saving.loading` (booléen) et `saving.count` (nombre) se lisent **sans `.value`**, dans le script comme dans le template. Le loader est un objet `reactive` : on ne le déstructure pas. **`lint`**
 - **`start()` / `stop()`** seulement pour un chargement réparti sur plusieurs fonctions ou événements (démarré au clic, arrêté dans un `@load`). `stop()` va alors dans un `finally` dès que c'est possible.
 - Plusieurs loaders à surveiller ensemble : `const busy = computed(() => isAnyLoading(saving, deleting))`. Pour une collection de loaders (un par élément d'une liste…) : `isAnyLoading(...Object.values(loaders))`.
-- Nom du loader : l'action en cours, en *-ing* : `saving`, `deleting`, `sending`.
+- Nom du loader : l'action en cours, en *-ing* : `saving`, `deleting`, `sending`. **`lint`**
 
 ## Template
 
 - Balises en kebab-case : `<h-button>`, `<user-menu>`, `<register-view>`. **`lint`**
 - **Jamais de composant Naive UI (`n-*`) hors de `components/c/`** **`lint`**. On utilise le wrapper `h-*`. S'il n'existe pas, on le crée ([voir wrappers.md](wrappers.md)) : ça prépare le terrain pour un comportement maison. Seule exception : les providers de `App.vue`.
-- Attributs en kebab-case (`:mask-closable`). Booléen vrai en raccourci (`ghost`, pas `:ghost="true"`). Le raccourci de même nom est permis : `:maintenance-mode` pour `:maintenance-mode="maintenanceMode"`.
-- Expressions courtes : au-delà d'une comparaison ou d'un ternaire, on passe par un `computed` ou une fonction.
+- Attributs en kebab-case (`:mask-closable`) **`lint`**. Booléen vrai en raccourci (`ghost`, pas `:ghost="true"`) **`lint`**. Le raccourci de même nom est permis : `:maintenance-mode` pour `:maintenance-mode="maintenanceMode"`.
+- Expressions courtes : au-delà d'une comparaison ou d'un ternaire, on passe par un `computed` ou une fonction. Un ternaire imbriqué est refusé. **`lint`**
 - Événements :
-  - avec un gestionnaire nommé, appelé avec parenthèses : `@click="handleSubmit()"` ;
+  - avec un gestionnaire nommé, appelé avec parenthèses : `@click="handleSubmit()"` **`lint`** ;
   - le code en ligne est réservé aux affectations simples : `@click="showModal = true"` ;
-  - pas de `$router` dans le template : la navigation se fait dans une fonction du script.
+  - pas de `$router` dans le template : la navigation se fait dans une fonction du script. **`lint`**
 - `v-for` toujours avec une `:key` stable, tirée de la donnée (id, nom), pas de l'index. **`lint`** Jamais de `v-if` sur le même élément qu'un `v-for`. **`lint`**
 - `v-show` pour ce qui s'affiche et se masque souvent. `v-if` pour le reste.
 - Quand un composant reçoit plusieurs slots, chacun a son `<template #nom>`, y compris `#default`.

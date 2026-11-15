@@ -1,14 +1,11 @@
 <script lang="ts" setup>
 import { provide } from "vue";
 
-const props = defineProps({
-  notificationsMap: {
-    type: Object,
-    required: true,
-  },
-});
+const { notificationsMap } = defineProps<{
+  notificationsMap: Record<string, unknown>;
+}>();
 const NOTIF_CTX = Symbol("NotificationContext");
-provide(NOTIF_CTX, props.notificationsMap);
+provide(NOTIF_CTX, notificationsMap);
 </script>
 
 <template>

@@ -1,22 +1,16 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, type PropType, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import { DateTime } from "luxon";
 import type { CountdownSettings, WidgetSize } from "@/types/Widget";
 
-const props = defineProps({
-  settings: {
-    type: Object as PropType<CountdownSettings>,
-    required: true,
-  },
-  size: {
-    type: String as PropType<WidgetSize>,
-    required: true,
-  },
-});
+const { settings, size } = defineProps<{
+  settings: CountdownSettings;
+  size: WidgetSize;
+}>();
 
 const now = ref(DateTime.now());
 
-const target = computed(() => DateTime.fromISO(props.settings.target).setLocale("fr"));
+const target = computed(() => DateTime.fromISO(settings.target).setLocale("fr"));
 
 const past = computed(() => target.value <= now.value);
 
@@ -75,13 +69,13 @@ onBeforeUnmount(() => clearInterval(timer));
 </script>
 
 <template>
-  <div :class="props.size" class="countdown">
-    <header class="title">{{ props.settings.title || "Évènement" }}</header>
+  <div :class="size" class="countdown">
+    <header class="title">{{ settings.title || "Évènement" }}</header>
     <p v-if="past" class="done">
       <font-awesome-icon class="done-icon" icon="check" />
       C'est arrivé !
     </p>
-    <p v-else-if="props.size === 'small'" :class="{ 'last-day': !headline.label }" class="headline">
+    <p v-else-if="size === 'small'" :class="{ 'last-day': !headline.label }" class="headline">
       <span class="value">{{ headline.value }}</span>
       <span class="unit">{{ headline.label }}</span>
     </p>

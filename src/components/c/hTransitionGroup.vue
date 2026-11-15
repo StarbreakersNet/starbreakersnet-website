@@ -1,139 +1,37 @@
 <script lang="ts" setup>
-import { computed, nextTick, type PropType } from "vue";
+import { useSizeTransition, type SizeTransitionMode } from "@/composables/useSizeTransition";
 
-type ModeType = "width" | "height";
+defineOptions({ inheritAttrs: false });
 
-const props = defineProps({
-  mode: {
-    type: String as PropType<ModeType>,
-    default: "height",
-  },
-  raw: {
-    type: Boolean,
-    default: false,
-  },
-});
+const { mode = "height", raw = false } = defineProps<{
+  /** Dimension animée à l'entrée et à la sortie */
+  mode?: SizeTransitionMode;
+  /** Sans animation de la taille : seule la transition CSS de `name` s'applique */
+  raw?: boolean;
+}>();
 
-const elementSizes = new Map<string, number>();
-const maxDimension = computed(() => `max-${props.mode}`);
-let transitionId = 0;
-
-function generateTransitionId() {
-  return `transition-${++transitionId}-${Date.now()}`;
-}
-
-function getElementId(el: HTMLElement) {
-  if (!el.dataset.transitionId) {
-    el.dataset.transitionId = generateTransitionId();
-  }
-  return el.dataset.transitionId;
-}
-
-function getNaturalSize(el: HTMLElement) {
-  return props.mode === "width" ? el.scrollWidth : el.scrollHeight;
-}
-
-async function beforeEnter(el: Element) {
-  const element = el as HTMLElement;
-
-  if (props.mode != null && props.raw) {
-    await nextTick();
-    const naturalSize = getNaturalSize(element);
-
-    element.style.setProperty(maxDimension.value, "none");
-    element.style.visibility = "hidden";
-
-    elementSizes.set(getElementId(element), naturalSize);
-
-    element.style.setProperty(maxDimension.value, "0");
-    element.style.visibility = "visible";
-  }
-}
-
-async function enter(el: Element) {
-  const element = el as HTMLElement;
-
-  if (props.mode != null && props.raw) {
-    await nextTick();
-    const naturalSize = elementSizes.get(getElementId(element));
-
-    if (naturalSize) {
-      void element.offsetHeight; // Forcer un reflow
-
-      element.style.setProperty(maxDimension.value, naturalSize + "px");
-      element.style.overflow = "hidden";
-    } else {
-      console.warn("[hTransitionGroup] enter - Taille non trouvée pour ID:", getElementId(element));
-    }
-  }
-}
-
-async function afterEnter(el: Element) {
-  const element = el as HTMLElement;
-
-  if (props.mode != null && props.raw) {
-    await nextTick();
-
-    element.style.setProperty(maxDimension.value, "");
-    element.style.overflow = "";
-
-    elementSizes.delete(getElementId(element));
-
-    delete element.dataset.transitionId;
-  }
-}
-
-async function beforeLeave(el: Element) {
-  const element = el as HTMLElement;
-
-  if (props.mode != null && props.raw) {
-    await nextTick();
-    const naturalSize = getNaturalSize(element);
-
-    elementSizes.set(getElementId(element), naturalSize);
-
-    element.style.setProperty(maxDimension.value, naturalSize + "px");
-    element.style.overflow = "hidden";
-  }
-}
-
-async function leave(el: Element) {
-  const element = el as HTMLElement;
-
-  if (props.mode != null && props.raw) {
-    await nextTick();
-
-    void element.offsetHeight; // Forcer un reflow
-
-    element.style.setProperty(maxDimension.value, "0");
-  }
-}
-
-async function afterLeave(el: Element) {
-  const element = el as HTMLElement;
-
-  if (props.mode != null && props.raw) {
-    await nextTick();
-
-    element.style.setProperty(maxDimension.value, "");
-    element.style.overflow = "";
-
-    elementSizes.delete(getElementId(element));
-
-    delete element.dataset.transitionId;
-  }
-}
+const {
+  handleBeforeEnter,
+  handleEnter,
+  handleAfterEnter,
+  handleBeforeLeave,
+  handleLeave,
+  handleAfterLeave,
+} = useSizeTransition(
+  () => mode,
+  () => raw
+);
 </script>
 
 <template>
   <transition-group
     v-bind="$attrs"
-    @enter="enter"
-    @leave="leave"
-    @before-enter="beforeEnter"
-    @after-enter="afterEnter"
-    @before-leave="beforeLeave"
-    @after-leave="afterLeave">
+    @before-enter="handleBeforeEnter($event)"
+    @enter="handleEnter($event)"
+    @after-enter="handleAfterEnter($event)"
+    @before-leave="handleBeforeLeave($event)"
+    @leave="handleLeave($event)"
+    @after-leave="handleAfterLeave($event)">
     <slot></slot>
   </transition-group>
 </template>

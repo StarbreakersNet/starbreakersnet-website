@@ -1,20 +1,14 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, type PropType, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import { DateTime } from "luxon";
 import type { TableProps } from "naive-ui";
 import HTable from "@/components/c/hTable.vue";
 import type { CalendarSettings, WidgetSize } from "@/types/Widget";
 
-const props = defineProps({
-  settings: {
-    type: Object as PropType<CalendarSettings>,
-    required: true,
-  },
-  size: {
-    type: String as PropType<WidgetSize>,
-    required: true,
-  },
-});
+const { settings, size } = defineProps<{
+  settings: CalendarSettings;
+  size: WidgetSize;
+}>();
 
 const WEEKDAYS = ["L", "M", "M", "J", "V", "S", "D"];
 
@@ -104,8 +98,8 @@ onBeforeUnmount(() => clearInterval(timer));
 </script>
 
 <template>
-  <div :class="[props.size, { 'week-numbers': props.settings.weekNumbers }]" class="calendar">
-    <section v-if="props.size === 'medium'" class="summary">
+  <div :class="[size, { 'week-numbers': settings.weekNumbers }]" class="calendar">
+    <section v-if="size === 'medium'" class="summary">
       <span class="weekday">{{ weekdayName }}</span>
       <span class="day-number">{{ today.day }}</span>
       <span class="month-year">{{ monthAndYear }}</span>
@@ -121,13 +115,13 @@ onBeforeUnmount(() => clearInterval(timer));
         single-column>
         <thead>
           <tr>
-            <th v-if="props.settings.weekNumbers" class="week" scope="col" />
+            <th v-if="settings.weekNumbers" class="week" scope="col" />
             <th v-for="(weekday, index) in WEEKDAYS" :key="index" scope="col">{{ weekday }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="week in weeks" :key="week.number">
-            <td v-if="props.settings.weekNumbers" class="week">{{ week.number }}</td>
+            <td v-if="settings.weekNumbers" class="week">{{ week.number }}</td>
             <td
               v-for="day in week.days"
               :key="day.key"

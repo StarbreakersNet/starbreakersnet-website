@@ -23,9 +23,30 @@ const LOCATE_MAX_AGE = 10 * 60 * 1000;
 const cache = new Map<string, { at: number; promise: Promise<Forecast> }>();
 
 export function roundCoordinates({ latitude, longitude }: { latitude: number; longitude: number }) {
-  const round = (value: number) => Math.round(value * 100) / 100;
+  function round(value: number) {
+    return Math.round(value * 100) / 100;
+  }
 
   return { latitude: round(latitude), longitude: round(longitude) };
+}
+
+async function requestForecast(params: URLSearchParams): Promise<Forecast> {
+  const response = await fetch(`${FORECAST_URL}?${params}`);
+  if (!response.ok) throw new Error(`Open-Meteo : ${response.status}`);
+  const data = await response.json();
+
+  return {
+    temperature: data.current.temperature_2m,
+    apparent: data.current.apparent_temperature,
+    code: data.current.weather_code,
+    isDay: data.current.is_day === 1,
+    days: (data.daily.time as string[]).map((date, index) => ({
+      date,
+      code: data.daily.weather_code[index],
+      max: data.daily.temperature_2m_max[index],
+      min: data.daily.temperature_2m_min[index],
+    })),
+  };
 }
 
 export function fetchForecast(settings: WeatherSettings): Promise<Forecast> {
@@ -47,23 +68,7 @@ export function fetchForecast(settings: WeatherSettings): Promise<Forecast> {
     forecast_days: "6",
   });
 
-  const promise = fetch(`${FORECAST_URL}?${params}`)
-    .then(response => {
-      if (!response.ok) throw new Error(`Open-Meteo : ${response.status}`);
-      return response.json();
-    })
-    .then(data => ({
-      temperature: data.current.temperature_2m,
-      apparent: data.current.apparent_temperature,
-      code: data.current.weather_code,
-      isDay: data.current.is_day === 1,
-      days: (data.daily.time as string[]).map((date, index) => ({
-        date,
-        code: data.daily.weather_code[index],
-        max: data.daily.temperature_2m_max[index],
-        min: data.daily.temperature_2m_min[index],
-      })),
-    }));
+  const promise = requestForecast(params);
 
   cache.set(key, { at: Date.now(), promise });
   // Échec : pas gardé en cache, le prochain rafraîchissement réessaiera

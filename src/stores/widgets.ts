@@ -2,19 +2,14 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import _ from "lodash";
 import { supabase } from "@/utils/supabaseClient";
-import { useMessage } from "@/composables/useMessage";
-import {
-  createId,
-  defaultWidgets,
-  findFreeSpot,
-  fits,
-  normalizeDocument,
-  toDocument,
-  WIDGET_DEFINITIONS,
-  WIDGET_SIZES,
-  widgetRect,
-} from "@/models/widgets";
-import { DEFAULT_WALLPAPER, normalizeUnsplashKey, normalizeWallpaper } from "@/models/wallpapers";
+import { useAppMessage } from "@/composables/useAppMessage";
+import { createId } from "@/utils/id";
+import { defaultWidgets, normalizeDocument, toDocument } from "@/utils/widgetDocument";
+import { findFreeSpot, fits, widgetRect } from "@/utils/widgetGrid";
+import { WIDGET_DEFINITIONS } from "@/models/WidgetDefinition";
+import { WIDGET_SIZES } from "@/models/WidgetSize";
+import { DEFAULT_WALLPAPER } from "@/models/WallpaperPreset";
+import { normalizeUnsplashKey, normalizeWallpaper } from "@/utils/wallpaper";
 import { deleteWallpaperFile } from "@/utils/wallpaperFile";
 import type { FitState } from "@/composables/useFitContent";
 import type { Wallpaper } from "@/types/Wallpaper";
@@ -60,7 +55,7 @@ function writeLocal(widgets: Widget[], wallpaper: Wallpaper, unsplashKey: string
 // Widgets de Buroh. Comme le thème (stores/settings.ts) : la copie du compte l'emporte à
 // la connexion, la copie locale sert aux visiteurs et au premier affichage.
 export const useWidgetsStore = defineStore("widgets", () => {
-  const message = useMessage();
+  const message = useAppMessage();
 
   const local = readLocal();
   const widgets = ref<Widget[]>(local.widgets ?? defaultWidgets());
@@ -201,7 +196,9 @@ export const useWidgetsStore = defineStore("widgets", () => {
       const samePlace = fits(rect, others(id));
       const position = samePlace ? { x: widget.x, y: widget.y } : findFreeSpot(size, others(id));
 
-      Object.assign(widget, { size, ...position });
+      widget.size = size;
+      widget.x = position.x;
+      widget.y = position.y;
       persist();
     }
   }

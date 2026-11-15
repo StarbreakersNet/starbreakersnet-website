@@ -1,36 +1,17 @@
-<script lang="ts" setup>
-import { NEllipsis, type PopoverProps } from "naive-ui";
-import { type PropType, useAttrs, useSlots } from "vue";
+<script setup lang="ts">
+import { NEllipsis, type EllipsisProps, type EllipsisSlots } from "naive-ui";
 
-const props = defineProps({
-  lineClamp: {
-    type: [String, Number],
-    default: undefined,
-  },
-  expandTrigger: {
-    type: String as PropType<"click">,
-    default: undefined,
-  },
-  tooltip: {
-    type: [Boolean, Object] as PropType<boolean | PopoverProps>,
-    default: true,
-  },
-});
-const attrs = useAttrs();
-const slots = useSlots();
+defineOptions({ inheritAttrs: false });
+
+defineProps</* @vue-ignore */ EllipsisProps>();
+
+defineSlots<EllipsisSlots>();
 </script>
 
 <template>
-  <n-ellipsis
-    :expand-trigger="props.expandTrigger"
-    :line-clamp="props.lineClamp"
-    :tooltip="props.tooltip"
-    v-bind="attrs">
-    <template v-if="slots.default">
-      <slot />
-    </template>
-    <template v-if="slots.tooltip" #tooltip>
-      <slot name="tooltip" />
+  <n-ellipsis v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof EllipsisSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-ellipsis>
 </template>

@@ -1,19 +1,13 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, type PropType, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { DateTime } from "luxon";
-import { localTimezone, timezoneCity } from "@/models/widgets";
+import { localTimezone, timezoneCity } from "@/utils/timezone";
 import type { ClockSettings, WidgetSize } from "@/types/Widget";
 
-const props = defineProps({
-  settings: {
-    type: Object as PropType<ClockSettings>,
-    required: true,
-  },
-  size: {
-    type: String as PropType<WidgetSize>,
-    required: true,
-  },
-});
+const { settings, size } = defineProps<{
+  settings: ClockSettings;
+  size: WidgetSize;
+}>();
 
 // Heure courante, rafraîchie chaque seconde (ou chaque minute sans trotteuse), calée sur le début
 // de la seconde ou de la minute
@@ -24,7 +18,7 @@ function tick() {
   clearTimeout(timer);
   now.value = DateTime.now();
 
-  const step = props.settings.seconds ? 1000 : 60000;
+  const step = settings.seconds ? 1000 : 60000;
   const untilNextStep = step - (Date.now() % step);
 
   timer = setTimeout(tick, untilNextStep);
@@ -33,24 +27,24 @@ function tick() {
 const zoned = computed(() => {
   const time = now.value.setLocale("fr");
 
-  return props.settings.timezone ? time.setZone(props.settings.timezone) : time;
+  return settings.timezone ? time.setZone(settings.timezone) : time;
 });
 
 const label = computed(() => {
-  const custom = props.settings.label.trim();
+  const custom = settings.label.trim();
 
-  return custom || timezoneCity(props.settings.timezone ?? localTimezone());
+  return custom || timezoneCity(settings.timezone ?? localTimezone());
 });
 
 const time = computed(() => {
-  const format = props.settings.seconds ? "HH:mm:ss" : "HH:mm";
+  const format = settings.seconds ? "HH:mm:ss" : "HH:mm";
 
   return zoned.value.toFormat(format);
 });
 
 const date = computed(() => zoned.value.toFormat("cccc d LLLL"));
 
-// Décalage avec l'heure de l'appareil, affiché pour un autre fuseau : « +6 h », « −9 h 30 »
+// Décalage avec l'heure de l'appareil, affiché pour un autre fuseau : "+6 h", "−9 h 30"
 function formatOffset(difference: number) {
   const sign = difference > 0 ? "+" : "−";
   const hours = Math.floor(Math.abs(difference) / 60);
@@ -72,13 +66,13 @@ function formatOffset(difference: number) {
 const offset = computed(() => {
   const difference = zoned.value.offset - now.value.offset;
 
-  return props.settings.timezone ? formatOffset(difference) : "";
+  return settings.timezone ? formatOffset(difference) : "";
 });
 
 // Angles des aiguilles, en degrés depuis midi
 const angles = computed(() => {
   const { hour, minute, second } = zoned.value;
-  const secondsShift = props.settings.seconds ? second * 0.1 : 0;
+  const secondsShift = settings.seconds ? second * 0.1 : 0;
 
   return {
     hour: (hour % 12) * 30 + minute * 0.5,
@@ -101,15 +95,15 @@ const numerals = Array.from({ length: 12 }, (_, index) => {
 const ticks = Array.from({ length: 60 }, (_, index) => index * 6);
 
 // Premier tic au montage, puis à chaque changement de rythme (avec ou sans trotteuse)
-watch(() => props.settings.seconds, tick, { immediate: true });
+watch(() => settings.seconds, tick, { immediate: true });
 
 onBeforeUnmount(() => clearTimeout(timer));
 </script>
 
 <template>
-  <div :class="[props.settings.style, props.size]" class="clock">
+  <div :class="[settings.style, size]" class="clock">
     <svg
-      v-if="props.settings.style === 'analog'"
+      v-if="settings.style === 'analog'"
       :aria-label="`${time}, ${label}`"
       class="face"
       role="img"
@@ -135,7 +129,7 @@ onBeforeUnmount(() => clearTimeout(timer));
         text-anchor="middle">
         {{ numeral.value }}
       </text>
-      <text v-if="props.size === 'small'" class="city" x="50" y="68" text-anchor="middle">
+      <text v-if="size === 'small'" class="city" x="50" y="68" text-anchor="middle">
         {{ label.slice(0, 3).toUpperCase() }}
       </text>
       <g :transform="`rotate(${angles.hour} 50 50)`">
@@ -144,13 +138,13 @@ onBeforeUnmount(() => clearTimeout(timer));
       <g :transform="`rotate(${angles.minute} 50 50)`">
         <line class="hand minute" x1="50" x2="50" y1="52" y2="12" />
       </g>
-      <g v-if="props.settings.seconds" :transform="`rotate(${angles.second} 50 50)`">
+      <g v-if="settings.seconds" :transform="`rotate(${angles.second} 50 50)`">
         <line class="hand second" x1="50" x2="50" y1="58" y2="9" />
       </g>
       <circle class="pin" cx="50" cy="50" r="1.8" />
       <circle class="pin-center" cx="50" cy="50" r="0.8" />
     </svg>
-    <div v-if="props.settings.style === 'digital' || props.size !== 'small'" class="details">
+    <div v-if="settings.style === 'digital' || size !== 'small'" class="details">
       <span class="label">{{ label }}</span>
       <span class="time">{{ time }}</span>
       <span class="date">{{ date }}</span>

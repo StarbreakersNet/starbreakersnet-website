@@ -5,6 +5,9 @@ const DB_NAME = "starbreakers-buroh";
 const STORE = "files";
 const KEY = "wallpaper";
 
+// Fichiers acceptés depuis l'ordinateur
+export const WALLPAPER_FILE_MAX_SIZE = 100 * 1024 * 1024;
+
 function open(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, 1);

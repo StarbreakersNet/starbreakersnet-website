@@ -32,10 +32,13 @@ jobs:
 
       # Sans --fix, contrairement à yarn lint : la CI vérifie, elle ne corrige pas
       - name: Lint (oxlint)
-        run: yarn oxlint . -D correctness --ignore-path .gitignore --ignore-pattern "supabase/docker/**"
+        run: yarn oxlint . -D correctness --import-plugin -D import/first --ignore-path .gitignore --ignore-pattern "supabase/docker/**"
 
       - name: Lint (ESLint)
         run: yarn eslint .
+
+      - name: Lint (noms de fichiers)
+        run: yarn lint:names
 
       - name: Types
         run: yarn type-check

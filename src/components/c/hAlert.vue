@@ -1,49 +1,21 @@
-<script lang="ts" setup>
-import { NAlert } from "naive-ui";
-import { type PropType, useSlots } from "vue";
+<script setup lang="ts">
+import { NAlert, type AlertProps, type AlertSlots } from "naive-ui";
 
-const props = defineProps({
-  bordered: {
-    type: Boolean,
-    default: false,
-  },
-  closable: {
-    type: Boolean,
-    default: false,
-  },
-  showIcon: {
-    type: Boolean,
-    default: true,
-  },
-  title: {
-    type: String,
-    default: undefined,
-  },
-  type: {
-    type: String as PropType<"default" | "info" | "success" | "warning" | "error">,
-    default: "default",
-  },
-});
+interface Props extends /* @vue-ignore */ AlertProps {
+  bordered?: boolean;
+}
 
-const slots = useSlots();
+defineOptions({ inheritAttrs: false });
+
+const { bordered = false } = defineProps<Props>();
+
+defineSlots<AlertSlots>();
 </script>
 
 <template>
-  <n-alert
-    :bordered="props.bordered"
-    :closable="props.closable"
-    :show-icon="props.showIcon"
-    :title="props.title"
-    :type="props.type"
-    v-bind="$attrs">
-    <template v-if="slots.default" #default>
-      <slot name="default" />
-    </template>
-    <template v-if="slots.header" #header>
-      <slot name="header" />
-    </template>
-    <template v-if="slots.icon" #icon>
-      <slot name="icon" />
+  <n-alert :bordered="bordered" v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof AlertSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-alert>
 </template>

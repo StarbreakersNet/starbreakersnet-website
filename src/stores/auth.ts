@@ -9,7 +9,7 @@ import {
 import { supabase } from "@/utils/supabaseClient";
 import { getAuthErrorMessage } from "@/utils/authErrors";
 import { APP_LOCALE } from "@/utils/locale";
-import { useMessage } from "@/composables/useMessage";
+import { useAppMessage } from "@/composables/useAppMessage";
 import { useUserStore } from "@/stores/user";
 import { useSettingsStore } from "@/stores/settings";
 import { useWidgetsStore } from "@/stores/widgets";
@@ -17,7 +17,7 @@ import type { UserType } from "@/types/User";
 
 type ProfileUpdate = Pick<UserType, "username" | "firstName" | "lastName">;
 
-// Résultat de la connexion : « unconfirmed » permet de proposer le renvoi du mail de confirmation
+// Résultat de la connexion : "unconfirmed" permet de proposer le renvoi du mail de confirmation
 export type LoginResult = "ok" | "unconfirmed" | "error";
 
 const CONFIRMATION_TEXT =
@@ -31,11 +31,11 @@ export const useAuthStore = defineStore("auth", () => {
   const user = useUserStore();
   const settings = useSettingsStore();
   const widgets = useWidgetsStore();
-  const message = useMessage();
+  const message = useAppMessage();
 
   // Passe à true quand on sait s'il y a une session (et que le profil est chargé s'il y en a une)
   const isReady = ref(false);
-  let resolveReady: () => void = () => {};
+  let resolveReady!: () => void;
   const readyPromise = new Promise<void>(resolve => {
     resolveReady = resolve;
   });
@@ -68,10 +68,9 @@ export const useAuthStore = defineStore("auth", () => {
 
     if (error) {
       message.error("Impossible de récupérer les informations du compte");
-      return;
+    } else {
+      user.infos.me = toUser(authUser, profile);
     }
-
-    user.infos.me = toUser(authUser, profile);
   }
 
   function toUser(

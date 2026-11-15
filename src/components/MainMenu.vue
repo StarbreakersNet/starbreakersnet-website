@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { type MenuItem, menuItems } from "@/models/MenuItem";
+import { type MenuItem, MENU_ITEMS } from "@/models/MenuItem";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useRouter } from "vue-router";
+import HButton from "@/components/c/hButton.vue";
+import HFlex from "@/components/c/hFlex.vue";
 
 const router = useRouter();
 
-function onClick(item: MenuItem) {
+function handleClick(item: MenuItem) {
   if (item.routeName) {
     router.push({ name: item.routeName });
   } else if (item.externalLink) {
@@ -15,19 +17,19 @@ function onClick(item: MenuItem) {
 </script>
 
 <template>
-  <n-flex :size="30" align="center" class="component apple-blurred" justify="center">
-    <div v-for="item in menuItems" :key="item.label" class="item">
-      <n-button
+  <h-flex wrap :size="30" align="center" class="component apple-blurred" justify="center">
+    <div v-for="item in MENU_ITEMS" :key="item.label" class="item">
+      <h-button
         :color="item.color"
         :text-color="item.textColor ?? (item.color ? 'white' : '')"
-        @click="onClick(item)">
-        <n-flex :size="10" align="center" justify="center" vertical>
+        @click="handleClick(item)">
+        <h-flex wrap :size="10" align="center" justify="center" vertical>
           <font-awesome-icon v-if="item.icon" :icon="item.icon" class="fa-icon" />
           <span v-if="item.label" class="label">{{ item.label }}</span>
-        </n-flex>
-      </n-button>
+        </h-flex>
+      </h-button>
     </div>
-  </n-flex>
+  </h-flex>
 </template>
 
 <style lang="scss" scoped>
@@ -51,7 +53,6 @@ function onClick(item: MenuItem) {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      //background: rgb(255 255 255 / 0.1);
       box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
     }
 

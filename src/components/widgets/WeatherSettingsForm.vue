@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, type PropType, ref } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
+import { useLoader } from "@/composables/useLoader";
 import _ from "lodash";
 import HButton from "@/components/c/hButton.vue";
 import HForm from "@/components/c/hForm.vue";
@@ -12,10 +13,7 @@ import HText from "@/components/c/hText.vue";
 import { locateDevice, searchCities } from "@/utils/weather";
 import type { WeatherLocation, WeatherSettings } from "@/types/Widget";
 
-const settings = defineModel("settings", {
-  type: Object as PropType<WeatherSettings>,
-  required: true,
-});
+const settings = defineModel<WeatherSettings>("settings", { required: true });
 
 // Attente après la dernière frappe avant de chercher la ville
 const SEARCH_DELAY = 300;
@@ -24,9 +22,9 @@ const SEARCH_DELAY = 300;
 const CURRENT = "current";
 
 const results = ref<WeatherLocation[]>([]);
-const loading = ref(false);
+const searching = useLoader();
 const failed = ref(false);
-const locating = ref(false);
+const locating = useLoader();
 const locateError = ref("");
 
 const feedback = computed(() => {
@@ -53,15 +51,11 @@ const options = computed(() => [
 ]);
 
 async function searchNow(query: string) {
-  loading.value = true;
-
   try {
-    results.value = await searchCities(query);
+    results.value = await searching.run(() => searchCities(query));
     failed.value = false;
   } catch {
     failed.value = true;
-  } finally {
-    loading.value = false;
   }
 }
 
@@ -89,11 +83,10 @@ function select(value: string) {
 }
 
 async function locate() {
-  locating.value = true;
   locateError.value = "";
 
   try {
-    const coordinates = await locateDevice();
+    const coordinates = await locating.run(locateDevice);
     settings.value = {
       ...settings.value,
       mode: "device",
@@ -102,8 +95,6 @@ async function locate() {
   } catch (error) {
     const previous = settings.value.mode === "device" ? "la dernière position" : "la ville";
     locateError.value = `${(error as Error).message}, ${previous} reste affichée.`;
-  } finally {
-    locating.value = false;
   }
 }
 
@@ -122,20 +113,20 @@ onBeforeUnmount(() => searchLater.cancel());
       label="Ville">
       <h-input-group>
         <h-select
-          :loading="loading"
+          :loading="searching.loading"
           :options="options"
           :value="CURRENT"
           filterable
           placeholder="Rechercher une ville"
           remote
-          @search="search"
-          @update:value="select" />
+          @search="search($event)"
+          @update:value="select($event)" />
         <h-button
-          :loading="locating"
+          :loading="locating.loading"
           :type="settings.mode === 'device' ? 'primary' : 'default'"
           aria-label="Ma position"
           title="Ma position"
-          @click="locate">
+          @click="locate()">
           <template #icon>
             <font-awesome-icon icon="location-arrow" />
           </template>
@@ -144,7 +135,7 @@ onBeforeUnmount(() => searchLater.cancel());
       </h-input-group>
     </h-form-item>
     <h-form-item label="Unité">
-      <h-radio-group :value="settings.unit" @update:value="updateUnit">
+      <h-radio-group :value="settings.unit" @update:value="updateUnit($event)">
         <h-radio-button value="celsius">°C</h-radio-button>
         <h-radio-button value="fahrenheit">°F</h-radio-button>
       </h-radio-group>

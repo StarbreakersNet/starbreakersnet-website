@@ -1,39 +1,35 @@
-import hButton from "@/components/c/hButton.vue";
-import hFlex from "@/components/c/hFlex.vue";
-import { renderedFontAwesomeIcon } from "@/composables/fontAwesomeUtils";
-import type {
-  NaiveNotificationType,
-  NotificationOptions,
-  NotificationType,
-} from "@/types/components/AppNotification";
+import HButton from "@/components/c/hButton.vue";
+import HFlex from "@/components/c/hFlex.vue";
+import { renderedFontAwesomeIcon } from "@/utils/naiveIcons";
+import { CONTACT_EMAIL } from "@/utils/contact";
+import type { NotificationOptions } from "@/types/components/AppNotification";
 import { DateTime } from "luxon";
 import type {
+  NotificationApi,
   NotificationOptions as NaiveNotificationOptions,
   NotificationReactive,
 } from "naive-ui";
-import { computed, h } from "vue";
+import { h } from "vue";
 
-type SentryWindow = Window & { Sentry?: { captureMessage: (message: string) => void } };
+const ERROR_DESCRIPTION = `Si le problème persiste, écrivez-nous à ${CONTACT_EMAIL}`;
 
-const ERROR_DESCRIPTION =
-  "Si le problème persiste, veuillez contacter supporthermes@investissement.valority.com";
+// Les stores ne sont pas sous le n-notification-provider : AppLayout transmet ici l'API du provider
+let notificationApi: NotificationApi | undefined;
 
-function getNaiveType(type: NotificationType): NaiveNotificationType {
-  switch (type) {
-    case undefined:
-      return undefined;
-    case "primary":
-      return "default";
-    case "accent":
-      return "default";
-    default:
-      return type as NaiveNotificationType;
-  }
+export function registerNotificationApi(api: NotificationApi) {
+  notificationApi = api;
 }
 
-export function useNotification() {
-  const notification = computed(() => window.$notification);
+function getNotificationApi() {
+  if (notificationApi) {
+    return notificationApi;
+  }
+  throw new Error(
+    "useAppNotification : l'API du n-notification-provider n'est pas encore enregistrée par AppLayout"
+  );
+}
 
+export function useAppNotification() {
   function custom(options: NotificationOptions): NotificationReactive {
     const clickIcon = options.clickIcon || "arrow-up-right-from-square";
 
@@ -48,14 +44,13 @@ export function useNotification() {
     }
 
     function getPreparedContent() {
-      return h(hFlex, { justify: "space-between" }, () => [
-        h(hFlex, { vertical: true }, getMinimalContent),
+      return h(HFlex, { justify: "space-between" }, () => [
+        h(HFlex, { vertical: true }, getMinimalContent),
         options.onClick &&
           h(
-            hButton,
+            HButton,
             {
               circle: true,
-              color: "default",
               secondary: true,
               onClick: options.onClick,
             },
@@ -76,7 +71,7 @@ export function useNotification() {
           options.title
         ),
       content: getPreparedContent,
-      type: getNaiveType(options.type) ?? "default",
+      type: options.type ?? "default",
       duration: options.duration || 2000,
       closable: options.closable ?? true,
       keepAliveOnHover: options.keepAliveOnHover ?? true,
@@ -85,7 +80,7 @@ export function useNotification() {
       action: options.action,
     };
 
-    return notification.value.create(notificationOptions);
+    return getNotificationApi().create(notificationOptions);
   }
 
   function success(message: string, duration = 2000): NotificationReactive {
@@ -96,18 +91,13 @@ export function useNotification() {
     });
   }
 
-  function error(message: string, error?: Error, duration = 10000): NotificationReactive | void {
+  function error(message: string, error?: Error, duration = 10000): void {
     custom({
       title: message,
       content: ERROR_DESCRIPTION,
       duration,
       type: "error",
     });
-
-    // Sentry logging si disponible
-    if (typeof window !== "undefined") {
-      (window as SentryWindow).Sentry?.captureMessage(message);
-    }
 
     if (error instanceof Error) {
       error.message = error.message + " (" + message + ")";
@@ -149,12 +139,11 @@ export function useNotification() {
     return custom({
       title,
       content: () =>
-        h(hFlex, { vertical: true }, () => [
+        h(HFlex, { vertical: true }, () => [
           h("div", { class: "tw:font-medium" }, "De : " + from),
           h("div", {}, "Objet : " + content),
         ]),
       duration,
-      type: "accent",
       avatar: renderedFontAwesomeIcon(["fas", "message"]),
       onClick: onClickAction,
       clickIcon: "arrow-up-right-from-square",

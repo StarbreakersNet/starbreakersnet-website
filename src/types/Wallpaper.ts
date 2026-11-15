@@ -20,7 +20,7 @@ export interface UnsplashPhoto {
   fetchedAt: string;
 }
 
-// Thème constitué par Unsplash (« Wallpapers », « Nature »…)
+// Thème constitué par Unsplash ("Wallpapers", "Nature"…)
 export interface UnsplashTopic {
   id: string;
   title: string;
@@ -70,7 +70,7 @@ export type Wallpaper =
   | UrlWallpaper
   | FileWallpaper;
 
-// « preset » | « unsplash » | « videos » | « url » | « file »
+// "preset" | "unsplash" | "videos" | "url" | "file"
 export type WallpaperSource = Wallpaper["source"];
 
 // Apparence du fond, transmise au verre des widgets

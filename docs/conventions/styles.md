@@ -4,8 +4,8 @@ Les règles marquées **`lint`** sont vérifiées par `yarn lint`.
 
 Dans l'ordre de préférence :
 
-1. **Un composant `h-*`** pour la mise en page : `<h-flex vertical>`, `<h-grid>`, plutôt que `class="tw:flex tw:flex-col"`.
-2. **Des classes Tailwind** pour les ajustements ponctuels : marges, largeurs, alignement du texte (`tw:mt-3`, `tw:max-w-4xl`). Le préfixe `tw:` est obligatoire (`assets/tailwind.css`). **Au plus 5 classes par élément**, pour que le template reste lisible.
+1. **Un composant `h-*`** pour la mise en page : `<h-flex vertical>`, `<h-grid>`, plutôt que `class="tw:flex tw:flex-col"`. **`lint`**
+2. **Des classes Tailwind** pour les ajustements ponctuels : marges, largeurs, alignement du texte (`tw:mt-3`, `tw:max-w-4xl`). Le préfixe `tw:` est obligatoire (`assets/tailwind.css`). **Au plus 5 classes par élément**, pour que le template reste lisible. **`lint`**
 3. **Une classe nommée dans `<style lang="scss" scoped>`** pour tout le reste : au-delà de 5 classes, états (`:hover`), animations, `:deep()`, media queries.
 
 Et :

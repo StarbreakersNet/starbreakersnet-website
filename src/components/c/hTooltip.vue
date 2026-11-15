@@ -1,206 +1,55 @@
-<script lang="ts" setup>
-import { NTooltip } from "naive-ui";
-import { computed, type CSSProperties, type PropType, useSlots, useTemplateRef } from "vue";
+<script setup lang="ts">
+import { NTooltip, type TooltipInst, type TooltipProps, type TooltipSlots } from "naive-ui";
+import { computed, useTemplateRef } from "vue";
 
-const props = defineProps({
-  animated: {
-    type: Boolean,
-    default: true,
-  },
-  arrowPointToCenter: {
-    type: Boolean,
-    default: false,
-  },
-  arrowClass: {
-    type: String,
-    default: undefined,
-  },
-  arrowStyle: {
-    type: [Object, String] as PropType<CSSProperties | string>,
-    default: undefined,
-  },
-  arrowWrapperClass: {
-    type: String,
-    default: undefined,
-  },
-  arrowWrapperStyle: {
-    type: [Object, String] as PropType<CSSProperties | string>,
-    default: undefined,
-  },
-  contentClass: {
-    type: String,
-    default: undefined,
-  },
-  contentStyle: {
-    type: [Object, String] as PropType<CSSProperties | string>,
-    default: undefined,
-  },
-  delay: {
-    type: Number,
-    default: 250,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  displayDirective: {
-    type: String as PropType<"if" | "show">,
-    default: "if",
-  },
-  duration: {
-    type: Number,
-    default: 100,
-  },
-  flip: {
-    type: Boolean,
-    default: true,
-  },
-  footerClass: {
-    type: String,
-    default: undefined,
-  },
-  footerStyle: {
-    type: [Object, String] as PropType<CSSProperties | string>,
-    default: undefined,
-  },
-  headerClass: {
-    type: String,
-    default: undefined,
-  },
-  headerStyle: {
-    type: [Object, String] as PropType<CSSProperties | string>,
-    default: undefined,
-  },
-  keepAliveOnHover: {
-    type: Boolean,
-    default: false,
-  },
-  overlap: {
-    type: Boolean,
-    default: false,
-  },
-  placement: {
-    type: String as PropType<import("vueuc/lib/binder/src/interface").Placement>,
-    default: "top",
-  },
-  raw: {
-    type: Boolean,
-    default: false,
-  },
-  scrollable: {
-    type: Boolean,
-    default: false,
-  },
-  showArrow: {
-    type: Boolean,
-    default: false,
-  },
-  show: {
-    type: Boolean,
-    default: undefined,
-  },
-  to: {
-    type: [String, Object, Boolean] as PropType<string | HTMLElement | boolean>,
-    default: "body",
-  },
-  trigger: {
-    type: String as PropType<"hover" | "click" | "focus" | "manual">,
-    default: "hover",
-  },
-  width: {
-    type: [Number, String] as PropType<number | "trigger">,
-    default: undefined,
-  },
-  x: {
-    type: Number,
-    default: undefined,
-  },
-  y: {
-    type: Number,
-    default: undefined,
-  },
-  zIndex: {
-    type: Number,
-    default: undefined,
-  },
-});
+interface Props extends /* @vue-ignore */ TooltipProps {
+  contentClass?: string;
+  delay?: TooltipProps["delay"];
+  keepAliveOnHover?: boolean;
+  showArrow?: boolean;
+  to?: TooltipProps["to"];
+}
 
-const tooltip = useTemplateRef("tooltip");
+defineOptions({ inheritAttrs: false });
 
-const slots = useSlots();
+const {
+  contentClass,
+  delay = 250,
+  keepAliveOnHover = false,
+  showArrow = false,
+  to = "body",
+} = defineProps<Props>();
+
+defineSlots<TooltipSlots>();
+
+const tooltipRef = useTemplateRef<TooltipInst>("tooltipRef");
+
+const mergedContentClass = computed(() =>
+  [!keepAliveOnHover && "h-tooltip-prevent-pointer-events", contentClass].filter(Boolean).join(" ")
+);
 
 function setShow(show: boolean) {
-  if (tooltip.value) {
-    tooltip.value.setShow(show);
-  }
+  tooltipRef.value?.setShow(show);
 }
 
 function syncPosition() {
-  if (tooltip.value) {
-    tooltip.value.syncPosition();
-  }
+  tooltipRef.value?.syncPosition();
 }
 
-const computedContentClass = computed(() => {
-  const additionalClasses = [
-    !props.keepAliveOnHover && "h-tooltip-prevent-pointer-events",
-    props.contentClass,
-  ];
-
-  return additionalClasses.filter(Boolean).join(" ");
-});
-
-defineExpose({
-  setShow,
-  syncPosition,
-});
+defineExpose({ setShow, syncPosition });
 </script>
 
 <template>
   <n-tooltip
-    ref="tooltip"
-    :animated="props.animated"
-    :arrow-class="props.arrowClass"
-    :arrow-point-to-center="props.arrowPointToCenter"
-    :arrow-style="props.arrowStyle"
-    :arrow-wrapper-class="props.arrowWrapperClass"
-    :arrow-wrapper-style="props.arrowWrapperStyle"
-    :content-class="computedContentClass"
-    :content-style="props.contentStyle"
-    :delay="props.delay"
-    :disabled="props.disabled"
-    :display-directive="props.displayDirective"
-    :duration="props.duration"
-    :flip="props.flip"
-    :footer-class="props.footerClass"
-    :footer-style="props.footerStyle"
-    :header-class="props.headerClass"
-    :header-style="props.headerStyle"
-    :keep-alive-on-hover="props.keepAliveOnHover"
-    :overlap="props.overlap"
-    :placement="props.placement"
-    :raw="props.raw"
-    :scrollable="props.scrollable"
-    :show="props.show"
-    :show-arrow="props.showArrow"
-    :to="props.to"
-    :trigger="props.trigger"
-    :width="props.width"
-    :x="props.x"
-    :y="props.y"
-    :z-index="props.zIndex"
+    ref="tooltipRef"
+    :content-class="mergedContentClass"
+    :delay="delay"
+    :keep-alive-on-hover="keepAliveOnHover"
+    :show-arrow="showArrow"
+    :to="to"
     v-bind="$attrs">
-    <template v-if="slots.trigger" #trigger>
-      <slot name="trigger" />
-    </template>
-    <template v-if="slots.footer" #footer>
-      <slot name="footer" />
-    </template>
-    <template v-if="slots.header" #header>
-      <slot name="header" />
-    </template>
-    <template #default>
-      <slot name="default" />
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof TooltipSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-tooltip>
 </template>

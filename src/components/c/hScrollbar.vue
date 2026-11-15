@@ -1,99 +1,49 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { NScrollbar, type ScrollbarInst, type ScrollbarProps } from "naive-ui";
-import { computed, type CSSProperties, type PropType, ref } from "vue";
+import { computed, useTemplateRef } from "vue";
 
-const props = defineProps({
-  trigger: {
-    type: String as PropType<"none" | "hover">,
-    default: undefined,
-  },
-  xScrollable: {
-    type: Boolean,
-    default: false,
-  },
-  yScrollable: {
-    type: Boolean,
-    default: true,
-  },
-  containerClass: {
-    type: String,
-    default: undefined,
-  },
-  containerStyle: {
-    type: [String, Object] as PropType<string | CSSProperties>,
-    default: undefined,
-  },
-  contentClass: {
-    type: String,
-    default: undefined,
-  },
-  contentStyle: {
-    type: [String, Object] as PropType<string | CSSProperties>,
-    default: undefined,
-  },
-  size: {
-    type: Number,
-    default: undefined,
-  },
-  yPlacement: {
-    type: String as PropType<"left" | "right">,
-    default: "right",
-  },
-  xPlacement: {
-    type: String as PropType<"top" | "bottom">,
-    default: "bottom",
-  },
-  theme: {
-    type: Object as PropType<InstanceType<typeof NScrollbar>["$props"]["theme"]>,
-    default: undefined,
-  },
-  themeOverrides: {
-    type: Object as PropType<ScrollbarProps["themeOverrides"]>,
-    default: undefined,
-  },
-});
-defineEmits(["scroll"]);
-const scrollbar = ref<ScrollbarInst | null>(null);
+interface Props extends /* @vue-ignore */ ScrollbarProps {
+  containerClass?: string;
+  yScrollable?: boolean;
+}
+
+defineOptions({ inheritAttrs: false });
+
+const { containerClass, yScrollable = true } = defineProps<Props>();
+
+const scrollbarRef = useTemplateRef<ScrollbarInst>("scrollbarRef");
+
+const mergedContainerClass = computed(() => [containerClass, "h-fade"].filter(Boolean).join(" "));
 
 // Délégation à NScrollbar en conservant les surcharges de scrollTo / scrollBy
 const scrollTo = ((...args: unknown[]) =>
-  scrollbar.value &&
-  Reflect.apply(scrollbar.value.scrollTo, scrollbar.value, args)) as ScrollbarInst["scrollTo"];
+  scrollbarRef.value &&
+  Reflect.apply(
+    scrollbarRef.value.scrollTo,
+    scrollbarRef.value,
+    args
+  )) as ScrollbarInst["scrollTo"];
 const scrollBy = ((...args: unknown[]) =>
-  scrollbar.value &&
-  Reflect.apply(scrollbar.value.scrollBy, scrollbar.value, args)) as ScrollbarInst["scrollBy"];
+  scrollbarRef.value &&
+  Reflect.apply(
+    scrollbarRef.value.scrollBy,
+    scrollbarRef.value,
+    args
+  )) as ScrollbarInst["scrollBy"];
 
-defineExpose({
-  scrollTo,
-  scrollBy,
-});
-
-const computedContainerClass = computed(() => {
-  const additionalClasses = [props.containerClass, "h-fade"];
-
-  return additionalClasses.filter(Boolean).join(" ");
-});
+defineExpose({ scrollTo, scrollBy });
 </script>
 
 <template>
   <n-scrollbar
-    ref="scrollbar"
-    :container-class="computedContainerClass"
-    :container-style="props.containerStyle"
-    :content-class="props.contentClass"
-    :content-style="props.contentStyle"
-    :size="props.size"
-    :theme="props.theme"
-    :theme-overrides="props.themeOverrides"
-    :trigger="props.trigger"
-    :x-placement="props.xPlacement"
-    :x-scrollable="props.xScrollable"
-    :y-placement="props.yPlacement"
-    :y-scrollable="props.yScrollable"
+    ref="scrollbarRef"
+    :container-class="mergedContainerClass"
+    :y-scrollable="yScrollable"
     class="h-scrollbar"
-    v-bind="$attrs"
-    @scroll="$emit('scroll', $event)">
-    <slot></slot>
+    v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps ?? {}" />
+    </template>
   </n-scrollbar>
 </template>
 

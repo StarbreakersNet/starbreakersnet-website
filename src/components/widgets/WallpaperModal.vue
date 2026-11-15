@@ -16,19 +16,19 @@ import HTabs from "@/components/c/hTabs.vue";
 import HText from "@/components/c/hText.vue";
 import { checkUnsplashKey, fetchRandomPhoto, fetchTopics, withReferral } from "@/utils/unsplash";
 import { saveWallpaperFile } from "@/utils/wallpaperFile";
+import { DEFAULT_WALLPAPER, WALLPAPER_PRESETS } from "@/models/WallpaperPreset";
 import {
-  DEFAULT_WALLPAPER,
   guessMediaKind,
   normalizeUnsplashKey,
   parseUnsplashCollection,
   pickVideo,
-  ROTATION_FREQUENCIES,
-  WALLPAPER_FILE_MAX_SIZE,
-  WALLPAPER_PRESETS,
-  WALLPAPER_VIDEOS,
-} from "@/models/wallpapers";
-import { normalizeUrl } from "@/models/widgets";
-import { useMessage } from "@/composables/useMessage";
+} from "@/utils/wallpaper";
+import { ROTATION_FREQUENCIES } from "@/models/RotationFrequencyOption";
+import { WALLPAPER_FILE_MAX_SIZE } from "@/utils/wallpaperFile";
+import { WALLPAPER_VIDEOS } from "@/models/WallpaperVideo";
+import { normalizeUrl } from "@/utils/url";
+import { useLoader } from "@/composables/useLoader";
+import { useAppMessage } from "@/composables/useAppMessage";
 import { useUserStore } from "@/stores/user";
 import { useWidgetsStore } from "@/stores/widgets";
 import type {
@@ -39,14 +39,11 @@ import type {
   WallpaperSource,
 } from "@/types/Wallpaper";
 
-const show = defineModel("show", {
-  type: Boolean,
-  required: true,
-});
+const show = defineModel<boolean>("show", { required: true });
 
 const store = useWidgetsStore();
 const user = useUserStore();
-const message = useMessage();
+const message = useAppMessage();
 
 const FREQUENCY_OPTIONS = ROTATION_FREQUENCIES.map(({ value, label }) => ({ value, label }));
 
@@ -68,11 +65,11 @@ const wallpaper = computed(() => store.wallpaper);
 
 const tab = ref("presets");
 
-// Onglet « Photos et vidéos » : photos Unsplash ou vidéos de la sélection, mêmes options
+// Onglet "Photos et vidéos" : photos Unsplash ou vidéos de la sélection, mêmes options
 const rotationKind = ref<"photos" | "videos">("photos");
 
 // À l'ouverture, onglet et options du fond d'écran actuel
-function onOpen(visible: boolean) {
+function handleOpen(visible: boolean) {
   const source = wallpaper.value.source;
 
   if (visible) {
@@ -122,9 +119,9 @@ const unsplashForm = reactive({
 });
 
 const collectionError = ref("");
-const fetching = ref(false);
+const fetching = useLoader();
 const topics = ref<UnsplashTopic[]>([]);
-const loadingTopics = ref(false);
+const loadingTopics = useLoader();
 
 const topicOptions = computed(() => [
   { value: "", label: "Toutes les photos" },
@@ -206,16 +203,12 @@ async function nextPhoto() {
   const current = unsplash.value;
 
   if (current && store.unsplashKey) {
-    fetching.value = true;
-
     try {
-      const photo = await fetchRandomPhoto(current, store.unsplashKey);
+      const photo = await fetching.run(() => fetchRandomPhoto(current, store.unsplashKey));
 
       store.setWallpaper({ ...current, photo });
     } catch {
       message.error("Impossible de récupérer une photo Unsplash pour le moment");
-    } finally {
-      fetching.value = false;
     }
   }
 }
@@ -229,7 +222,7 @@ const keyForm = reactive({
 });
 
 const keyError = ref("");
-const checkingKey = ref(false);
+const checkingKey = useLoader();
 
 async function saveKey() {
   const key = normalizeUnsplashKey(keyForm.key);
@@ -237,9 +230,7 @@ async function saveKey() {
   keyError.value = key ? "" : "Clé d'accès invalide";
 
   if (key) {
-    checkingKey.value = true;
-    const status = await checkUnsplashKey(key);
-    checkingKey.value = false;
+    const status = await checkingKey.run(() => checkUnsplashKey(key));
 
     if (status === "invalid") {
       keyError.value = "Clé refusée par Unsplash";
@@ -268,18 +259,14 @@ function removeKey() {
 }
 
 async function loadTopics() {
-  loadingTopics.value = true;
-
   try {
-    topics.value = await fetchTopics(store.unsplashKey);
+    topics.value = await loadingTopics.run(() => fetchTopics(store.unsplashKey));
   } catch {
     message.error("Impossible de récupérer les thèmes Unsplash pour le moment");
-  } finally {
-    loadingTopics.value = false;
   }
 }
 
-function onPhotosShown(visible: boolean) {
+function handlePhotosShown(visible: boolean) {
   if (visible && store.unsplashKey && !topics.value.length) {
     loadTopics();
   }
@@ -335,8 +322,8 @@ const customForm = reactive({
 });
 
 const urlError = ref("");
-const saving = ref(false);
-const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
+const saving = useLoader();
+const fileInputRef = useTemplateRef<HTMLInputElement>("fileInputRef");
 
 const fileName = computed(() => (wallpaper.value.source === "file" ? wallpaper.value.name : ""));
 
@@ -374,10 +361,8 @@ function fileKind(file: File): MediaKind | null {
 }
 
 async function saveFile(file: File, kind: MediaKind) {
-  saving.value = true;
-
   try {
-    await saveWallpaperFile(file);
+    await saving.run(() => saveWallpaperFile(file));
 
     store.setWallpaper({
       source: "file",
@@ -387,12 +372,10 @@ async function saveFile(file: File, kind: MediaKind) {
     });
   } catch {
     message.error("Impossible d'enregistrer ce fichier dans le navigateur");
-  } finally {
-    saving.value = false;
   }
 }
 
-function onFileChosen(event: Event) {
+function handleFileChosen(event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   const kind = file ? fileKind(file) : null;
@@ -412,11 +395,11 @@ function onFileChosen(event: Event) {
   }
 }
 
-watch(show, onOpen);
+watch(show, handleOpen);
 
 watch(
   () => show.value && tab.value === "rotation" && rotationKind.value === "photos",
-  onPhotosShown,
+  handlePhotosShown,
   { immediate: true }
 );
 
@@ -472,17 +455,19 @@ watch(
         <template v-if="rotationKind === 'photos'">
           <h-form :model="unsplashForm" label-placement="top">
             <h-form-item v-if="hasKey" label="Photos">
-              <h-radio-group :value="unsplashForm.selection" @update:value="chooseSelection">
+              <h-radio-group
+                :value="unsplashForm.selection"
+                @update:value="chooseSelection($event)">
                 <h-radio-button value="topic">D'un thème Unsplash</h-radio-button>
                 <h-radio-button value="collection">D'une collection</h-radio-button>
               </h-radio-group>
             </h-form-item>
             <h-form-item v-if="hasKey && unsplashForm.selection === 'topic'" label="Thème">
               <h-select
-                :loading="loadingTopics"
+                :loading="loadingTopics.loading"
                 :options="topicOptions"
                 :value="topicValue"
-                @update:value="updateTopic" />
+                @update:value="updateTopic($event)" />
             </h-form-item>
             <h-form-item
               v-if="hasKey && unsplashForm.selection === 'collection'"
@@ -493,11 +478,11 @@ watch(
                 <h-input
                   v-model:value="unsplashForm.collection"
                   placeholder="https://unsplash.com/collections/…"
-                  @keydown.enter.prevent="applyCollection" />
+                  @keydown.enter.prevent="applyCollection()" />
                 <h-button
                   :disabled="!unsplash || !unsplashForm.collection.trim()"
                   type="primary"
-                  @click="applyCollection">
+                  @click="applyCollection()">
                   Appliquer
                 </h-button>
               </h-input-group>
@@ -506,7 +491,7 @@ watch(
               <h-select
                 :options="FREQUENCY_OPTIONS"
                 :value="unsplashForm.frequency"
-                @update:value="updatePhotoFrequency" />
+                @update:value="updatePhotoFrequency($event)" />
             </h-form-item>
             <h-form-item
               :feedback="keyError"
@@ -519,14 +504,14 @@ watch(
                   placeholder="Access Key de votre application Unsplash"
                   show-password-on="click"
                   type="password"
-                  @keydown.enter.prevent="saveKey" />
-                <h-button v-if="hasKey" @click="removeKey">Retirer</h-button>
+                  @keydown.enter.prevent="saveKey()" />
+                <h-button v-if="hasKey" @click="removeKey()">Retirer</h-button>
                 <h-button
                   v-else
                   :disabled="!keyForm.key.trim()"
-                  :loading="checkingKey"
+                  :loading="checkingKey.loading"
                   type="primary"
-                  @click="saveKey">
+                  @click="saveKey()">
                   Enregistrer
                 </h-button>
               </h-input-group>
@@ -537,7 +522,7 @@ watch(
             <a href="https://unsplash.com/developers" rel="noopener" target="_blank">
               unsplash.com/developers
             </a>
-            (« Access Key », jamais la « Secret Key »). Elle est enregistrée avec votre Buroh. Vous
+            ("Access Key", jamais la "Secret Key"). Elle est enregistrée avec votre Buroh. Vous
             choisissez ensuite un thème d'Unsplash ou l'une de ses collections.
           </h-text>
           <h-flex justify="space-between">
@@ -551,10 +536,10 @@ watch(
               </a>
             </h-text>
             <span v-else />
-            <h-button v-if="!unsplash" :disabled="!hasKey" type="primary" @click="useUnsplash">
+            <h-button v-if="!unsplash" :disabled="!hasKey" type="primary" @click="useUnsplash()">
               Utiliser Unsplash
             </h-button>
-            <h-button v-else :disabled="!hasKey" :loading="fetching" @click="nextPhoto">
+            <h-button v-else :disabled="!hasKey" :loading="fetching.loading" @click="nextPhoto()">
               <template #icon>
                 <font-awesome-icon icon="rotate" />
               </template>
@@ -585,16 +570,16 @@ watch(
               <h-select
                 :options="FREQUENCY_OPTIONS"
                 :value="videoForm.frequency"
-                @update:value="updateVideoFrequency" />
+                @update:value="updateVideoFrequency($event)" />
             </h-form-item>
           </h-form>
           <h-flex justify="space-between">
             <h-text v-if="currentVideo" depth="3">Vidéo : {{ currentVideo.credit }}</h-text>
             <span v-else />
-            <h-button v-if="!videos" type="primary" @click="useVideos">
+            <h-button v-if="!videos" type="primary" @click="useVideos()">
               Utiliser les vidéos
             </h-button>
-            <h-button v-else :disabled="WALLPAPER_VIDEOS.length < 2" @click="nextVideo">
+            <h-button v-else :disabled="WALLPAPER_VIDEOS.length < 2" @click="nextVideo()">
               <template #icon>
                 <font-awesome-icon icon="rotate" />
               </template>
@@ -604,7 +589,7 @@ watch(
         </template>
       </h-tab-pane>
       <h-tab-pane name="custom" tab="Personnalisé">
-        <h-form :model="customForm" label-placement="top" @submit="applyUrl">
+        <h-form :model="customForm" label-placement="top" @submit="applyUrl()">
           <h-form-item
             :feedback="urlError"
             :validation-status="urlError ? 'error' : undefined"
@@ -613,19 +598,19 @@ watch(
               <h-input
                 :value="customForm.url"
                 placeholder="https://exemple.fr/fond.jpg"
-                @update:value="updateUrl" />
+                @update:value="updateUrl($event)" />
               <h-select
                 v-model:value="customForm.kind"
                 :options="KIND_OPTIONS"
                 class="kind-select" />
-              <h-button :disabled="!customForm.url.trim()" type="primary" @click="applyUrl">
+              <h-button :disabled="!customForm.url.trim()" type="primary" @click="applyUrl()">
                 Appliquer
               </h-button>
             </h-input-group>
           </h-form-item>
           <h-form-item label="Depuis votre ordinateur">
             <h-flex>
-              <h-button :loading="saving" @click="fileInput?.click()">
+              <h-button :loading="saving.loading" @click="fileInputRef?.click()">
                 <template #icon>
                   <font-awesome-icon icon="upload" />
                 </template>
@@ -634,11 +619,11 @@ watch(
               <h-text v-if="fileName" depth="3">{{ fileName }}</h-text>
             </h-flex>
             <input
-              ref="fileInput"
+              ref="fileInputRef"
               accept="image/*,video/*"
               class="file-input"
               type="file"
-              @change="onFileChosen" />
+              @change="handleFileChosen($event)" />
           </h-form-item>
         </h-form>
         <h-text depth="3">

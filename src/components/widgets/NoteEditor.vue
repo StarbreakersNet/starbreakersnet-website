@@ -5,27 +5,21 @@ import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HInput from "@/components/c/hInput.vue";
 import { markdownExtensions } from "@/utils/markdown";
-import { normalizeUrl } from "@/models/widgets";
+import { normalizeUrl } from "@/utils/url";
 
-const markdown = defineModel({
-  type: String,
-  required: true,
-});
+const markdown = defineModel<string>({ required: true });
 
 // Éditeur du widget Note, sans Markdown à écrire (TipTap). Le texte reste enregistré en Markdown,
 // comme avant : les notes existantes s'ouvrent telles quelles. Mêmes extensions que l'affichage
 // du widget (utils/markdown.ts), pour que la note s'affiche comme on l'a écrite.
 
-const props = defineProps({
-  maxLength: {
-    type: Number,
-    required: true,
-  },
-});
+const { maxLength } = defineProps<{
+  maxLength: number;
+}>();
 
 const length = ref(markdown.value.length);
 
-const tooLong = computed(() => length.value > props.maxLength);
+const tooLong = computed(() => length.value > maxLength);
 
 const editor = useEditor({
   content: markdown.value,
@@ -44,7 +38,7 @@ const editor = useEditor({
     length.value = next.length;
 
     // Au-delà de la limite, le texte n'est plus enregistré tant qu'il n'est pas raccourci
-    if (next.length <= props.maxLength) {
+    if (next.length <= maxLength) {
       markdown.value = next;
     }
   },
@@ -112,7 +106,7 @@ const ACTIONS: Action[] = [
 
 const linkOpen = ref(false);
 const linkUrl = ref("");
-const linkInput = useTemplateRef<InstanceType<typeof HInput>>("linkInput");
+const linkInputRef = useTemplateRef<InstanceType<typeof HInput>>("linkInputRef");
 
 const linkHref = computed(() => normalizeUrl(linkUrl.value));
 
@@ -130,7 +124,7 @@ async function toggleLink() {
     linkOpen.value = true;
 
     await nextTick();
-    linkInput.value?.focus();
+    linkInputRef.value?.focus();
   }
 }
 
@@ -185,28 +179,28 @@ onBeforeUnmount(() => editor.value?.destroy());
         :type="onLink || linkOpen ? 'primary' : 'default'"
         quaternary
         size="small"
-        @click="toggleLink">
+        @click="toggleLink()">
         <font-awesome-icon :icon="onLink ? 'link-slash' : 'link'" />
       </h-button>
     </h-flex>
     <h-flex v-if="linkOpen" :size="6" :wrap="false" class="link-row">
       <h-input
-        ref="linkInput"
+        ref="linkInputRef"
         v-model:value="linkUrl"
         :status="linkInvalid ? 'error' : undefined"
         placeholder="https://exemple.fr"
         size="small"
-        @keydown.enter.prevent="applyLink"
-        @keydown.esc.prevent.stop="cancelLink" />
-      <h-button :disabled="!linkHref" size="small" type="primary" @click="applyLink">
+        @keydown.enter.prevent="applyLink()"
+        @keydown.esc.prevent.stop="cancelLink()" />
+      <h-button :disabled="!linkHref" size="small" type="primary" @click="applyLink()">
         Ajouter
       </h-button>
-      <h-button quaternary size="small" @click="cancelLink">Annuler</h-button>
+      <h-button quaternary size="small" @click="cancelLink()">Annuler</h-button>
     </h-flex>
     <editor-content :editor="editor" class="content" />
     <p :class="{ error: tooLong }" class="count">
       <template v-if="tooLong">Texte trop long : il n'est plus enregistré.</template>
-      {{ length }} / {{ props.maxLength }}
+      {{ length }} / {{ maxLength }}
     </p>
   </div>
 </template>

@@ -1,67 +1,17 @@
-<script lang="ts" setup>
-import { NSelect, type SelectProps } from "naive-ui";
-import { type PropType, useSlots } from "vue";
+<script setup lang="ts">
+import { NSelect, type SelectProps, type SelectSlots } from "naive-ui";
 
-const props = defineProps({
-  value: {
-    type: [String, Number, Array] as PropType<SelectProps["value"]>,
-    default: undefined,
-  },
-  options: {
-    type: Array as PropType<SelectProps["options"]>,
-    default: () => [],
-  },
-  placeholder: {
-    type: String,
-    default: undefined,
-  },
-  size: {
-    type: String as PropType<SelectProps["size"]>,
-    default: undefined,
-  },
-  filterable: {
-    type: Boolean,
-    default: false,
-  },
-  remote: {
-    type: Boolean,
-    default: false,
-  },
-  clearable: {
-    type: Boolean,
-    default: false,
-  },
-  disabled: {
-    type: Boolean,
-    default: undefined,
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-});
+defineOptions({ inheritAttrs: false });
 
-defineEmits(["update:value", "search"]);
+defineProps</* @vue-ignore */ SelectProps>();
 
-const slots = useSlots();
+defineSlots<SelectSlots>();
 </script>
 
 <template>
-  <n-select
-    :clearable="props.clearable"
-    :disabled="props.disabled"
-    :filterable="props.filterable"
-    :loading="props.loading"
-    :options="props.options"
-    :placeholder="props.placeholder"
-    :remote="props.remote"
-    :size="props.size"
-    :value="props.value"
-    v-bind="$attrs"
-    @search="$emit('search', $event)"
-    @update:value="$emit('update:value', $event)">
-    <template v-if="slots.empty" #empty>
-      <slot name="empty" />
+  <n-select v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof SelectSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-select>
 </template>

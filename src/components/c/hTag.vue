@@ -1,91 +1,21 @@
-<script lang="ts" setup>
-import { NTag, type TagProps } from "naive-ui";
-import { type PropType, useSlots } from "vue";
+<script setup lang="ts">
+import { NTag, type TagProps, type TagSlots } from "naive-ui";
 
-const props = defineProps({
-  type: {
-    type: String as PropType<TagProps["type"]>,
-    default: undefined,
-  },
-  size: {
-    type: String as PropType<TagProps["size"]>,
-    default: undefined,
-  },
-  bordered: {
-    type: Boolean as PropType<TagProps["bordered"]>,
-    default: false,
-  },
-  round: {
-    type: Boolean as PropType<TagProps["round"]>,
-    default: undefined,
-  },
-  strong: {
-    type: Boolean as PropType<TagProps["strong"]>,
-    default: undefined,
-  },
-  closable: {
-    type: Boolean as PropType<TagProps["closable"]>,
-    default: undefined,
-  },
-  checkable: {
-    type: Boolean as PropType<TagProps["checkable"]>,
-    default: undefined,
-  },
-  checked: {
-    type: Boolean as PropType<TagProps["checked"]>,
-    default: undefined,
-  },
-  disabled: {
-    type: Boolean as PropType<TagProps["disabled"]>,
-    default: undefined,
-  },
-  color: {
-    type: Object as PropType<TagProps["color"]>,
-    default: undefined,
-  },
-  themeOverrides: {
-    type: Object as PropType<TagProps["themeOverrides"]>,
-    default: undefined,
-  },
-  triggerClickOnClose: {
-    type: Boolean as PropType<TagProps["triggerClickOnClose"]>,
-    default: undefined,
-  },
-});
+interface Props extends /* @vue-ignore */ TagProps {
+  bordered?: boolean;
+}
 
-defineEmits<{
-  (e: "close", event: MouseEvent): void;
-  (e: "update:checked", value: boolean): void;
-}>();
+defineOptions({ inheritAttrs: false });
 
-const slots = useSlots();
+const { bordered = false } = defineProps<Props>();
+
+defineSlots<TagSlots>();
 </script>
 
 <template>
-  <n-tag
-    :type="props.type"
-    :size="props.size"
-    :bordered="props.bordered"
-    :round="props.round"
-    :strong="props.strong"
-    :closable="props.closable"
-    :checkable="props.checkable"
-    :checked="props.checked"
-    :disabled="props.disabled"
-    :color="props.color"
-    :theme-overrides="props.themeOverrides"
-    :trigger-click-on-close="props.triggerClickOnClose"
-    v-bind="$attrs"
-    @close="$emit('close', $event)"
-    @update:checked="$emit('update:checked', $event)">
-    <template v-if="slots.avatar" #avatar>
-      <slot name="avatar" />
-    </template>
-    <template v-if="slots.icon" #icon>
-      <slot name="icon" />
-    </template>
-    <template v-if="slots.default" #default>
-      <slot />
+  <n-tag :bordered="bordered" v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name as keyof TagSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-tag>
 </template>

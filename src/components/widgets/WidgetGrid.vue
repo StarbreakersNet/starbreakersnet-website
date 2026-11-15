@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { nextTick, onBeforeUnmount, onMounted, type PropType, ref, watch } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, useTemplateRef, watch } from "vue";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.min.css";
 import type { GridItem, GridPosition } from "@/types/Widget";
@@ -8,43 +8,34 @@ import type { GridItem, GridPosition } from "@/types/Widget";
 // Au toucher, un widget se saisit par un appui long (300 ms) : un doigt qui glisse tout de suite fait
 // défiler la page.
 // Vue affiche les widgets ; gridstack les place. Les changements venus du store (ajout, suppression,
-// nouvelle taille) lui sont transmis ici, et ses glisser-déposer remontent par l'événement « moved ».
+// nouvelle taille) lui sont transmis ici, et ses glisser-déposer remontent par l'événement "moved".
 
-const props = defineProps({
-  items: {
-    type: Array as PropType<GridItem[]>,
-    required: true,
-  },
-  columns: {
-    type: Number,
-    required: true,
-  },
+const {
+  items,
+  columns,
+  gap,
+  editable = false,
+  list = false,
+} = defineProps<{
+  items: GridItem[];
+  columns: number;
   // Espace entre deux widgets, en pixels
-  gap: {
-    type: Number,
-    required: true,
-  },
-  editable: {
-    type: Boolean,
-    default: false,
-  },
+  gap: number;
+  editable?: boolean;
   // Widgets réordonnés comme une liste, à la manière de l'écran d'accueil d'un téléphone (mobile),
   // ou laissés où on les pose (ordinateur)
-  list: {
-    type: Boolean,
-    default: false,
-  },
-});
+  list?: boolean;
+}>();
 
 const emit = defineEmits<{
-  (e: "moved", positions: GridPosition[]): void;
+  moved: [positions: GridPosition[]];
 }>();
 
 defineSlots<{
   item(props: { id: string }): unknown;
 }>();
 
-const root = ref<HTMLElement | null>(null);
+const rootRef = useTemplateRef<HTMLElement>("rootRef");
 const elements = new Map<string, HTMLElement>();
 
 let grid: GridStack | null = null;
@@ -71,14 +62,14 @@ function remember(items: GridItem[]) {
 function createGrid(element: HTMLElement) {
   return GridStack.init(
     {
-      column: props.columns,
+      column: columns,
       // Cases carrées, recalculées avec la largeur de la page
       cellHeight: "auto",
-      margin: props.gap / 2,
-      mode: props.list ? "list" : "float",
+      margin: gap / 2,
+      mode: list ? "list" : "float",
       animate: true,
       disableResize: true,
-      staticGrid: !props.editable,
+      staticGrid: !editable,
       // Boutons du cadre (supprimer, régler) cliquables sans déplacer le widget
       draggable: { cancel: "button, a, input, textarea, select, .no-drag" },
     },
@@ -87,7 +78,7 @@ function createGrid(element: HTMLElement) {
 }
 
 // Fin d'un glisser-déposer : positions de tous les widgets, poussés compris
-function onDragStop() {
+function handleDragStop() {
   const nodes = grid?.engine.nodes ?? [];
 
   const positions = nodes.map(node => ({
@@ -144,18 +135,18 @@ async function sync(items: GridItem[]) {
 }
 
 watch(
-  () => props.editable,
+  () => editable,
   editable => grid?.setStatic(!editable)
 );
 
-watch(() => props.items, sync, { deep: true });
+watch(() => items, sync, { deep: true });
 
 onMounted(() => {
-  grid = root.value ? createGrid(root.value) : null;
+  grid = rootRef.value ? createGrid(rootRef.value) : null;
 
   if (grid) {
-    remember(props.items);
-    grid.on("dragstop", onDragStop);
+    remember(items);
+    grid.on("dragstop", handleDragStop);
   }
 });
 
@@ -166,9 +157,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="root" class="grid-stack">
+  <div ref="rootRef" class="grid-stack">
     <div
-      v-for="item in props.items"
+      v-for="item in items"
       :key="item.id"
       :ref="element => setElement(item.id, element)"
       :gs-h="item.h"

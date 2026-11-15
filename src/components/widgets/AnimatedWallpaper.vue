@@ -1,17 +1,11 @@
 <script lang="ts" setup>
-import { computed, type PropType } from "vue";
-import type { WallpaperMotion } from "@/models/wallpapers";
+import { computed } from "vue";
+import type { WallpaperMotion } from "@/models/WallpaperPreset";
 
-const props = defineProps({
-  motion: {
-    type: String as PropType<WallpaperMotion>,
-    required: true,
-  },
-  light: {
-    type: Boolean,
-    default: false,
-  },
-});
+const { motion, light = false } = defineProps<{
+  motion: WallpaperMotion;
+  light?: boolean;
+}>();
 
 // Graine fixe : les mêmes étoiles à chaque affichage
 function random(seed: number) {
@@ -43,7 +37,7 @@ const AURORA_COLORS = {
   ],
 };
 
-const auroraColors = computed(() => (props.light ? AURORA_COLORS.light : AURORA_COLORS.dark));
+const auroraColors = computed(() => (light ? AURORA_COLORS.light : AURORA_COLORS.dark));
 
 // --- Nuit étoilée
 
@@ -71,7 +65,7 @@ const stars = (() => {
   });
 })();
 
-const starColor = computed(() => (props.light ? "rgb(70 80 150)" : "rgb(255 255 255)"));
+const starColor = computed(() => (light ? "rgb(70 80 150)" : "rgb(255 255 255)"));
 
 // --- Vagues
 

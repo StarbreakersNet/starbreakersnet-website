@@ -1,66 +1,19 @@
-<script lang="ts" setup>
-import { NText } from "naive-ui";
-import { type PropType, useAttrs, useSlots } from "vue";
+<script setup lang="ts">
+import { NText, type TextProps } from "naive-ui";
 
-const props = defineProps({
-  type: {
-    type: String,
-    default: undefined,
-  },
-  depth: {
-    type: [String, Number] as PropType<1 | 2 | 3 | "1" | "2" | "3">,
-    default: undefined,
-  },
-  tag: {
-    type: String,
-    default: "span",
-  },
-  strong: {
-    type: Boolean,
-    default: false,
-  },
-  italic: {
-    type: Boolean,
-    default: false,
-  },
-  underline: {
-    type: Boolean,
-    default: false,
-  },
-  delete: {
-    type: Boolean,
-    default: false,
-  },
-  code: {
-    type: Boolean,
-    default: false,
-  },
-  keyboard: {
-    type: Boolean,
-    default: false,
-  },
-  themeOverrides: {
-    type: Object,
-  },
-});
-const attrs = useAttrs();
-const slots = useSlots();
+interface Props extends /* @vue-ignore */ TextProps {
+  tag?: TextProps["tag"];
+}
+
+defineOptions({ inheritAttrs: false });
+
+const { tag = "span" } = defineProps<Props>();
 </script>
 
 <template>
-  <n-text
-    :code="props.code"
-    :delete="props.delete"
-    :depth="props.depth"
-    :italic="props.italic"
-    :strong="props.strong"
-    :tag="props.tag"
-    :theme-overrides="props.themeOverrides"
-    :type="props.type"
-    :underline="props.underline"
-    v-bind="attrs">
-    <template v-if="slots.default">
-      <slot />
+  <n-text :tag="tag" v-bind="$attrs">
+    <template v-for="(_, name) in $slots" #[name]="slotProps">
+      <slot :name="name" v-bind="slotProps ?? {}" />
     </template>
   </n-text>
 </template>

@@ -1,38 +1,23 @@
-<script lang="ts" setup>
-import { type AnchorLinkProps, NAnchorLink } from "naive-ui";
-import { type PropType, useSlots } from "vue";
+<script setup lang="ts">
+import { NAnchorLink, type AnchorLinkProps, type AnchorLinkSlots } from "naive-ui";
+import { slotsExcept } from "@/utils/slots";
 
-const props = defineProps({
-  title: {
-    type: [String, Number] as PropType<AnchorLinkProps["title"]>,
-    default: undefined,
-  },
-  href: {
-    type: String as PropType<AnchorLinkProps["href"]>,
-    default: undefined,
-  },
-});
+defineOptions({ inheritAttrs: false });
 
-defineEmits<{
-  (e: "click", event: MouseEvent): void;
-}>();
+defineProps</* @vue-ignore */ AnchorLinkProps>();
 
-const slots = useSlots();
+defineSlots<AnchorLinkSlots>();
 </script>
 
 <template>
-  <n-anchor-link
-    :href="props.href"
-    :title="props.title"
-    v-bind="$attrs"
-    @click="$emit('click', $event)">
-    <template v-if="slots.title" #title>
+  <n-anchor-link v-bind="$attrs">
+    <template v-if="$slots.title" #title>
       <div class="tw:py-[.5rem]">
         <slot name="title" />
       </div>
     </template>
-    <template v-if="slots.default">
-      <slot />
+    <template v-for="(_, name) in slotsExcept($slots, 'title')" #[name]="slotProps">
+      <slot :name="name as keyof AnchorLinkSlots" v-bind="slotProps ?? {}" />
     </template>
   </n-anchor-link>
 </template>

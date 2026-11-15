@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { computed, reactive, ref, useTemplateRef } from "vue";
+import { computed, reactive, useTemplateRef } from "vue";
+import { useLoader } from "@/composables/useLoader";
 import { useRoute, useRouter } from "vue-router";
 import type { HFormInst } from "@/types/components/c/hForm";
 import HCard from "@/components/c/hCard.vue";
@@ -10,16 +11,16 @@ import HInput from "@/components/c/hInput.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HButton from "@/components/c/hButton.vue";
 import { useAuthStore } from "@/stores/auth";
-import { useMessage } from "@/composables/useMessage";
+import { useAppMessage } from "@/composables/useAppMessage";
 import { passwordConfirmationRule, passwordRule } from "@/utils/validation";
 
 const auth = useAuthStore();
-const message = useMessage();
+const message = useAppMessage();
 const route = useRoute();
 const router = useRouter();
 
 const formRef = useTemplateRef<HFormInst>("formRef");
-const loading = ref(false);
+const saving = useLoader();
 const form = reactive({
   password: "",
   passwordConfirmation: "",
@@ -35,9 +36,7 @@ const linkError = computed(() =>
 );
 
 async function handleSubmit() {
-  loading.value = true;
-  const response = await auth.resetPassword(form.password);
-  loading.value = false;
+  const response = await saving.run(() => auth.resetPassword(form.password));
 
   if (response) {
     message.success("Mot de passe modifié, vous êtes connecté");
@@ -72,7 +71,7 @@ async function handleSubmit() {
             type="password" />
         </h-form-item>
         <h-flex vertical>
-          <h-button :disabled="!formRef?.isValid" :loading="loading" attr-type="submit">
+          <h-button :disabled="!formRef?.isValid" :loading="saving.loading" attr-type="submit">
             Enregistrer le mot de passe
           </h-button>
         </h-flex>

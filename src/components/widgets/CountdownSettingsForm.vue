@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, type PropType } from "vue";
+import { computed } from "vue";
 import { DateTime } from "luxon";
 import HDatePicker from "@/components/c/hDatePicker.vue";
 import HForm from "@/components/c/hForm.vue";
@@ -7,10 +7,7 @@ import HFormItem from "@/components/c/hFormItem.vue";
 import HInput from "@/components/c/hInput.vue";
 import type { CountdownSettings } from "@/types/Widget";
 
-const settings = defineModel("settings", {
-  type: Object as PropType<CountdownSettings>,
-  required: true,
-});
+const settings = defineModel<CountdownSettings>("settings", { required: true });
 
 // Le sélecteur de date travaille en millisecondes, le widget enregistre une date ISO
 const targetMillis = computed(() => DateTime.fromISO(settings.value.target).toMillis());
@@ -35,7 +32,7 @@ function updateTarget(millis: number | null) {
         :maxlength="40"
         :value="settings.title"
         placeholder="Soirée jeux, anniversaire…"
-        @update:value="updateTitle" />
+        @update:value="updateTitle($event)" />
     </h-form-item>
     <h-form-item label="Date et heure">
       <h-date-picker
@@ -44,7 +41,7 @@ function updateTarget(millis: number | null) {
         class="date-picker"
         format="d MMMM yyyy, HH:mm"
         type="datetime"
-        @update:value="updateTarget" />
+        @update:value="updateTarget($event)" />
     </h-form-item>
   </h-form>
 </template>

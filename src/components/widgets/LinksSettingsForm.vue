@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { type PropType, ref } from "vue";
+import { ref } from "vue";
 import HButton from "@/components/c/hButton.vue";
 import HFlex from "@/components/c/hFlex.vue";
 import HForm from "@/components/c/hForm.vue";
@@ -8,13 +8,12 @@ import HInput from "@/components/c/hInput.vue";
 import HInputGroup from "@/components/c/hInputGroup.vue";
 import HSwitch from "@/components/c/hSwitch.vue";
 import HText from "@/components/c/hText.vue";
-import { createId, LINKS_MAX, normalizeUrl } from "@/models/widgets";
+import { createId } from "@/utils/id";
+import { LINKS_MAX } from "@/models/WidgetDefinition";
+import { normalizeUrl } from "@/utils/url";
 import type { LinkItem, LinksSettings } from "@/types/Widget";
 
-const settings = defineModel("settings", {
-  type: Object as PropType<LinksSettings>,
-  required: true,
-});
+const settings = defineModel<LinksSettings>("settings", { required: true });
 
 const newTitle = ref("");
 const newUrl = ref("");
@@ -68,7 +67,7 @@ function updateNewTab(newTab: boolean) {
 </script>
 
 <template>
-  <h-form :model="settings" label-placement="top" @submit="addLink">
+  <h-form :model="settings" label-placement="top" @submit="addLink()">
     <h-form-item label="Liens">
       <h-text v-if="settings.links.length === 0" depth="3">Aucun lien pour l'instant.</h-text>
       <ol v-else class="list">
@@ -80,7 +79,7 @@ function updateNewTab(newTab: boolean) {
               :value="link.title"
               class="title"
               size="small"
-              @update:value="(title: string) => renameLink(link.id, title)" />
+              @update:value="renameLink(link.id, $event)" />
             <h-text class="url" depth="3">{{ link.url }}</h-text>
             <h-flex :size="2">
               <h-button
@@ -125,13 +124,13 @@ function updateNewTab(newTab: boolean) {
         <h-input
           v-model:value="newUrl"
           placeholder="exemple.fr"
-          @keydown.enter.prevent="addLink"
+          @keydown.enter.prevent="addLink()"
           @update:value="urlError = ''" />
-        <h-button :disabled="!newUrl.trim()" type="primary" @click="addLink">Ajouter</h-button>
+        <h-button :disabled="!newUrl.trim()" type="primary" @click="addLink()">Ajouter</h-button>
       </h-input-group>
     </h-form-item>
     <h-form-item label="Ouvrir dans un nouvel onglet">
-      <h-switch :value="settings.newTab" @update:value="updateNewTab" />
+      <h-switch :value="settings.newTab" @update:value="updateNewTab($event)" />
     </h-form-item>
   </h-form>
 </template>

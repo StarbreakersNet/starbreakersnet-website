@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, type PropType } from "vue";
+import { computed } from "vue";
 import HForm from "@/components/c/hForm.vue";
 import HFormItem from "@/components/c/hFormItem.vue";
 import HInput from "@/components/c/hInput.vue";
@@ -7,15 +7,12 @@ import HRadioButton from "@/components/c/hRadioButton.vue";
 import HRadioGroup from "@/components/c/hRadioGroup.vue";
 import HSelect from "@/components/c/hSelect.vue";
 import HSwitch from "@/components/c/hSwitch.vue";
-import { localTimezone, timezoneCity } from "@/models/widgets";
+import { localTimezone, timezoneCity } from "@/utils/timezone";
 import type { ClockSettings } from "@/types/Widget";
 
-const settings = defineModel("settings", {
-  type: Object as PropType<ClockSettings>,
-  required: true,
-});
+const settings = defineModel<ClockSettings>("settings", { required: true });
 
-// Valeur de la liste pour « Heure de l'appareil », enregistrée comme fuseau null
+// Valeur de la liste pour "Heure de l'appareil", enregistrée comme fuseau null
 const DEVICE_TIMEZONE = "device";
 
 // Intl.supportedValuesOf (ES2022) absent des types du projet, ciblés ES2020
@@ -47,24 +44,20 @@ function updateTimezone(value: string) {
 <template>
   <h-form :model="settings" label-placement="top">
     <h-form-item label="Style">
-      <h-radio-group
-        :value="settings.style"
-        @update:value="(style: ClockSettings['style']) => update({ style })">
+      <h-radio-group :value="settings.style" @update:value="update({ style: $event })">
         <h-radio-button value="analog">À aiguilles</h-radio-button>
         <h-radio-button value="digital">En chiffres</h-radio-button>
       </h-radio-group>
     </h-form-item>
     <h-form-item label="Secondes">
-      <h-switch
-        :value="settings.seconds"
-        @update:value="(seconds: boolean) => update({ seconds })" />
+      <h-switch :value="settings.seconds" @update:value="update({ seconds: $event })" />
     </h-form-item>
     <h-form-item label="Fuseau horaire">
       <h-select
         :options="timezoneOptions"
         :value="settings.timezone ?? DEVICE_TIMEZONE"
         filterable
-        @update:value="updateTimezone" />
+        @update:value="updateTimezone($event)" />
     </h-form-item>
     <h-form-item label="Nom affiché">
       <h-input
@@ -72,7 +65,7 @@ function updateTimezone(value: string) {
         :placeholder="labelPlaceholder"
         :value="settings.label"
         clearable
-        @update:value="(label: string) => update({ label })" />
+        @update:value="update({ label: $event })" />
     </h-form-item>
   </h-form>
 </template>

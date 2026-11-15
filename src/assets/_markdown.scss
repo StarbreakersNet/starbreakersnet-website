@@ -1,5 +1,5 @@
 // Mise en forme du texte d'une note, commune à son affichage (MarkdownWidget.vue) et à son éditeur
-// (NoteEditor.vue). TipTap ne fournit aucun style (éditeur « headless ») et la remise à zéro de
+// (NoteEditor.vue). TipTap ne fournit aucun style (éditeur "headless") et la remise à zéro de
 // Tailwind efface celle du navigateur : titres, listes, citations et code la retrouvent ici.
 // À inclure dans un composant scoped, le HTML étant produit par TipTap :
 //   @use "@/assets/markdown";
@@ -39,7 +39,7 @@
     padding-left: 1.3em;
   }
 
-  // Points de liste serrés, même quand chacun est un paragraphe (éditeur, listes « aérées »)
+  // Points de liste serrés, même quand chacun est un paragraphe (éditeur, listes "aérées")
   :deep(li > p) {
     margin: 0;
   }

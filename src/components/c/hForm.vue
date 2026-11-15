@@ -4,16 +4,18 @@ import _ from "lodash";
 import type { FormItemRule, FormRules, FormValidationError } from "naive-ui";
 import { onMounted, provide, ref, useTemplateRef, watch } from "vue";
 
+defineOptions({ inheritAttrs: false });
+
 const model = defineModel<object>("model", { required: true });
 
-const props = defineProps({
-  rules: {
-    type: Object as () => FormRules,
-    default: () => ({}),
-  },
-});
+const { rules = {} } = defineProps<{
+  rules?: FormRules;
+}>();
 
-const emit = defineEmits(["submit", "validate"]);
+const emit = defineEmits<{
+  submit: [event: Event];
+  validate: [errors: Array<FormValidationError> | undefined];
+}>();
 
 const naiveFormRef = useTemplateRef<HFormInst>("naiveFormRef");
 
@@ -39,35 +41,30 @@ function isEmpty(value: unknown) {
   );
 }
 
-function computeIsValidSilently() {
-  const rules: FormRules = props.rules || {};
-  const values = (model.value || {}) as Record<string, unknown>;
+function isRuleSatisfied(rule: FormItemRule, value: unknown, values: Record<string, unknown>) {
+  if (rule.required === true && isEmpty(value)) {
+    return false;
+  }
 
-  for (const [path, ruleDef] of Object.entries(rules)) {
-    const ruleList = Array.isArray(ruleDef) ? ruleDef : [ruleDef as FormItemRule];
-
-    for (const rule of ruleList) {
-      if (!rule) continue;
-
-      if (rule.required === true) {
-        const value = values[path];
-        if (isEmpty(value)) return false;
-      }
-
-      if (rule.validator) {
-        const value = values[path];
-        try {
-          const result = rule.validator(rule, value, () => {}, values, {});
-
-          if (result instanceof Error) return false;
-        } catch {
-          return false;
-        }
-      }
+  if (rule.validator) {
+    try {
+      return !(rule.validator(rule, value, () => {}, values, {}) instanceof Error);
+    } catch {
+      return false;
     }
   }
 
   return true;
+}
+
+function computeIsValidSilently() {
+  const values = (model.value || {}) as Record<string, unknown>;
+
+  return Object.entries(rules).every(([path, ruleDef]) => {
+    const ruleList = Array.isArray(ruleDef) ? ruleDef : [ruleDef as FormItemRule];
+
+    return ruleList.every(rule => !rule || isRuleSatisfied(rule, values[path], values));
+  });
 }
 
 function recomputeSilentValidity() {
@@ -92,12 +89,11 @@ watch(
   { deep: true }
 );
 watch(
-  () => props.rules,
+  () => rules,
   () => recomputeSilentValidity(),
   { deep: true }
 );
 
-// Provide de la référence du formulaire pour les enfants
 provide("naiveFormRef", naiveFormRef);
 
 defineExpose({
@@ -123,7 +119,7 @@ defineExpose({
     :model="model"
     :rules="rules"
     v-bind="$attrs"
-    @validate="handleValidate"
+    @validate="handleValidate($event)"
     @submit.prevent="emit('submit', $event)">
     <slot />
   </n-form>

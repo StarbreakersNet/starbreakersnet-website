@@ -10,17 +10,12 @@ import WidgetGallery from "@/components/widgets/WidgetGallery.vue";
 import WidgetGrid from "@/components/widgets/WidgetGrid.vue";
 import WidgetSettingsModal from "@/components/widgets/WidgetSettingsModal.vue";
 import { WIDGET_COMPONENTS } from "@/components/widgets/registry";
-import {
-  GRID_COLUMNS,
-  MOBILE_COLUMNS,
-  mobileLayout,
-  WIDGET_DEFINITIONS,
-  WIDGET_SIZES,
-} from "@/models/widgets";
+import { GRID_COLUMNS, MOBILE_COLUMNS, WIDGET_SIZES } from "@/models/WidgetSize";
+import { mobileLayout } from "@/utils/widgetGrid";
+import { WIDGET_DEFINITIONS } from "@/models/WidgetDefinition";
 import { useWidgetsStore } from "@/stores/widgets";
-import type { FitState } from "@/composables/useFitContent";
 import type { WallpaperAppearance } from "@/types/Wallpaper";
-import type { GridItem, GridPosition, WidgetSize, WidgetType } from "@/types/Widget";
+import type { GridItem, GridPosition, NewWidget } from "@/types/Widget";
 
 // Buroh, page d'accueil à widgets à la manière du bureau de macOS : grille libre où l'on place
 // et règle ses widgets.
@@ -48,7 +43,7 @@ const configuredId = ref<string | null>(null);
 const mobileQuery = window.matchMedia(MOBILE_QUERY);
 const isMobile = ref(mobileQuery.matches);
 
-function onMobileChange(event: MediaQueryListEvent) {
+function handleMobileChange(event: MediaQueryListEvent) {
   isMobile.value = event.matches;
 }
 
@@ -66,13 +61,13 @@ const gridItems = computed<GridItem[]>(() => {
 
 const widgetsById = computed(() => new Map(store.widgets.map(widget => [widget.id, widget])));
 
-function onMoved(positions: GridPosition[]) {
+function handleMoved(positions: GridPosition[]) {
   store.move(positions, isMobile.value ? "mobile" : "desktop");
 }
 
 // --- Édition
 
-// Sur mobile, la galerie couvrirait les widgets à déplacer : elle s'ouvre avec le bouton « + »,
+// Sur mobile, la galerie couvrirait les widgets à déplacer : elle s'ouvre avec le bouton "+",
 // comme sur iPhone, et se referme après un ajout
 const galleryOpen = ref(false);
 
@@ -82,7 +77,7 @@ const galleryLabel = computed(() =>
   galleryOpen.value ? "Fermer la galerie" : "Ajouter un widget"
 );
 
-function addWidget(type: WidgetType, size: WidgetSize) {
+function addWidget({ type, size }: NewWidget) {
   galleryOpen.value = false;
 
   const widget = store.add(type, size);
@@ -145,7 +140,7 @@ function sleep() {
 
 // Seul le focus au clavier garde la barre affichée : après un clic, ou quand une fenêtre rend le
 // focus à son bouton en se fermant, elle s'efface comme d'habitude
-function onToolbarFocusIn(event: FocusEvent) {
+function handleToolbarFocusIn(event: FocusEvent) {
   toolbarFocused.value = (event.target as Element).matches(":focus-visible");
 }
 
@@ -158,7 +153,7 @@ const menuOptions = computed(() => [
   { key: "wallpaper", label: "Changer le fond d'écran…" },
 ]);
 
-function onContextMenu(event: MouseEvent) {
+function handleContextMenu(event: MouseEvent) {
   // Menu du navigateur conservé sur les liens et les champs de saisie
   const onField = (event.target as Element).closest("a, input, textarea, [contenteditable]");
 
@@ -168,7 +163,7 @@ function onContextMenu(event: MouseEvent) {
   }
 }
 
-function onMenuSelect(key: string) {
+function handleMenuSelect(key: string) {
   menu.value.show = false;
 
   if (key === "edit") {
@@ -191,7 +186,7 @@ const toolbarVisible = computed(
 );
 
 onMounted(() => {
-  mobileQuery.addEventListener("change", onMobileChange);
+  mobileQuery.addEventListener("change", handleMobileChange);
 
   wake();
   ACTIVITY_EVENTS.forEach(event => window.addEventListener(event, wake, { passive: true }));
@@ -199,7 +194,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  mobileQuery.removeEventListener("change", onMobileChange);
+  mobileQuery.removeEventListener("change", handleMobileChange);
 
   clearTimeout(idleTimer);
   ACTIVITY_EVENTS.forEach(event => window.removeEventListener(event, wake));
@@ -213,7 +208,7 @@ onBeforeUnmount(() => {
     :data-wallpaper="appearance.kind"
     :style="burohStyle"
     class="buroh"
-    @contextmenu="onContextMenu">
+    @contextmenu="handleContextMenu($event)">
     <buroh-wallpaper @appearance="appearance = $event" />
     <widget-grid
       :key="isMobile ? 'mobile' : 'desktop'"
@@ -224,7 +219,7 @@ onBeforeUnmount(() => {
       :gap="isMobile ? MOBILE_GAP : GAP"
       :items="gridItems"
       class="grid"
-      @moved="onMoved">
+      @moved="handleMoved($event)">
       <template #item="{ id }">
         <widget-frame
           v-if="widgetsById.get(id)"
@@ -236,18 +231,18 @@ onBeforeUnmount(() => {
             :is="WIDGET_COMPONENTS[widgetsById.get(id)!.type].view"
             :settings="widgetsById.get(id)!.settings"
             :size="widgetsById.get(id)!.size"
-            @fit="(state: FitState) => store.growIfCramped(id, state)" />
+            @fit="store.growIfCramped(id, $event)" />
         </widget-frame>
       </template>
     </widget-grid>
     <div class="dock">
       <transition name="slide-up">
-        <widget-gallery v-if="showGallery" @add="addWidget" />
+        <widget-gallery v-if="showGallery" @add="addWidget($event)" />
       </transition>
       <div
         :class="{ hidden: !toolbarVisible }"
         class="toolbar liquid-glass liquid-glass--overlay"
-        @focusin="onToolbarFocusIn"
+        @focusin="handleToolbarFocusIn($event)"
         @focusout="toolbarFocused = false"
         @pointerenter="toolbarHovered = true"
         @pointerleave="toolbarHovered = false">
@@ -282,7 +277,7 @@ onBeforeUnmount(() => {
           </template>
           Remplacer vos widgets par ceux d'origine ?
         </h-popconfirm>
-        <h-button :type="editing ? 'primary' : 'default'" glass @click="toggleEditing">
+        <h-button :type="editing ? 'primary' : 'default'" glass @click="toggleEditing()">
           <template #icon>
             <font-awesome-icon :icon="editing ? 'check' : 'pen'" />
           </template>
@@ -290,7 +285,7 @@ onBeforeUnmount(() => {
         </h-button>
       </div>
     </div>
-    <widget-settings-modal :widget-id="configuredId" @close="closeSettings" />
+    <widget-settings-modal :widget-id="configuredId" @close="closeSettings()" />
     <wallpaper-modal v-model:show="showWallpaper" />
     <h-dropdown
       :options="menuOptions"
@@ -300,7 +295,7 @@ onBeforeUnmount(() => {
       placement="bottom-start"
       trigger="manual"
       @clickoutside="menu.show = false"
-      @select="onMenuSelect" />
+      @select="handleMenuSelect($event)" />
   </main>
 </template>
 
@@ -390,7 +385,7 @@ onBeforeUnmount(() => {
     pointer-events: none;
   }
 
-  // Petit écran : icônes seules (libellés gardés pour les lecteurs d'écran), sauf « Terminé »
+  // Petit écran : icônes seules (libellés gardés pour les lecteurs d'écran), sauf "Terminé"
   @media (max-width: 720px) {
     .h-button--glass:not(.n-button--primary-type) {
       width: 2.25rem;

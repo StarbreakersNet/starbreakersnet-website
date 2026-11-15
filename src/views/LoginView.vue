@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { reactive, ref, useTemplateRef } from "vue";
+import { useLoader } from "@/composables/useLoader";
 import type { FormRules } from "naive-ui";
 import RegisterView from "@/views/RegisterView.vue";
 import ForgotPasswordView from "@/views/ForgotPasswordView.vue";
@@ -15,9 +16,12 @@ import type { HFormInst } from "@/types/components/c/hForm";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { emailRule } from "@/utils/validation";
-import { renderNaiveFontAwesomeIcon } from "@/composables/fontAwesomeUtils";
+import { renderNaiveFontAwesomeIcon } from "@/utils/naiveIcons";
+import HA from "@/components/c/hA.vue";
 
-const emit = defineEmits(["connected"]);
+const emit = defineEmits<{
+  connected: [];
+}>();
 const auth = useAuthStore();
 const user = useUserStore();
 
@@ -32,43 +36,42 @@ const rules: FormRules = {
   email: emailRule,
   password: { required: true, trigger: ["blur"], message: "Saisissez votre mot de passe" },
 };
-const loading = ref(false);
-const resending = ref(false);
+const loggingIn = useLoader();
+const resending = useLoader();
 // Email du compte non confirmé, pour proposer le renvoi du lien
 const unconfirmedEmail = ref<string | null>(null);
 const showRegisterModal = ref(false);
 const showForgotPasswordModal = ref(false);
 
+async function isFormValid() {
+  try {
+    await formRef.value?.validate();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function handleSubmit() {
   // Pas de bouton désactivé : les champs remplis par le gestionnaire de mots de passe ne sont
   // visibles du script qu'après une interaction, on valide donc à l'envoi
-  try {
-    await formRef.value?.validate();
-  } catch {
-    return;
-  }
+  if (await isFormValid()) {
+    const result = await loggingIn.run(() => auth.login(form.email, form.password));
 
-  loading.value = true;
-  const result = await auth.login(form.email, form.password);
-  loading.value = false;
+    unconfirmedEmail.value = result === "unconfirmed" ? form.email : null;
 
-  unconfirmedEmail.value = result === "unconfirmed" ? form.email : null;
-
-  if (result === "ok") {
-    emit("connected");
+    if (result === "ok") {
+      emit("connected");
+    }
   }
 }
 
 async function handleResend() {
-  if (!unconfirmedEmail.value) {
-    return;
-  }
+  const email = unconfirmedEmail.value;
 
-  resending.value = true;
-  if (await auth.resendConfirmation(unconfirmedEmail.value)) {
+  if (email && (await resending.run(() => auth.resendConfirmation(email)))) {
     unconfirmedEmail.value = null;
   }
-  resending.value = false;
 }
 
 function handleRegistered() {
@@ -102,18 +105,18 @@ function handleRegistered() {
         <h-alert v-if="unconfirmedEmail" type="warning">
           <h-flex vertical>
             <span>Votre adresse n'est pas encore confirmée. Lien perdu ou expiré ?</span>
-            <h-button :loading="resending" size="small" @click="handleResend()">
+            <h-button :loading="resending.loading" size="small" @click="handleResend()">
               Renvoyer le mail de confirmation
             </h-button>
           </h-flex>
         </h-alert>
-        <h-button :loading="loading" attr-type="submit">Se connecter</h-button>
+        <h-button :loading="loggingIn.loading" attr-type="submit">Se connecter</h-button>
         <h-text>
-          <n-a @click="showForgotPasswordModal = true">Mot de passe oublié ?</n-a>
+          <h-a @click="showForgotPasswordModal = true">Mot de passe oublié ?</h-a>
         </h-text>
         <h-text>
           Vous n'avez pas de compte ?
-          <n-a @click="showRegisterModal = true">S'inscrire</n-a>
+          <h-a @click="showRegisterModal = true">S'inscrire</h-a>
         </h-text>
       </h-flex>
     </h-form>

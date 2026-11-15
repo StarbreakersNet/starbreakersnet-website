@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { supabase } from "@/utils/supabaseClient";
 import { writeLocalTheme } from "@/utils/localTheme";
-import { useMessage } from "@/composables/useMessage";
+import { useAppMessage } from "@/composables/useAppMessage";
 import { useUserStore } from "@/stores/user";
 import type { ThemeType } from "@/types/User";
 
@@ -9,7 +9,7 @@ import type { ThemeType } from "@/types/User";
 // la copie locale sert aux visiteurs et au premier affichage.
 export const useSettingsStore = defineStore("settings", () => {
   const user = useUserStore();
-  const message = useMessage();
+  const message = useAppMessage();
 
   function applyTheme(theme: ThemeType) {
     user.settings.theme = theme;
@@ -34,14 +34,15 @@ export const useSettingsStore = defineStore("settings", () => {
 
     const userId = user.infos.me?.id;
 
-    if (!userId) {
-      return;
-    }
+    if (userId) {
+      const { error } = await supabase
+        .from("user_settings")
+        .update({ theme })
+        .eq("user_id", userId);
 
-    const { error } = await supabase.from("user_settings").update({ theme }).eq("user_id", userId);
-
-    if (error) {
-      message.error("Impossible d'enregistrer le thème sur votre compte");
+      if (error) {
+        message.error("Impossible d'enregistrer le thème sur votre compte");
+      }
     }
   }
 

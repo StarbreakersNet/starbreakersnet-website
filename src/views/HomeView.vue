@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { type CarouselItem, carouselListItems } from "@/models/CarouselItem";
-import { particlesOptions } from "@/models/ParticlesConfig";
+import { type CarouselItem, CAROUSEL_ITEMS } from "@/models/CarouselItem";
+import { PARTICLES_OPTIONS } from "@/models/ParticlesConfig";
+import HCarousel from "@/components/c/hCarousel.vue";
+import HButton from "@/components/c/hButton.vue";
+import HFlex from "@/components/c/hFlex.vue";
+import HText from "@/components/c/hText.vue";
+import HCard from "@/components/c/hCard.vue";
+import HH1 from "@/components/c/hH1.vue";
 
-const carouselItemsStyle = carouselListItems.map(item => {
+const carouselItemsStyle = CAROUSEL_ITEMS.map(item => {
   const align = item.style.align;
   const delay = calculateDelays(item);
 
@@ -27,10 +33,10 @@ function calculateDelays(item: CarouselItem) {
 
 <template>
   <main class="fullscreen-container">
-    <vue-particles id="tsparticles" :options="particlesOptions" />
-    <n-carousel :interval="15000" autoplay dot-placement="top" dot-type="line" draggable keyboard>
-      <div v-for="(item, itemIndex) in carouselListItems" :key="item.title.toLowerCase()">
-        <n-flex :align="item.style.align" class="content-container" size="large" vertical>
+    <vue-particles id="tsparticles" :options="PARTICLES_OPTIONS" />
+    <h-carousel :interval="15000" autoplay dot-placement="top" dot-type="line" draggable keyboard>
+      <div v-for="(item, itemIndex) in CAROUSEL_ITEMS" :key="item.title.toLowerCase()">
+        <h-flex wrap :align="item.style.align" class="content-container" size="large" vertical>
           <div
             v-if="item.thumbnail"
             :class="{ absolute: item.style.align !== 'center' }"
@@ -41,34 +47,36 @@ function calculateDelays(item: CarouselItem) {
           <div
             :style="{ transitionDelay: carouselItemsStyle[itemIndex]?.delay[1] }"
             class="title-container">
-            <n-h1>
+            <h-h1>
               {{ item.title }}
-            </n-h1>
+            </h-h1>
           </div>
-          <n-card
+          <h-card
             :bordered="false"
             :style="{ transitionDelay: carouselItemsStyle[itemIndex]?.delay[2] }"
             class="description-container card-blurred">
-            <n-text>{{ item.description }}</n-text>
-          </n-card>
-          <n-flex
+            <h-text>{{ item.description }}</h-text>
+          </h-card>
+          <h-flex
+            wrap
+            align="stretch"
             :style="{ transitionDelay: carouselItemsStyle[itemIndex]?.delay[3] }"
             class="actions-container">
             <template v-for="action in item.actions" :key="action.label">
-              <n-button
+              <h-button
                 :href="action.externalLink"
                 :tag="action.externalLink ? 'a' : 'button'"
                 :type="action.type"
                 class="btn-action"
                 target="_blank">
-                <n-flex size="small">
+                <h-flex wrap align="stretch" size="small">
                   <font-awesome-icon :icon="action.icon" />
                   {{ action.label }}
-                </n-flex>
-              </n-button>
+                </h-flex>
+              </h-button>
             </template>
-          </n-flex>
-        </n-flex>
+          </h-flex>
+        </h-flex>
         <div class="background-container">
           <video
             v-if="item.background?.videoSrc"
@@ -83,7 +91,7 @@ function calculateDelays(item: CarouselItem) {
             :src="item.background?.imageSrc" />
         </div>
       </div>
-    </n-carousel>
+    </h-carousel>
   </main>
 </template>
 

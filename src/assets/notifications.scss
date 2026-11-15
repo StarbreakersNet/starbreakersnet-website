@@ -9,16 +9,7 @@
       --n-icon-color: var(--n-color) !important;
       --text-color: var(--n-text-color);
     }
-    &:has(.notification-primary) {
-      --n-icon-color: var(--primary-light) !important;
-    }
-    &:has(.notification-accent) {
-      --background-color: var(--accent);
-      --text-color: white;
-    }
     &:has(.notification-default),
-    &:has(.notification-primary),
-    &:has(.notification-accent),
     &:has(.notification-info),
     &:has(.notification-success),
     &:has(.notification-warning),

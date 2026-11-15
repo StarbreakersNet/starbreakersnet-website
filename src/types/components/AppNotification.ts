@@ -1,20 +1,6 @@
 import type { VNodeChild } from "vue";
 
-export type NotificationType =
-  | "info"
-  | "success"
-  | "warning"
-  | "error"
-  | "primary"
-  | "accent"
-  | undefined;
-export type NaiveNotificationType =
-  | "info"
-  | "success"
-  | "warning"
-  | "error"
-  | "default"
-  | undefined;
+export type NotificationType = "info" | "success" | "warning" | "error";
 
 export interface NotificationOptions {
   title: string;
@@ -28,13 +14,4 @@ export interface NotificationOptions {
   clickIcon?: string;
   avatar?: () => VNodeChild;
   action?: () => VNodeChild;
-  style?: string;
-}
-
-export interface EventSourceDataType {
-  type: "message" | "conversation";
-  id: string;
-  title: string;
-  from: string;
-  conversationType: string;
 }
