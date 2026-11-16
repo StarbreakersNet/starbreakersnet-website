@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 import _ from "lodash";
 import { supabase } from "@/utils/supabaseClient";
 import { useAppMessage } from "@/composables/useAppMessage";
@@ -10,9 +10,14 @@ import { WIDGET_DEFINITIONS } from "@/models/WidgetDefinition";
 import { WIDGET_SIZES } from "@/models/WidgetSize";
 import { DEFAULT_WALLPAPER } from "@/models/WallpaperPreset";
 import { normalizeUnsplashKey, normalizeWallpaper } from "@/utils/wallpaper";
-import { deleteWallpaperFile } from "@/utils/wallpaperFile";
+import {
+  deleteWallpaperFile,
+  loadWallpaperFile,
+  saveWallpaperFile,
+  WALLPAPER_REMOTE_MAX_SIZE,
+} from "@/utils/wallpaperFile";
 import type { FitState } from "@/composables/useFitContent";
-import type { Wallpaper } from "@/types/Wallpaper";
+import type { FileWallpaper, MediaKind, Wallpaper } from "@/types/Wallpaper";
 import type {
   GridPosition,
   Widget,
@@ -22,6 +27,8 @@ import type {
 } from "@/types/Widget";
 
 const STORAGE_KEY = "widgets";
+
+const WALLPAPER_BUCKET = "wallpapers";
 
 // Délai avant d'enregistrer sur le compte : un déplacement ou une saisie n'envoie qu'une requête
 const REMOTE_SAVE_DELAY = 800;
@@ -126,6 +133,8 @@ export const useWidgetsStore = defineStore("widgets", () => {
         unsplashKey.value = normalizeUnsplashKey(data.widgets?.unsplashKey);
         writeLocal(remote, wallpaper.value, unsplashKey.value);
       }
+
+      syncWallpaperFile();
     }
   }
 
@@ -138,14 +147,171 @@ export const useWidgetsStore = defineStore("widgets", () => {
 
   // --- Fond d'écran
 
-  // Un fichier de l'ordinateur remplacé est supprimé du navigateur
-  function setWallpaper(next: Wallpaper) {
-    if (wallpaper.value.source === "file" && next.source !== "file") {
+  // Fichier de l'ordinateur affiché en fond, relu du navigateur ou récupéré du compte
+  const wallpaperFile = shallowRef<Blob | null>(null);
+  let wallpaperFileAddedAt: string | null = null;
+  let syncCount = 0;
+  let uploadingAddedAt: string | null = null;
+
+  // Le chemin d'un autre compte (Buroh gardé dans le navigateur après un changement de compte) ne
+  // compte pas : le fichier est renvoyé sur celui-ci
+  function remotePath(current: FileWallpaper) {
+    return accountId && current.path?.startsWith(`${accountId}/`) ? current.path : null;
+  }
+
+  function isCurrentFile(current: FileWallpaper) {
+    return wallpaper.value.source === "file" && wallpaper.value.addedAt === current.addedAt;
+  }
+
+  async function removeRemoteFile(path: string) {
+    const { error } = await supabase.storage.from(WALLPAPER_BUCKET).remove([path]);
+
+    if (error) {
+      console.warn("Suppression du fond d'écran du compte", error);
+    }
+  }
+
+  async function downloadWallpaperFile(current: FileWallpaper, path: string) {
+    const { data, error } = await supabase.storage.from(WALLPAPER_BUCKET).download(path);
+
+    if (error) {
+      console.warn("Récupération du fond d'écran du compte", error);
+    } else {
+      await saveWallpaperFile(data, current.addedAt).catch(() => undefined);
+    }
+
+    return data;
+  }
+
+  async function uploadWallpaperFile(file: Blob, current: FileWallpaper, userId: string) {
+    const path = `${userId}/${createId()}`;
+
+    uploadingAddedAt = current.addedAt;
+
+    const { error } = await supabase.storage
+      .from(WALLPAPER_BUCKET)
+      .upload(path, file, { contentType: file.type });
+
+    uploadingAddedAt = null;
+
+    if (error) {
+      console.warn("Envoi du fond d'écran sur le compte", error);
+    } else if (accountId === userId && isCurrentFile(current)) {
+      wallpaper.value = { ...current, path };
+      persist();
+      saveRemoteLater.flush();
+    } else {
+      removeRemoteFile(path);
+    }
+
+    return !error;
+  }
+
+  // Fichier du navigateur pas encore sur le compte : envoyé. notify : seulement quand le membre
+  // vient de le choisir, pas à chaque chargement de la page
+  async function uploadIfMissing(file: Blob, current: FileWallpaper, notify: boolean) {
+    const userId = accountId;
+    const missing = userId !== null && !remotePath(current);
+    const tooLarge = file.size > WALLPAPER_REMOTE_MAX_SIZE;
+
+    if (missing && tooLarge && notify) {
+      message.info(
+        "Fichier de plus de 50 Mo : il reste dans ce navigateur, sans être enregistré sur votre compte"
+      );
+    }
+
+    if (missing && !tooLarge && uploadingAddedAt !== current.addedAt) {
+      const uploaded = await uploadWallpaperFile(file, current, userId);
+
+      if (!uploaded && notify) {
+        message.warning(
+          "Impossible d'enregistrer ce fond d'écran sur votre compte : il reste dans ce navigateur"
+        );
+      }
+    }
+  }
+
+  async function readWallpaperFile(current: FileWallpaper) {
+    const path = remotePath(current);
+    let file =
+      wallpaperFileAddedAt === current.addedAt
+        ? wallpaperFile.value
+        : await loadWallpaperFile(current.addedAt, current.name);
+
+    if (!file && path) {
+      file = await downloadWallpaperFile(current, path);
+    }
+
+    return file;
+  }
+
+  async function syncWallpaperFile(notify = false) {
+    const current = wallpaper.value;
+    const count = ++syncCount;
+    const file = current.source === "file" ? await readWallpaperFile(current) : null;
+
+    // Fond changé pendant la lecture : la synchronisation suivante décide
+    if (count === syncCount) {
+      wallpaperFile.value = file;
+      wallpaperFileAddedAt = current.source === "file" ? current.addedAt : null;
+
+      if (file && current.source === "file") {
+        await uploadIfMissing(file, current, notify);
+      }
+    }
+  }
+
+  // Un fichier de l'ordinateur remplacé est supprimé du navigateur et du compte
+  function applyWallpaper(next: Wallpaper) {
+    const previous = wallpaper.value;
+    const previousPath = previous.source === "file" ? remotePath(previous) : null;
+
+    if (previous.source === "file" && next.source !== "file") {
       deleteWallpaperFile();
+    }
+
+    if (previousPath && !(next.source === "file" && next.path === previousPath)) {
+      removeRemoteFile(previousPath);
     }
 
     wallpaper.value = next;
     persist();
+  }
+
+  function setWallpaper(next: Wallpaper) {
+    applyWallpaper(next);
+    syncWallpaperFile();
+  }
+
+  async function setWallpaperFile(file: File, kind: MediaKind) {
+    const addedAt = new Date().toISOString();
+    let saved = true;
+
+    try {
+      await saveWallpaperFile(file, addedAt);
+    } catch {
+      saved = false;
+      message.error("Impossible d'enregistrer ce fichier dans le navigateur");
+    }
+
+    if (saved) {
+      applyWallpaper({ source: "file", kind, name: file.name, addedAt, path: null });
+      await syncWallpaperFile(true);
+    }
+
+    return saved;
+  }
+
+  // Avant la suppression du compte : ses fichiers ne partent pas avec lui
+  async function removeAccountFiles() {
+    if (accountId) {
+      const bucket = supabase.storage.from(WALLPAPER_BUCKET);
+      const { data } = await bucket.list(accountId);
+
+      if (data?.length) {
+        await bucket.remove(data.map(file => `${accountId}/${file.name}`));
+      }
+    }
   }
 
   function setUnsplashKey(key: string) {
@@ -266,10 +432,15 @@ export const useWidgetsStore = defineStore("widgets", () => {
     persist();
   }
 
+  syncWallpaperFile();
+
   return {
     widgets,
     wallpaper,
+    wallpaperFile,
     setWallpaper,
+    setWallpaperFile,
+    removeAccountFiles,
     unsplashKey,
     setUnsplashKey,
     load,

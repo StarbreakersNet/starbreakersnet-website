@@ -186,8 +186,10 @@ function handleAccountClick() {
                     Aucun cookie publicitaire ni de mesure d'audience. Votre navigateur garde
                     seulement votre session, votre choix de thème et les widgets de votre page
                     Buroh, nécessaires au fonctionnement du site : ils ne demandent donc pas de
-                    consentement. Le fond d'écran de Buroh y est gardé aussi : une image ou une
-                    vidéo choisie sur votre ordinateur n'est jamais envoyée au site.
+                    consentement. Le fond d'écran de Buroh y est gardé aussi. Une image ou une vidéo
+                    choisie sur votre ordinateur n'est envoyée au site que si vous êtes connecté :
+                    elle est alors enregistrée sur votre compte, lisible par vous seul, et supprimée
+                    quand vous changez de fond d'écran ou supprimez votre compte.
                   </h-text>
                   <h-text depth="3">
                     Les pages Discord et Le Zap affichent des contenus de services tiers, qui

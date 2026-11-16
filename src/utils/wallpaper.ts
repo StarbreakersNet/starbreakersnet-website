@@ -39,6 +39,9 @@ export function normalizeUnsplashKey(raw: unknown) {
   return /^[A-Za-z0-9_-]{20,100}$/.test(key) ? key : "";
 }
 
+// Identifiant du compte, puis identifiant du fichier
+const WALLPAPER_PATH = /^[0-9a-f-]{36}\/[0-9a-f-]{36}$/;
+
 const PAGE_LOADED_AT = Date.now();
 
 // Photo ou vidéo à renouveler selon le rythme choisi, d'après la date où elle a été choisie
@@ -133,6 +136,10 @@ export function normalizeWallpaper(raw: unknown): Wallpaper {
         kind,
         name: typeof wallpaper.name === "string" ? wallpaper.name.slice(0, 120) : "",
         addedAt: typeof wallpaper.addedAt === "string" ? wallpaper.addedAt : "",
+        path:
+          typeof wallpaper.path === "string" && WALLPAPER_PATH.test(wallpaper.path)
+            ? wallpaper.path
+            : null,
       };
     default:
       return DEFAULT_WALLPAPER;

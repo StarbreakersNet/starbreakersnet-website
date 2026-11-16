@@ -325,6 +325,8 @@ export const useAuthStore = defineStore("auth", () => {
       return false;
     }
 
+    await widgets.removeAccountFiles();
+
     const { error } = await supabase.rpc("delete_own_account");
 
     if (error) {

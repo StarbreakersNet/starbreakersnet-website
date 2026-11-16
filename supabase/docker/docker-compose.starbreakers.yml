@@ -105,8 +105,11 @@ services:
         ARG SUPABASE_CLI_VERSION
         RUN npm install -g supabase@$${SUPABASE_CLI_VERSION} --silent
     restart: "no"
+    # storage : ses propres migrations créent les colonnes de storage.buckets dont les nôtres se servent
     depends_on:
       db:
+        condition: service_healthy
+      storage:
         condition: service_healthy
     volumes:
       - ../config.toml:/project/supabase/config.toml:ro,z
