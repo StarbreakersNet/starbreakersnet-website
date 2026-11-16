@@ -3,7 +3,6 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import AnimatedWallpaper from "@/components/widgets/AnimatedWallpaper.vue";
 import { createBackdrop } from "@/utils/backdrop";
 import { fetchRandomPhoto, withReferral } from "@/utils/unsplash";
-import { loadWallpaperFile } from "@/utils/wallpaperFile";
 import { isStale, pickVideo, presetById, videoById } from "@/utils/wallpaper";
 import { WALLPAPER_PRESETS } from "@/models/WallpaperPreset";
 import { useAppMessage } from "@/composables/useAppMessage";
@@ -92,24 +91,12 @@ const videoCredit = computed(() => {
   return current.source === "videos" ? (videoById(current.video?.id)?.credit ?? null) : null;
 });
 
-// Fichier de l'ordinateur, relu depuis le navigateur à chaque nouveau fichier choisi
-async function readFile(addedAt: string | null) {
+function readFile(file: Blob | null) {
   if (fileUrl.value) {
     URL.revokeObjectURL(fileUrl.value);
   }
 
-  fileUrl.value = null;
-
-  if (addedAt !== null) {
-    const file = await loadWallpaperFile();
-
-    if (file) {
-      fileUrl.value = URL.createObjectURL(file);
-    } else {
-      // Fichier absent de ce navigateur (autre appareil) : dégradé par défaut
-      emit("appearance", GRADIENT_APPEARANCE);
-    }
-  }
+  fileUrl.value = file ? URL.createObjectURL(file) : null;
 }
 
 function handleMediaChange() {
@@ -205,9 +192,7 @@ const rotationKey = computed(() => {
   return key;
 });
 
-watch(() => (wallpaper.value.source === "file" ? wallpaper.value.addedAt : null), readFile, {
-  immediate: true,
-});
+watch(() => store.wallpaperFile, readFile, { immediate: true });
 
 watch(() => media.value?.src, handleMediaChange);
 

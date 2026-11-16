@@ -1,5 +1,5 @@
-// Fond d'écran choisi sur l'ordinateur : gardé dans le navigateur (IndexedDB), jamais envoyé au
-// serveur. Sur un autre appareil, Buroh retombe sur le fond par défaut.
+// Fond d'écran choisi sur l'ordinateur : gardé dans le navigateur (IndexedDB). Pour un membre
+// connecté, stores/widgets.ts l'envoie aussi sur son compte, d'où un autre appareil le récupère.
 
 const DB_NAME = "starbreakers-buroh";
 const STORE = "files";
@@ -7,6 +7,15 @@ const KEY = "wallpaper";
 
 // Fichiers acceptés depuis l'ordinateur
 export const WALLPAPER_FILE_MAX_SIZE = 100 * 1024 * 1024;
+
+// Au-delà, le fichier reste dans le navigateur : limite du bucket (migration wallpapers_bucket) et
+// du service de stockage (FILE_SIZE_LIMIT)
+export const WALLPAPER_REMOTE_MAX_SIZE = 50 * 1024 * 1024;
+
+interface StoredWallpaper {
+  file: Blob;
+  addedAt: string;
+}
 
 function open(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -30,13 +39,23 @@ async function run<T>(mode: IDBTransactionMode, action: (store: IDBObjectStore) 
   }
 }
 
-export function saveWallpaperFile(file: Blob) {
-  return run("readwrite", store => store.put(file, KEY));
+export function saveWallpaperFile(file: Blob, addedAt: string) {
+  return run("readwrite", store => store.put({ file, addedAt } satisfies StoredWallpaper, KEY));
 }
 
-export async function loadWallpaperFile(): Promise<Blob | null> {
+// Fichier du fond décrit par addedAt et name, ou null si ce navigateur en garde un autre (ou aucun)
+export async function loadWallpaperFile(addedAt: string, name: string): Promise<Blob | null> {
   try {
-    return ((await run("readonly", store => store.get(KEY))) as Blob | undefined) ?? null;
+    const stored: unknown = await run("readonly", store => store.get(KEY));
+
+    // Avant l'envoi sur le compte, le fichier était enregistré seul, sans sa date d'ajout
+    if (stored instanceof Blob) {
+      return stored instanceof File && stored.name === name ? stored : null;
+    }
+
+    const { file, addedAt: storedAt } = (stored ?? {}) as Partial<StoredWallpaper>;
+
+    return file instanceof Blob && storedAt === addedAt ? file : null;
   } catch {
     return null;
   }

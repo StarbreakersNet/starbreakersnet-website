@@ -1,6 +1,6 @@
 // Fond d'écran de Buroh : dégradé, photo Unsplash ou vidéo de la sélection du site (avec
-// renouvellement), image ou vidéo par adresse, ou fichier de l'ordinateur (gardé dans le navigateur,
-// voir utils/wallpaperFile.ts)
+// renouvellement), image ou vidéo par adresse, ou fichier de l'ordinateur (gardé dans le navigateur
+// et, pour un membre connecté, sur son compte : voir utils/wallpaperFile.ts)
 
 export type MediaKind = "image" | "video";
 
@@ -61,6 +61,8 @@ export interface FileWallpaper {
   name: string;
   // Date d'ajout (ISO), pour relire le fichier quand on en choisit un autre
   addedAt: string;
+  // Chemin du fichier dans le stockage du compte (null tant qu'il n'y est pas envoyé)
+  path: string | null;
 }
 
 export type Wallpaper =

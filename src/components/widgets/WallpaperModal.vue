@@ -15,7 +15,6 @@ import HTabPane from "@/components/c/hTabPane.vue";
 import HTabs from "@/components/c/hTabs.vue";
 import HText from "@/components/c/hText.vue";
 import { checkUnsplashKey, fetchRandomPhoto, fetchTopics, withReferral } from "@/utils/unsplash";
-import { saveWallpaperFile } from "@/utils/wallpaperFile";
 import { DEFAULT_WALLPAPER, WALLPAPER_PRESETS } from "@/models/WallpaperPreset";
 import {
   guessMediaKind,
@@ -360,22 +359,7 @@ function fileKind(file: File): MediaKind | null {
   return kind;
 }
 
-async function saveFile(file: File, kind: MediaKind) {
-  try {
-    await saving.run(() => saveWallpaperFile(file));
-
-    store.setWallpaper({
-      source: "file",
-      kind,
-      name: file.name,
-      addedAt: new Date().toISOString(),
-    });
-  } catch {
-    message.error("Impossible d'enregistrer ce fichier dans le navigateur");
-  }
-}
-
-function handleFileChosen(event: Event) {
+async function handleFileChosen(event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   const kind = file ? fileKind(file) : null;
@@ -391,7 +375,7 @@ function handleFileChosen(event: Event) {
   }
 
   if (file && kind && file.size <= WALLPAPER_FILE_MAX_SIZE) {
-    saveFile(file, kind);
+    await saving.run(() => store.setWallpaperFile(file, kind));
   }
 }
 
@@ -627,8 +611,9 @@ watch(
           </h-form-item>
         </h-form>
         <h-text depth="3">
-          Un fichier de l'ordinateur reste dans ce navigateur (100 Mo au maximum) : sur un autre
-          appareil, Buroh affiche le fond par défaut. Les vidéos sont lues en boucle, sans son.
+          Un fichier de l'ordinateur est gardé dans ce navigateur (100 Mo au maximum). Si vous êtes
+          connecté, il est aussi enregistré sur votre compte jusqu'à 50 Mo, pour le retrouver sur
+          vos autres appareils. Les vidéos sont lues en boucle, sans son.
         </h-text>
       </h-tab-pane>
     </h-tabs>
